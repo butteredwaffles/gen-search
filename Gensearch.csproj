@@ -8,5 +8,6 @@
   <ItemGroup>
     <PackageReference Include="AngleSharp" Version="*"/>
     <PackageReference Include="sqlite-net-pcl" Version="*"/>
+    <PackageReference Include="SQLiteNetExtensions.Async" Version="*"/>
   </ItemGroup>
 </Project>

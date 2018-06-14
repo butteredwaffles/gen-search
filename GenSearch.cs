@@ -8,8 +8,11 @@ namespace Gensearch
         static void Main(string[] args)
         {
             var itemManager = new Items();
-            itemManager.GetItemList().Wait();
-            Console.WriteLine("Finished!");
+            // itemManager.GetItemList().Wait();
+            // Console.WriteLine("Finished!");
+            var monManager = new Monsters();
+            monManager.GetMonsters().Wait();
+            Console.WriteLine("Done!");
         }
     }
 }
