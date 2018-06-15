@@ -6,8 +6,8 @@
   <ItemGroup>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="AngleSharp" Version="*"/>
-    <PackageReference Include="sqlite-net-pcl" Version="*"/>
     <PackageReference Include="SQLiteNetExtensions.Async" Version="*"/>
+    <PackageReference Include="AngleSharp" Version="*"/>
+    <PackageReference Include="sqlite-net-pcl" Version="1.5.166-beta"/>
   </ItemGroup>
 </Project>

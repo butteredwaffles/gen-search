@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
 using AngleSharp;
 using AngleSharp.Dom.Html;
 using SQLite;
@@ -21,7 +22,7 @@ namespace Gensearch
             await db.CreateTableAsync<Item>();
             List<Task> tasks = new List<Task>();
             foreach (IHtmlAnchorElement item in rows) {
-                var it = await db.QueryAsync<Item>("select * from Item where name = ?", item.TextContent);
+                var it = await db.QueryAsync<Item>("select * from Items where name = ?", item.TextContent);
                 if (it.Count == 0) {
                     tasks.Add(UpdateItemDatabase(GetItem(item.Href)));
                 }
@@ -34,7 +35,7 @@ namespace Gensearch
 
         public async Task<string[]> GetItem(string address) {
             var page = await BrowsingContext.New(Configuration.Default.WithDefaultLoader()).OpenAsync(address);
-            string name = page.QuerySelector("h3[itemprop=\"name\"]").TextContent;
+            string name = HttpUtility.UrlDecode(page.QuerySelector("h3[itemprop=\"name\"]").TextContent);
             var itemIntData = page.QuerySelectorAll("div.lead");
             string combination;
             var combinationDiv = page.QuerySelector(".col-lg-12 div");
@@ -50,7 +51,7 @@ namespace Gensearch
             else {
                 combination = "None";
             }
-            Console.WriteLine(String.Format("Retrieved item {0}.", name));
+            Console.WriteLine("Retrieved item " + name + ".");
             return new string[6] {
                 name, // name
                 page.QuerySelector("p[itemprop=\"description\"]").TextContent, // description
