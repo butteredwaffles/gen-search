@@ -22,7 +22,7 @@ namespace Gensearch
             await db.CreateTableAsync<Item>();
             List<Task> tasks = new List<Task>();
             foreach (IHtmlAnchorElement item in rows) {
-                var it = await db.QueryAsync<Item>("select * from Items where name = ?", item.TextContent);
+                var it = await db.QueryAsync<Item>("select * from Items where item_name = ?", item.TextContent);
                 if (it.Count == 0) {
                     tasks.Add(UpdateItemDatabase(GetItem(item.Href)));
                 }
@@ -34,32 +34,41 @@ namespace Gensearch
         }
 
         public async Task<string[]> GetItem(string address) {
-            var page = await BrowsingContext.New(Configuration.Default.WithDefaultLoader()).OpenAsync(address);
-            string name = HttpUtility.UrlDecode(page.QuerySelector("h3[itemprop=\"name\"]").TextContent);
-            var itemIntData = page.QuerySelectorAll("div.lead");
-            string combination;
-            var combinationDiv = page.QuerySelector(".col-lg-12 div");
-            if (combinationDiv != null) {
-                var comboitems = combinationDiv.QuerySelectorAll("a").OfType<IHtmlAnchorElement>().ToArray();
-                try {
-                    combination = comboitems[0].TextContent + " + " + comboitems[1].TextContent;
+            try {
+                var page = await BrowsingContext.New(Configuration.Default.WithDefaultLoader()).OpenAsync(address);
+                string name = page.QuerySelector("h3[itemprop=\"name\"]").TextContent;
+                var itemIntData = page.QuerySelectorAll("div.lead");
+                string combination;
+                var combinationDiv = page.QuerySelector(".col-lg-12 div");
+                if (combinationDiv != null) {
+                    var comboitems = combinationDiv.QuerySelectorAll("a").OfType<IHtmlAnchorElement>().ToArray();
+                    try {
+                        combination = comboitems[0].TextContent + " + " + comboitems[1].TextContent;
+                    }
+                    catch (IndexOutOfRangeException) {
+                        combination = "None";
+                    }
                 }
-                catch (IndexOutOfRangeException) {
+                else {
                     combination = "None";
                 }
+                Console.WriteLine("Retrieved " + name.Trim() + ".");
+                return new string[6] {
+                    name, // name
+                    page.QuerySelector("p[itemprop=\"description\"]").TextContent, // description
+                    itemIntData[0].TextContent, // rarity
+                    itemIntData[1].TextContent, // stack size
+                    itemIntData[2].TextContent, // sell price
+                    combination
+                }.ToArray();
             }
-            else {
-                combination = "None";
+            catch (Exception ex) {
+                Console.WriteLine(ex.ToString());
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Error on page " + address + ". Retrying.");
+                Console.ResetColor();
+                return await GetItem(address);
             }
-            Console.WriteLine("Retrieved item " + name + ".");
-            return new string[6] {
-                name, // name
-                page.QuerySelector("p[itemprop=\"description\"]").TextContent, // description
-                itemIntData[0].TextContent, // rarity
-                itemIntData[1].TextContent, // stack size
-                itemIntData[2].TextContent, // sell price
-                combination
-            }.ToArray();
         }
 
         public async Task UpdateItemDatabase(Task<string[]> task) {
@@ -68,14 +77,16 @@ namespace Gensearch
             await db.CreateTableAsync<Item>();
             try {
                 await db.InsertAsync (new Item() {
-                    name = data[0],
+                    item_name = data[0],
                     description = data[1],
                     rarity = Convert.ToInt32(data[2]),
                     max_stack = Convert.ToInt32(data[3]),
                     sell_price = Convert.ToInt32(data[4].Remove(data[4].Length - 1)),
                     combinations = data[5]
                 });
+                Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine(String.Format ("Inserted {0} into the item database!", data[0]));
+                Console.ResetColor();
             } catch (SQLiteException) { Console.WriteLine (data[0] + " is already in the item database."); }
         }
 

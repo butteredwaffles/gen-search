@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -9,18 +11,41 @@ namespace Gensearch
     {
         static void Main(string[] args)
         {
-            // var itemManager = new Items();
-            // itemManager.GetItemList().Wait();
-            // Console.WriteLine("\n\nFinished with items!\n\n");
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
-            var monManager = new Monsters();
+            TimeSpan timeSpan = new TimeSpan();
 
-            Console.WriteLine("Starting monster data retrieval.");
-            monManager.GetMonsters().Wait();
+            if (args.Contains("--items") || args.Contains("--all")) {
+                var itemManager = new Items();
+                itemManager.GetItemList().Wait();
+                timeSpan = TimeSpan.FromSeconds(Convert.ToInt32(stopwatch.Elapsed.TotalSeconds));
+                Console.WriteLine("\n\nFinished with items! Took " + timeSpan.ToString("c") + ".\n\n");
+                stopwatch.Reset();
+                stopwatch.Start();
+            }
+            
+            if (args.Contains("--monsters") || args.Contains("--all")) {
+                var monManager = new Monsters();
+                Console.WriteLine("Starting monster data retrieval.");
+                monManager.GetMonsters().Wait();
+                timeSpan = TimeSpan.FromSeconds(Convert.ToInt32(stopwatch.Elapsed.TotalSeconds));
+                Console.WriteLine("Done with monsters! Took " + timeSpan.ToString("c") + ".\n\n");
+                stopwatch.Reset();
+                stopwatch.Start();
+            }
+            
+            if (args.Contains("--quests") || args.Contains("--all")) {
+                var questManager = new Quests();
+                Console.WriteLine("Starting quest data retrieval.");
+                questManager.GetQuests("http://mhgen.kiranico.com/quest/village").Wait();
+                timeSpan = TimeSpan.FromSeconds(Convert.ToInt32(stopwatch.Elapsed.TotalSeconds));
+                Console.WriteLine("Done with quests! Took " + timeSpan.ToString("c") + ".\n\n");
+                stopwatch.Reset();
+                stopwatch.Start();
+            }
+
             stopwatch.Stop();
-            TimeSpan timeSpan = TimeSpan.FromSeconds(Convert.ToInt32(stopwatch.Elapsed.TotalSeconds));
-            Console.WriteLine("Done with monsters! Took " + timeSpan.ToString("c") + ".");
+
         }
     }
 }
