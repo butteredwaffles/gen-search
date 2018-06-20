@@ -26,10 +26,12 @@ namespace Gensearch
                         for (int i = 0; i < rows.Length; i += 2) {
                             var qinfo_tds = rows[i].QuerySelectorAll("td");
                             // Have to get the key and prowler data off of the search page, as it's not available on the individual pages
+                            // Could make unstable value more filtered, but /shrug
                             bool isKey = qinfo_tds[0].FirstElementChild != null;
+                            bool isUnstable = rows[i].TextContent.Contains("UNSTABLE");
                             string address = qinfo_tds[1].FirstElementChild.GetAttribute("href");
                             bool isProwler = qinfo_tds[2].FirstElementChild != null;
-                            tasks.Add(GetQuest(isKey, isProwler, address));
+                            tasks.Add(GetQuest(isKey, isUnstable, isProwler, address));
                         }
                     }
                 }
@@ -40,8 +42,9 @@ namespace Gensearch
                     for (int i = 0; i < rows.Length; i+= 2) {
                         var tds = rows[i].QuerySelectorAll("td");
                         bool isProwler = tds[1].FirstElementChild != null;
+                        bool isUnstable = rows[i].TextContent.Contains("UNSTABLE");
                         string address = tds[0].FirstElementChild.GetAttribute("href");
-                        tasks.Add(GetQuest(false, isProwler, address));
+                        tasks.Add(GetQuest(false, isUnstable, isProwler, address));
                     }
                 }
                 await Task.WhenAll(tasks);
@@ -53,7 +56,7 @@ namespace Gensearch
             }
         }
 
-        public async Task GetQuest(bool isKey, bool isProwler, string address) {
+        public async Task GetQuest(bool isKey, bool isUnstable, bool isProwler, string address) {
             try {
                 var page = await BrowsingContext.New(Configuration.Default.WithDefaultLoader()).OpenAsync(address);
                 var db = new SQLiteAsyncConnection("data/mhgen.db");
@@ -90,6 +93,7 @@ namespace Gensearch
                     quest_type = questType,
                     isKey = isKey ? "yes" : "no",
                     isProwler = isProwler ? "yes" : "no",
+                    isUnstable = isUnstable ? "yes" : "no",
                     timeLimit = timeLimit,
                     contractFee = contractFee,
                     goalid = goal.id,
@@ -131,7 +135,7 @@ namespace Gensearch
                 Console.WriteLine("Error on address " + address + ". Retrying in three seconds.");
                 Console.ResetColor();
                 Thread.Sleep(3000);
-                await GetQuest(isKey, isProwler, address);
+                await GetQuest(isKey, isUnstable, isProwler, address);
             }
         }
 

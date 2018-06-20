@@ -91,6 +91,7 @@ namespace Gensearch
         public string quest_description {get; set;}
         public string isKey {get; set;}
         public string isProwler {get; set;}
+        public string isUnstable {get; set;}
         public int timeLimit {get; set;}
         public int contractFee {get; set;}
 
