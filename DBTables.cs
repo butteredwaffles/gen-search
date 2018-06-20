@@ -17,6 +17,19 @@ namespace Gensearch
         public int max_stack {get; set;}
         public int sell_price {get; set;}
         public string combinations {get; set;}
+
+        public override bool Equals(object obj)
+        {
+            Item other = (Item) obj; 
+            return item_name == other.item_name && description == other.description
+            && rarity == other.rarity && max_stack == other.max_stack 
+            && sell_price == other.sell_price && combinations == other.combinations;
+        }
+
+        public override int GetHashCode()
+        {
+            return id;
+        }
     }
 
     [Table("Monsters")]

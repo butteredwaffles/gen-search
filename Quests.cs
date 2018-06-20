@@ -20,15 +20,28 @@ namespace Gensearch
                 var context = BrowsingContext.New(config);
                 var page = await context.OpenAsync(addr);
                 List<Task> tasks = new List<Task>();
-                foreach (var table in page.QuerySelectorAll(".table")) {
-                    var rows = table.QuerySelectorAll("tr").Skip(1).ToArray();
-                    for (int i = 0; i < rows.Length; i += 2) {
-                        var qinfo_tds = rows[i].QuerySelectorAll("td");
-                        // Have to get the key and prowler data off of the search page, as it's not available on the individual pages
-                        bool isKey = qinfo_tds[0].FirstElementChild != null;
-                        string address = qinfo_tds[1].FirstElementChild.GetAttribute("href");
-                        bool isProwler = qinfo_tds[2].FirstElementChild != null;
-                        tasks.Add(GetQuest(isKey, isProwler, address));
+                if (!addr.Contains("event")) { 
+                    foreach (var table in page.QuerySelectorAll(".table")) {
+                        var rows = table.QuerySelectorAll("tr").Skip(1).ToArray();
+                        for (int i = 0; i < rows.Length; i += 2) {
+                            var qinfo_tds = rows[i].QuerySelectorAll("td");
+                            // Have to get the key and prowler data off of the search page, as it's not available on the individual pages
+                            bool isKey = qinfo_tds[0].FirstElementChild != null;
+                            string address = qinfo_tds[1].FirstElementChild.GetAttribute("href");
+                            bool isProwler = qinfo_tds[2].FirstElementChild != null;
+                            tasks.Add(GetQuest(isKey, isProwler, address));
+                        }
+                    }
+                }
+                else {
+                    // Event quests do not have a 'key' value, so have to handle it slightly differently
+                    // In addition, there is only one table, so no need for an extra loop
+                    var rows = page.QuerySelector(".table").QuerySelectorAll("tr").Skip(1).ToArray();
+                    for (int i = 0; i < rows.Length; i+= 2) {
+                        var tds = rows[i].QuerySelectorAll("td");
+                        bool isProwler = tds[1].FirstElementChild != null;
+                        string address = tds[0].FirstElementChild.GetAttribute("href");
+                        tasks.Add(GetQuest(false, isProwler, address));
                     }
                 }
                 await Task.WhenAll(tasks);

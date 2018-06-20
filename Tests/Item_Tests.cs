@@ -14,15 +14,15 @@ namespace Gensearch.Tests
         [Fact]
         public async Task PlainItemTest() {
             string dash_url = "http://mhgen.kiranico.com/item/mega-dash-juice";
-            string[] dash_values = new string[] {
-                "Mega Dash Juice",
-                "Lets you run without tiring for longer than regular Dash Juice does.",
-                "3",
-                "5",
-                "205z",
-                "Dash Extract + Well-done Steak"
+            Item dash_values = new Item() {
+                item_name = "Mega Dash Juice",
+                description = "Lets you run without tiring for longer than regular Dash Juice does.",
+                rarity = 3,
+                max_stack = 5,
+                sell_price = 205,
+                combinations = "Dash Extract + Well-done Steak"
             };
-            string[] dash_data = await this.itemManager.GetItem(dash_url);
+            Item dash_data = await this.itemManager.GetItem(dash_url);
             Assert.Equal(dash_values, dash_data);    
         }
 
@@ -32,16 +32,16 @@ namespace Gensearch.Tests
         [Fact]
         public async Task SymbolItemTest() {
             string bomb_url = "http://mhgen.kiranico.com/item/barrel-bomb-l+";
-            string[] bomb_values = new string[] {
-                "Barrel Bomb L+",
-                "Upgraded Large Barrel Bomb. Effective against large monsters.",
-                "4",
-                "2",
-                "80z",
-                "Scatterfish + Barrel Bomb L"
+            Item bomb_values = new Item() {
+                item_name = "Barrel Bomb L+",
+                description = "Upgraded Large Barrel Bomb. Effective against large monsters.",
+                rarity = 4,
+                max_stack = 2,
+                sell_price = 80,
+                combinations = "Scatterfish + Barrel Bomb L"
             };
-            string[] bomb_data = await this.itemManager.GetItem(bomb_url);
-            Assert.Equal(bomb_values, bomb_values);
+            Item bomb_data = await this.itemManager.GetItem(bomb_url);
+            Assert.Equal(bomb_values, bomb_data);
         }
 
     }

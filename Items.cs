@@ -33,7 +33,7 @@ namespace Gensearch
             await Task.WhenAll(tasks.ToArray());
         }
 
-        public async Task<string[]> GetItem(string address) {
+        public async Task<Item> GetItem(string address) {
             try {
                 var page = await BrowsingContext.New(Configuration.Default.WithDefaultLoader()).OpenAsync(address);
                 string name = page.QuerySelector("h3[itemprop=\"name\"]").TextContent;
@@ -53,14 +53,14 @@ namespace Gensearch
                     combination = "None";
                 }
                 Console.WriteLine("Retrieved " + name.Trim() + ".");
-                return new string[6] {
-                    name, // name
-                    page.QuerySelector("p[itemprop=\"description\"]").TextContent, // description
-                    itemIntData[0].TextContent, // rarity
-                    itemIntData[1].TextContent, // stack size
-                    itemIntData[2].TextContent, // sell price
-                    combination
-                }.ToArray();
+                return new Item() {
+                    item_name = name, // name
+                    description = page.QuerySelector("p[itemprop=\"description\"]").TextContent,
+                    rarity = Convert.ToInt32(itemIntData[0].TextContent),
+                    max_stack = Convert.ToInt32(itemIntData[1].TextContent),
+                    sell_price = Convert.ToInt32(itemIntData[2].TextContent.Replace("z", "")),
+                    combinations = combination
+                };
             }
             catch (Exception ex) {
                 Console.WriteLine(ex.ToString());
@@ -71,23 +71,16 @@ namespace Gensearch
             }
         }
 
-        public async Task UpdateItemDatabase(Task<string[]> task) {
-            string[] data = await task;
+        public async Task UpdateItemDatabase(Task<Item> task) {
+            Item item = await task;
             var db = new SQLiteAsyncConnection("data/mhgen.db");
             await db.CreateTableAsync<Item>();
             try {
-                await db.InsertAsync (new Item() {
-                    item_name = data[0],
-                    description = data[1],
-                    rarity = Convert.ToInt32(data[2]),
-                    max_stack = Convert.ToInt32(data[3]),
-                    sell_price = Convert.ToInt32(data[4].Remove(data[4].Length - 1)),
-                    combinations = data[5]
-                });
+                await db.InsertAsync(item);
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine(String.Format ("Inserted {0} into the item database!", data[0]));
+                Console.WriteLine(String.Format ("Inserted {0} into the item database!", item.item_name));
                 Console.ResetColor();
-            } catch (SQLiteException) { Console.WriteLine (data[0] + " is already in the item database."); }
+            } catch (SQLiteException) { Console.WriteLine (item.item_name + " is already in the item database."); }
         }
 
     }
