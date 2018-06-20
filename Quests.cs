@@ -15,22 +15,29 @@ namespace Gensearch
     public class Quests
     {
         public async Task GetQuests(string addr) {
-            var config = Configuration.Default.WithDefaultLoader();
-            var context = BrowsingContext.New(config);
-            var page = await context.OpenAsync(addr);
-            List<Task> tasks = new List<Task>();
-            foreach (var table in page.QuerySelectorAll(".table")) {
-                var rows = table.QuerySelectorAll("tr").Skip(1).ToArray();
-                for (int i = 0; i < rows.Length; i += 2) {
-                    var qinfo_tds = rows[i].QuerySelectorAll("td");
-                    // Have to get the key and prowler data off of the search page, as it's not available on the individual pages
-                    bool isKey = qinfo_tds[0].FirstElementChild != null;
-                    string address = qinfo_tds[1].FirstElementChild.GetAttribute("href");
-                    bool isProwler = qinfo_tds[2].FirstElementChild != null;
-                    tasks.Add(GetQuest(isKey, isProwler, address));
+            try {
+                var config = Configuration.Default.WithDefaultLoader();
+                var context = BrowsingContext.New(config);
+                var page = await context.OpenAsync(addr);
+                List<Task> tasks = new List<Task>();
+                foreach (var table in page.QuerySelectorAll(".table")) {
+                    var rows = table.QuerySelectorAll("tr").Skip(1).ToArray();
+                    for (int i = 0; i < rows.Length; i += 2) {
+                        var qinfo_tds = rows[i].QuerySelectorAll("td");
+                        // Have to get the key and prowler data off of the search page, as it's not available on the individual pages
+                        bool isKey = qinfo_tds[0].FirstElementChild != null;
+                        string address = qinfo_tds[1].FirstElementChild.GetAttribute("href");
+                        bool isProwler = qinfo_tds[2].FirstElementChild != null;
+                        tasks.Add(GetQuest(isKey, isProwler, address));
+                    }
                 }
+                await Task.WhenAll(tasks);
             }
-            await Task.WhenAll(tasks);
+            catch {
+                Console.WriteLine("Error getting page. Pausing for sixty seconds.");
+                Thread.Sleep(60000);
+                await GetQuests(addr);
+            }
         }
 
         public async Task GetQuest(bool isKey, bool isProwler, string address) {

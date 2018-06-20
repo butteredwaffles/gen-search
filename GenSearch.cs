@@ -38,8 +38,13 @@ namespace Gensearch
                 var questManager = new Quests();
                 Console.WriteLine("Starting quest data retrieval.");
                 questManager.GetQuests("http://mhgen.kiranico.com/quest/village").Wait();
+                questManager.GetQuests("http://mhgen.kiranico.com/quest/guild").Wait();
+                questManager.GetQuests("http://mhgen.kiranico.com/quest/arena").Wait();
+                questManager.GetQuests("http://mhgen.kiranico.com/quest/training").Wait();
+                questManager.GetQuests("http://mhgen.kiranico.com/quest/special-permit").Wait();
+                questManager.GetQuests("http://mhgen.kiranico.com/event").Wait();
                 timeSpan = TimeSpan.FromSeconds(Convert.ToInt32(stopwatch.Elapsed.TotalSeconds));
-                Console.WriteLine("Done with quests! Took " + timeSpan.ToString("c") + ".\n\n");
+                Console.WriteLine("Done with all quests! Took " + timeSpan.ToString("c") + ".\n\n");
                 stopwatch.Reset();
                 stopwatch.Start();
             }
