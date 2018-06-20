@@ -48,9 +48,7 @@ namespace Gensearch
                 stopwatch.Reset();
                 stopwatch.Start();
             }
-
             stopwatch.Stop();
-
         }
     }
 }
