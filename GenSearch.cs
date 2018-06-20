@@ -15,7 +15,7 @@ namespace Gensearch
             stopwatch.Start();
             TimeSpan timeSpan = new TimeSpan();
 
-            if (args.Contains("--items") || args.Contains("--all")) {
+            if (args.Contains("--items") || args.Contains("--all") || args.Length == 0) {
                 var itemManager = new Items();
                 itemManager.GetItemList().Wait();
                 timeSpan = TimeSpan.FromSeconds(Convert.ToInt32(stopwatch.Elapsed.TotalSeconds));
@@ -24,7 +24,7 @@ namespace Gensearch
                 stopwatch.Start();
             }
             
-            if (args.Contains("--monsters") || args.Contains("--all")) {
+            if (args.Contains("--monsters") || args.Contains("--all") || args.Length == 0) {
                 var monManager = new Monsters();
                 Console.WriteLine("Starting monster data retrieval.");
                 monManager.GetMonsters().Wait();
@@ -34,7 +34,7 @@ namespace Gensearch
                 stopwatch.Start();
             }
             
-            if (args.Contains("--quests") || args.Contains("--all")) {
+            if (args.Contains("--quests") || args.Contains("--all") || args.Length == 0) {
                 var questManager = new Quests();
                 Console.WriteLine("Starting quest data retrieval.");
                 questManager.GetQuests("http://mhgen.kiranico.com/quest/village").Wait();
