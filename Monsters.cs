@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using AngleSharp;
+using AngleSharp.Dom;
 using AngleSharp.Dom.Html;
 using SQLite;
 using SQLiteNetExtensionsAsync.Extensions;
@@ -34,6 +35,7 @@ namespace Gensearch
             try {
                 var page = await BrowsingContext.New(Configuration.Default.WithDefaultLoader()).OpenAsync(address);
                 var db = new SQLiteAsyncConnection("data/mhgen.db");
+                await db.CreateTablesAsync<Monster, MonsterDrop, MonsterPart>();
                 // Adds basic monster info into the database.
                 var intvalues = page.QuerySelectorAll(".lead");
                 Regex decimalsOnly = new Regex(@"[^\d.]"); 
@@ -63,7 +65,6 @@ namespace Gensearch
                     king_size = king_size,
                 };
 
-                await db.CreateTableAsync<Monster>();
                 try {
                     await db.InsertAsync(monster);
                     Console.WriteLine(monster.mon_name + " has been added to the database.");
@@ -72,14 +73,23 @@ namespace Gensearch
                     Console.WriteLine(monster.mon_name + " is already in the database!");
                 }
 
-                var temp = await db.QueryAsync<Monster>("select * from Monsters where mon_name = ?", monster.mon_name);
-                monster = temp[0];
+                await GetParts(page, monster, db);
+                await GetDrops(page, monster, db);
+                
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("Finished with " + monster.mon_name + "!");
+                Console.ResetColor();
+            }
+            catch (Exception) {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Error on address " + address + ". Retrying.");
+                Console.ResetColor();
+                await GetMonster(address);
+            }
+        }
 
-                // Get monster part data
-                await db.CreateTableAsync<MonsterPart>();
-                // Used later in order to make creating drop tables easier
-                List<MonsterPart> parts = new List<MonsterPart>();
-                var part_rows = page.QuerySelectorAll(".col-lg-5 tbody tr");
+        public async Task GetParts(IDocument page, Monster monster, SQLiteAsyncConnection db) {
+            var part_rows = page.QuerySelectorAll(".col-lg-5 tbody tr");
                 foreach (var row in part_rows) {
                     var tds = row.QuerySelectorAll("td");
                     MonsterPart part = new MonsterPart() {
@@ -93,79 +103,68 @@ namespace Gensearch
 
                     try {
                         await db.InsertAsync(part);
-                        parts.Add(part);
                         Console.WriteLine("Inserted " + monster.mon_name + "'s " + part.part_name + " information.");
                     }
                     catch (SQLiteException ex) {
                         Console.WriteLine(ex.ToString());
                     }
                 }
+        }
 
-                // Get drop tables
-                await db.CreateTableAsync<MonsterDrop>();
-                var table_wrappers = page.QuerySelectorAll(".col-lg-6");
-                foreach (var wrapper in table_wrappers) {
-                    string rank = wrapper.QuerySelector("h5").TextContent;
-                    string currentSource = "";
-                    foreach (var tr in wrapper.QuerySelectorAll("tr").Where(t => t.ClassName != "table-active")) {
-                        if (tr.FirstElementChild.ClassName == "vertical-align") {
-                            currentSource = tr.FirstElementChild.TextContent.Trim();
+        public async Task GetDrops(IDocument page, Monster monster, SQLiteAsyncConnection db) {
+            var table_wrappers = page.QuerySelectorAll(".col-lg-6");
+            foreach (var wrapper in table_wrappers) {
+                string rank = wrapper.QuerySelector("h5").TextContent;
+                string currentSource = "";
+                foreach (var tr in wrapper.QuerySelectorAll("tr").Where(t => t.ClassName != "table-active")) {
+                    if (tr.FirstElementChild.ClassName == "vertical-align") {
+                        currentSource = tr.FirstElementChild.TextContent.Trim();
+                    }
+                    else {
+                        var tds = tr.QuerySelectorAll("td");
+                        var drop_item = await db.QueryAsync<Item>("select * from Items where item_name = ?", 
+                        ((IHtmlAnchorElement) tds[1].FirstElementChild).TextContent);
+                        MonsterPart part = new MonsterPart();
+                        // Make sure it's not adding the same carve/capture multiple time.
+                        var tempp = await db.QueryAsync<MonsterPart>("SELECT * FROM MonsterParts WHERE monsterid = ?", monster.id);
+                        foreach (var monpart in tempp) {
+                            if (currentSource == monpart.part_name) {
+                                part = monpart;
+                                break;
+                            }
+                        }
+                        if (part.part_name == null) {
+                            part.monsterid = monster.id;
+                            part.part_name = currentSource;
+                            await db.InsertAsync(part);
+                        }
+                        Regex intsOnly = new Regex(@"[^\d]"); 
+                        var part_wrap = await db.QueryAsync<MonsterPart>("select * from MonsterParts where id = ?", part.id);
+                        string quantity = "";
+                        if (tds[1].TextContent.Any(char.IsDigit)) {
+                            quantity = intsOnly.Replace(tds[1].TextContent.Trim(), "");
                         }
                         else {
-                            var tds = tr.QuerySelectorAll("td");
-                            var drop_item = await db.QueryAsync<Item>("select * from Items where item_name = ?", 
-                            ((IHtmlAnchorElement) tds[1].FirstElementChild).TextContent);
-                            MonsterPart part = new MonsterPart();
-                                // Make sure it's not adding the same carve/capture multiple time.
-                            var tempp = await db.QueryAsync<MonsterPart>("SELECT * FROM MonsterParts WHERE monsterid = ?", monster.id);
-                            foreach (var monpart in tempp) {
-                                if (currentSource == monpart.part_name) {
-                                    part = monpart;
-                                    break;
-                                }
-                            }
-                            if (part.part_name == null) {
-                                part.monsterid = monster.id;
-                                part.part_name = currentSource;
-                                await db.InsertAsync(part);
-                            }
-                            Regex intsOnly = new Regex(@"[^\d]"); 
-                            var part_wrap = await db.QueryAsync<MonsterPart>("select * from MonsterParts where id = ?", part.id);
-                            string quantity = "";
-                            if (tds[1].TextContent.Any(char.IsDigit)) {
-                                quantity = intsOnly.Replace(tds[1].TextContent.Trim(), "");
-                            }
-                            else {
-                                quantity = "1";
-                            }
+                            quantity = "1";
+                        }
 
-                            MonsterDrop drop = new MonsterDrop() {
-                                itemid = drop_item[0].id,
-                                monsterid = monster.id,
-                                sourceid = part_wrap[0].id,
-                                rank = rank,
-                                drop_chance = Convert.ToInt32(intsOnly.Replace(tds[2].TextContent.Trim(), "")),
-                                quantity = Convert.ToInt32(intsOnly.Replace(quantity, ""))
-                            };
-                            try {
-                                await db.InsertAsync(drop);
-                            }
-                            catch (SQLiteException ex) {
-                                if (ex.ToString().Contains("Constraint")) {Console.WriteLine(monster.mon_name + "'s " + part.part_name + " is already in the database!");}
-                                else {Console.WriteLine(ex.ToString());}
-                            }
+                        MonsterDrop drop = new MonsterDrop() {
+                            itemid = drop_item[0].id,
+                            monsterid = monster.id,
+                            sourceid = part_wrap[0].id,
+                            rank = rank,
+                            drop_chance = Convert.ToInt32(intsOnly.Replace(tds[2].TextContent.Trim(), "")),
+                            quantity = Convert.ToInt32(intsOnly.Replace(quantity, ""))
+                        };
+                        try {
+                            await db.InsertAsync(drop);
+                        }
+                        catch (SQLiteException ex) {
+                            if (ex.ToString().Contains("Constraint")) {Console.WriteLine(monster.mon_name + "'s " + part.part_name + " is already in the database!");}
+                            else {Console.WriteLine(ex.ToString());}
                         }
                     }
                 }
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("Finished with " + monster.mon_name + "!");
-                Console.ResetColor();
-            }
-            catch (Exception) {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Error on address " + address + ". Retrying.");
-                Console.ResetColor();
-                await GetMonster(address);
             }
         }
     }
