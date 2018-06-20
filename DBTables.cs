@@ -124,7 +124,7 @@ namespace Gensearch
         [ForeignKey(typeof(Monster))]
         public int monsterid {get; set;}
         public int amount {get; set;}
-        public string isIntruder {get; set;}
+        public string isSpecial {get; set;}
         public int mon_hp {get; set;}
         public double stag_multiplier {get; set;}
         public double atk_multiplier {get; set;}

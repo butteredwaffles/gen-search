@@ -205,13 +205,20 @@ namespace Gensearch
         public async Task GetQuestMonsters(IElement wrapper, SQLiteAsyncConnection db, int quest_id) {
             // Sometimes there are no monsters that can appear in a quest
             if (wrapper == null) {return;}
+
             Regex intsOnly = new Regex(@"[^\d]");
             Regex decimalsOnly = new Regex(@"[^\d.]");
             foreach (var row in wrapper.QuerySelectorAll("tbody tr")) {
                 var tds = row.QuerySelectorAll("td");
                 string monname = tds[0].TextContent.Trim();
                 int monid = (await db.QueryAsync<Monster>("select * from Monsters where mon_name = ?", monname))[0].id;
-                string isIntruder = tds[1].TextContent.Contains("INTRUDER") ? "yes" : "no";
+                string isSpecial = "";
+                if (tds[1].TextContent.Contains("INTRUDER") || tds[1].TextContent.Contains("HYPER")) {
+                    isSpecial = tds[1].TextContent.Trim().ToLower();
+                }
+                else {
+                    isSpecial = "no";
+                }
                 int amount = Convert.ToInt32(tds[2].TextContent);
                 int hp = Convert.ToInt32(intsOnly.Replace(tds[3].TextContent, ""));
                 double stag = Convert.ToDouble(decimalsOnly.Replace(tds[4].TextContent, ""));
@@ -224,7 +231,7 @@ namespace Gensearch
                     questid = quest_id,
                     monsterid = monid,
                     amount = amount,
-                    isIntruder = isIntruder,
+                    isSpecial = isSpecial,
                     mon_hp = hp,
                     stag_multiplier = stag,
                     atk_multiplier = atk,
