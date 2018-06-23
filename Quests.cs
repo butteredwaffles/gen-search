@@ -237,7 +237,7 @@ namespace Gensearch
                 double def = Convert.ToDouble(decimalsOnly.Replace(tds[6].TextContent, ""));
                 double exh = Convert.ToDouble(decimalsOnly.Replace(tds[7].TextContent, ""));
                 double diz = Convert.ToDouble(decimalsOnly.Replace(tds[8].TextContent, ""));
-                double mnt = Convert.ToDouble(decimalsOnly.Replace(tds[4].TextContent, ""));
+                double mnt = Convert.ToDouble(decimalsOnly.Replace(tds[9].TextContent, ""));
                 mons.Add(new QuestMonster() {
                     questid = quest_id,
                     monsterid = monid,

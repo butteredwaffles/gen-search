@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using AngleSharp;
 using DeepEqual.Syntax;
@@ -45,6 +46,26 @@ namespace Gensearch.Tests
             
             List<QuestBoxItem> items_data = await questManager.GetBox(box_element, "Main Reward C", 0, db);
             items_values.ShouldDeepEqual(items_data);
+        }
+
+        [Fact]
+        public async Task MonTest() {
+            var page = await BrowsingContext.New(Configuration.Default.WithDefaultLoader())
+            .OpenAsync(testAddress);
+            var box_element = page.QuerySelectorAll("h3")[1].NextElementSibling;
+
+            List<QuestMonster> monster_values = new List<QuestMonster>() {
+                // glavenus
+                new QuestMonster() {questid = 0, monsterid = 90, amount = 1, isSpecial = "no", mon_hp = 4928, 
+                stag_multiplier = 1.5, atk_multiplier = 2.3, def_multiplier = .85, exh_multiplier = 1.5, 
+                diz_multiplier = 1.2, mnt_multiplier = 1.6},
+                // great maccao
+                new QuestMonster() {questid = 0, monsterid = 35, amount = 1, isSpecial = "intruder", mon_hp = 1940,
+                stag_multiplier = 1.3, atk_multiplier = 2.3, def_multiplier = .85, exh_multiplier = 1.5,
+                diz_multiplier = 1.2, mnt_multiplier = 1.6},
+            };
+            List<QuestMonster> monster_data = await questManager.GetQuestMonsters(box_element, db, 0);
+            monster_values.ShouldDeepEqual(monster_data);
         }
     }
 }
