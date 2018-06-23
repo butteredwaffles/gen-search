@@ -15,18 +15,21 @@ namespace Gensearch
 {
     public class Monsters
     {
-        
-        List<string> woundable_parts = new List<string>();
-
         public async Task GetMonsters() {
             var config = Configuration.Default.WithDefaultLoader();
             var context = BrowsingContext.New(config);
             var page = await context.OpenAsync("http://mhgen.kiranico.com");
             var rows = page.QuerySelectorAll(".table")[6].QuerySelectorAll("td a").OfType<IHtmlAnchorElement>().ToArray();
+            int throttle = 3;
             
             List<Task> tasks = new List<Task>();
             foreach (var row in rows) {
                 tasks.Add(GetMonster(row.Href));
+                
+                if (tasks.Count == throttle) {
+                    Task completed = await Task.WhenAny(tasks);
+                    tasks.Remove(completed);
+                }
             }
             await Task.WhenAll(tasks);
         }
@@ -67,14 +70,18 @@ namespace Gensearch
 
                 try {
                     await db.InsertAsync(monster);
+                    Console.ForegroundColor = ConsoleColor.Magenta;
                     Console.WriteLine(monster.mon_name + " has been added to the database.");
+                    Console.ResetColor();
                 }
                 catch (SQLiteException) {
+                    Console.ForegroundColor = ConsoleColor.Magenta;
                     Console.WriteLine(monster.mon_name + " is already in the database!");
+                    Console.ResetColor();
                 }
 
-                await GetParts(page, monster, db);
-                await GetDrops(page, monster, db);
+                await db.InsertAllAsync(GetParts(page, monster.id));
+                await db.InsertAllAsync(await GetDrops(page, monster.id, db));
                 
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine("Finished with " + monster.mon_name + "!");
@@ -88,30 +95,32 @@ namespace Gensearch
             }
         }
 
-        public async Task GetParts(IDocument page, Monster monster, SQLiteAsyncConnection db) {
+        public List<MonsterPart> GetParts(IDocument page, int monster) {
+            List<MonsterPart> parts = new List<MonsterPart>();
             var part_rows = page.QuerySelectorAll(".col-lg-5 tbody tr");
                 foreach (var row in part_rows) {
                     var tds = row.QuerySelectorAll("td");
                     MonsterPart part = new MonsterPart() {
                         part_name = tds[0].TextContent,
                         stagger_value = Convert.ToInt32(tds[1].TextContent),
-                        monsterid = monster.id
+                        monsterid = monster
                     };
                     if (tds[3].TextContent.Contains("R")) { part.extract_color = "red"; }
                     else if (tds[3].TextContent.Contains("O")) { part.extract_color = "orange"; }
                     else { part.extract_color = "white"; }
 
                     try {
-                        await db.InsertAsync(part);
-                        Console.WriteLine("Inserted " + monster.mon_name + "'s " + part.part_name + " information.");
+                        parts.Add(part);
                     }
                     catch (SQLiteException ex) {
                         Console.WriteLine(ex.ToString());
                     }
                 }
+            return parts;
         }
 
-        public async Task GetDrops(IDocument page, Monster monster, SQLiteAsyncConnection db) {
+        public async Task<List<MonsterDrop>> GetDrops(IDocument page, int monster, SQLiteAsyncConnection db) {
+            List<MonsterDrop> drops = new List<MonsterDrop>();
             var table_wrappers = page.QuerySelectorAll(".col-lg-6");
             foreach (var wrapper in table_wrappers) {
                 string rank = wrapper.QuerySelector("h5").TextContent;
@@ -126,7 +135,7 @@ namespace Gensearch
                         ((IHtmlAnchorElement) tds[1].FirstElementChild).TextContent);
                         MonsterPart part = new MonsterPart();
                         // Make sure it's not adding the same carve/capture multiple time.
-                        var tempp = await db.QueryAsync<MonsterPart>("SELECT * FROM MonsterParts WHERE monsterid = ?", monster.id);
+                        var tempp = await db.QueryAsync<MonsterPart>("SELECT * FROM MonsterParts WHERE monsterid = ?", monster);
                         foreach (var monpart in tempp) {
                             if (currentSource == monpart.part_name) {
                                 part = monpart;
@@ -134,7 +143,7 @@ namespace Gensearch
                             }
                         }
                         if (part.part_name == null) {
-                            part.monsterid = monster.id;
+                            part.monsterid = monster;
                             part.part_name = currentSource;
                             await db.InsertAsync(part);
                         }
@@ -150,22 +159,17 @@ namespace Gensearch
 
                         MonsterDrop drop = new MonsterDrop() {
                             itemid = drop_item[0].id,
-                            monsterid = monster.id,
+                            monsterid = monster,
                             sourceid = part_wrap[0].id,
                             rank = rank,
                             drop_chance = Convert.ToInt32(intsOnly.Replace(tds[2].TextContent.Trim(), "")),
                             quantity = Convert.ToInt32(intsOnly.Replace(quantity, ""))
                         };
-                        try {
-                            await db.InsertAsync(drop);
-                        }
-                        catch (SQLiteException ex) {
-                            if (ex.ToString().Contains("Constraint")) {Console.WriteLine(monster.mon_name + "'s " + part.part_name + " is already in the database!");}
-                            else {Console.WriteLine(ex.ToString());}
-                        }
+                        drops.Add(drop);
                     }
                 }
             }
+            return drops;
         }
     }
 }

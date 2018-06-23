@@ -5,7 +5,10 @@
     <GenerateProgramFile>false</GenerateProgramFile>
     <NoWarn>NU1701</NoWarn>
   </PropertyGroup>
-  <ItemGroup>
+ <ItemGroup>
+    <None Update="data/mhgen.db">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="*"/>
