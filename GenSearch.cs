@@ -42,7 +42,6 @@ namespace Gensearch
                 questManager.GetQuests("http://mhgen.kiranico.com/quest/arena").Wait();
                 questManager.GetQuests("http://mhgen.kiranico.com/quest/training").Wait();
                 questManager.GetQuests("http://mhgen.kiranico.com/quest/special-permit").Wait();
-                questManager.GetQuests("http://mhgen.kiranico.com/event").Wait();
                 timeSpan = TimeSpan.FromSeconds(Convert.ToInt32(stopwatch.Elapsed.TotalSeconds));
                 Console.WriteLine("Done with all quests! Took " + timeSpan.ToString("c") + ".\n\n");
                 stopwatch.Reset();

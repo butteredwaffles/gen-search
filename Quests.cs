@@ -15,6 +15,7 @@ namespace Gensearch
     public class Quests
     {
         public async Task GetQuests(string addr) {
+            int throttle = 3;
             try {
                 var config = Configuration.Default.WithDefaultLoader();
                 var context = BrowsingContext.New(config);
@@ -32,6 +33,11 @@ namespace Gensearch
                             string address = qinfo_tds[1].FirstElementChild.GetAttribute("href");
                             bool isProwler = qinfo_tds[2].FirstElementChild != null;
                             tasks.Add(GetQuest(isKey, isUnstable, isProwler, address));
+
+                            if (tasks.Count == throttle) {
+                                Task completed = await Task.WhenAny(tasks);
+                                tasks.Remove(completed);
+                            }
                         }
                     }
                 }
@@ -45,6 +51,11 @@ namespace Gensearch
                         bool isUnstable = rows[i].TextContent.Contains("UNSTABLE");
                         string address = tds[0].FirstElementChild.GetAttribute("href");
                         tasks.Add(GetQuest(false, isUnstable, isProwler, address));
+
+                        if (tasks.Count == throttle) {
+                            Task completed = await Task.WhenAny(tasks);
+                            tasks.Remove(completed);
+                        }
                     }
                 }
                 await Task.WhenAll(tasks);
@@ -99,12 +110,7 @@ namespace Gensearch
                     goalid = goal.id,
                     subgoalid = subgoal.id
                     };
-                try {
-                    await db.InsertAsync(quest);
-                }
-                catch {
-                    await db.InsertOrReplaceAsync(quest);
-                }
+                await db.InsertAsync(quest);
 
                 // Quest Boxes
                 foreach (var box in page.QuerySelectorAll(".card-header")) {

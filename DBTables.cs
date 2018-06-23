@@ -85,9 +85,11 @@ namespace Gensearch
     public class Quest {
         [PrimaryKey, AutoIncrement]
         public int id {get; set;}
-        [Unique]
+        [NotNull]
         public string quest_name {get; set;}
+        [NotNull]
         public string quest_type {get; set;} // hunt, gather, capture, slay, survive
+        [NotNull]
         public string quest_description {get; set;}
         public string isKey {get; set;}
         public string isProwler {get; set;}
@@ -144,10 +146,11 @@ namespace Gensearch
     public class QuestBoxItem {
         [PrimaryKey, AutoIncrement]
         public int id {get; set;}
+        [NotNull]
         public string box_type {get; set;} // main reward A, main reward B, supplies, etc...
-        [ForeignKey(typeof(Quest))]
+        [ForeignKey(typeof(Quest)), NotNull]
         public int questid {get; set;}
-        [ForeignKey(typeof(Item))]
+        [ForeignKey(typeof(Item)), NotNull]
         public int itemid {get; set;}
         public int quantity {get; set;}
         public double appear_chance {get; set;}
@@ -162,8 +165,9 @@ namespace Gensearch
     public class QuestUnlock {
         [PrimaryKey, AutoIncrement]
         public int id {get; set;}
+        [NotNull]
         public string unlock_type {get; set;} // whether this quest is a prereq or unlocks another one
-        [ForeignKey(typeof(Quest))]
+        [ForeignKey(typeof(Quest)), NotNull]
         public int questid {get; set;}
 
         [OneToOne]
