@@ -72,8 +72,6 @@ namespace Gensearch
                 var page = await BrowsingContext.New(Configuration.Default.WithDefaultLoader()).OpenAsync(address);
                 var db = new SQLiteAsyncConnection("data/mhgen.db");
                 await db.CreateTablesAsync<Quest, Goal, QuestMonster, QuestBoxItem, QuestUnlock>();
-
-
                 Regex intsOnly = new Regex(@"[^\d]");
 
                 var general_qdata = page.QuerySelectorAll(".lead");
@@ -112,17 +110,19 @@ namespace Gensearch
                     };
                 await db.InsertAsync(quest);
 
-                // Quest Boxes
                 foreach (var box in page.QuerySelectorAll(".card-header")) {
                     string box_type = box.TextContent.Trim();
-                    await GetBox(box.NextElementSibling, box_type, quest.id, db);
+                    await db.InsertAllAsync(await GetBox(box.NextElementSibling, box_type, quest.id, db));
                 }
 
                 var mon_table = page.QuerySelectorAll("h3")[1].NextElementSibling;
-                await GetQuestMonsters(mon_table, db, quest.id);
+                List<QuestMonster> mons = await GetQuestMonsters(mon_table, db, quest.id);
+                if (mons != null) {
+                    await db.InsertAllAsync(mons);
+                }
 
                 foreach (var alert in page.QuerySelectorAll(".alert-info")) {
-                    await GetQuestUnlocks(alert, quest.id, db);
+                    await db.InsertAllAsync(GetQuestUnlocks(alert, quest.id));
                 }
 
                 Console.ForegroundColor = ConsoleColor.Yellow;
@@ -173,22 +173,21 @@ namespace Gensearch
             };
         }
 
-        public async Task GetBox(IElement wrapper, string boxname, int quest_id, SQLiteAsyncConnection db) {
+        public async Task<List<QuestBoxItem>> GetBox(IElement wrapper, string boxname, int quest_id, SQLiteAsyncConnection db) {
             Regex intsOnly = new Regex(@"[^\d]");
+            List<QuestBoxItem> items = new List<QuestBoxItem>();
             if (boxname != "Supplies") {
                 foreach (var row in wrapper.QuerySelectorAll("tr")) {
                     var tds = row.QuerySelectorAll("td");
-                    var iteminfo = tds[0].FirstElementChild.TextContent.Trim();
-                    string itemname = "";
-                    if (iteminfo.Any(char.IsDigit)) {String.Join(" ", iteminfo.Split(' ').SkipLast(1)).Trim(); }
-                    else { itemname = iteminfo; }
+                    string itemname = tds[0].FirstElementChild.TextContent.Trim();
+                    string quantinfo = tds[0].TextContent.Trim();
                     var itemdata = await db.QueryAsync<Item>("select * from Items where item_name = ?", itemname);
                     int quantity = 1;
-                    if (intsOnly.Replace(iteminfo, "") != "") {
-                        quantity = Convert.ToInt32(intsOnly.Replace(iteminfo, ""));
-                    }
+                    if (intsOnly.Replace(quantinfo, "") != "") {
+                        quantity = Convert.ToInt32(intsOnly.Replace(quantinfo, ""));
+                    }        
                     int appearchance = Convert.ToInt32(intsOnly.Replace(tds[1].TextContent, ""));
-                    await db.InsertAsync(new QuestBoxItem() {
+                    items.Add(new QuestBoxItem() {
                         box_type = boxname,
                         questid = quest_id,
                         itemid = itemdata[0].id,
@@ -202,7 +201,7 @@ namespace Gensearch
                     var tds = row.QuerySelectorAll("td");
                     string itemname = tds[1].TextContent.Trim();
                     int quantity = Convert.ToInt32(intsOnly.Replace(tds[2].TextContent, ""));
-                    await db.InsertAsync(new QuestBoxItem() {
+                    items.Add(new QuestBoxItem() {
                         box_type = boxname,
                         questid = quest_id,
                         itemid = (await db.QueryAsync<Item>("select * from Items where item_name = ?", itemname))[0].id,
@@ -210,12 +209,14 @@ namespace Gensearch
                     });
                 }
             }
+            return items;
         }
 
-        public async Task GetQuestMonsters(IElement wrapper, SQLiteAsyncConnection db, int quest_id) {
+        public async Task<List<QuestMonster>> GetQuestMonsters(IElement wrapper, SQLiteAsyncConnection db, int quest_id) {
             // Sometimes there are no monsters that can appear in a quest
-            if (wrapper == null) {return;}
+            if (wrapper == null) {return null;}
 
+            List<QuestMonster> mons = new List<QuestMonster>();
             Regex intsOnly = new Regex(@"[^\d]");
             Regex decimalsOnly = new Regex(@"[^\d.]");
             foreach (var row in wrapper.QuerySelectorAll("tbody tr")) {
@@ -237,7 +238,7 @@ namespace Gensearch
                 double exh = Convert.ToDouble(decimalsOnly.Replace(tds[7].TextContent, ""));
                 double diz = Convert.ToDouble(decimalsOnly.Replace(tds[8].TextContent, ""));
                 double mnt = Convert.ToDouble(decimalsOnly.Replace(tds[4].TextContent, ""));
-                await db.InsertAsync(new QuestMonster() {
+                mons.Add(new QuestMonster() {
                     questid = quest_id,
                     monsterid = monid,
                     amount = amount,
@@ -251,14 +252,17 @@ namespace Gensearch
                     mnt_multiplier = mnt
                 });
             }
+            return mons;
         }
 
-        public async Task GetQuestUnlocks(IElement wrapper, int quest_id, SQLiteAsyncConnection db) {
+        public List<QuestUnlock> GetQuestUnlocks(IElement wrapper, int quest_id) {
+            List<QuestUnlock> unlocks = new List<QuestUnlock>();
+
             // Unlock_type is always first div, so just use regular queryselector
             try {
                 string unlock_type = wrapper.QuerySelector("div").TextContent.Contains("completing") ? "prerequisite" : "unlocks";
                 foreach (var quest in wrapper.QuerySelectorAll("div").Skip(1)) {
-                    await db.InsertAsync(new QuestUnlock() {
+                    unlocks.Add(new QuestUnlock() {
                         unlock_type = unlock_type,
                         questid = quest_id,
                     });
@@ -268,6 +272,7 @@ namespace Gensearch
                 Console.WriteLine(ex.ToString());
                 Console.WriteLine("Errored on quest id " + quest_id.ToString() + ".");
             }
+            return unlocks;
         }       
     }
 }

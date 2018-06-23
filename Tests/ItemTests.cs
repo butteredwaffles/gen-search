@@ -1,10 +1,11 @@
 using System;
 using System.Threading.Tasks;
+using DeepEqual.Syntax;
 using Xunit;
 
 namespace Gensearch.Tests
 {
-    public class Item_Tests
+    public class ItemTests
     {
         private Items itemManager = new Items();
 
@@ -23,7 +24,7 @@ namespace Gensearch.Tests
                 combinations = "Dash Extract + Well-done Steak"
             };
             Item dash_data = await this.itemManager.GetItem(dash_url);
-            Assert.Equal(dash_values, dash_data);    
+            dash_values.ShouldDeepEqual(dash_data);    
         }
 
         /// <summary>
@@ -41,7 +42,7 @@ namespace Gensearch.Tests
                 combinations = "Scatterfish + Barrel Bomb L"
             };
             Item bomb_data = await this.itemManager.GetItem(bomb_url);
-            Assert.Equal(bomb_values, bomb_data);
+            bomb_values.ShouldDeepEqual(bomb_data);
         }
 
     }

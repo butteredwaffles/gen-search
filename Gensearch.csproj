@@ -14,5 +14,6 @@
     <PackageReference Include="sqlite-net-pcl" Version="1.5.166-beta"/>
     <PackageReference Include="xunit" Version="*"/>
     <PackageReference Include="xunit.runner.visualstudio" Version="*"/>
+    <PackageReference Include="DeepEqual" Version="*"/>
   </ItemGroup>
 </Project>

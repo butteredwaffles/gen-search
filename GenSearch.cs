@@ -4,6 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using AngleSharp;
+using AngleSharp.Dom;
+using SQLite;
 
 namespace Gensearch
 {
@@ -14,7 +17,7 @@ namespace Gensearch
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
             TimeSpan timeSpan = new TimeSpan();
-
+            
             if (args.Contains("--items") || args.Contains("--all") || args.Length == 0) {
                 var itemManager = new Items();
                 itemManager.GetItemList().Wait();
