@@ -51,6 +51,11 @@ namespace Gensearch
                 stopwatch.Reset();
                 stopwatch.Start();
             }
+
+            if (args.Contains("--weapons")) {
+                var weaponManager = new Weapons();
+                weaponManager.GetWeapons("http://mhgen.kiranico.com/greatsword").Wait();
+            }
             stopwatch.Stop();
         }
     }

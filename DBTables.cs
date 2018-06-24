@@ -167,12 +167,11 @@ namespace Gensearch
         public int gs_id {get; set;}
         [Unique, NotNull]
         public string gs_name {get; set;}
+        public int gs_set_name {get; set;}
         [NotNull]
         public int raw_dmg {get; set;}
         [ForeignKey(typeof(ElementDamage))]
         public int elem_id {get; set;}
-        [ForeignKey(typeof(SharpnessValue)), NotNull]
-        public int sharp_id {get; set;}
         [NotNull]
         public int slots {get; set;}
         [NotNull]
@@ -208,11 +207,11 @@ namespace Gensearch
         public int weapon_id {get; set;}
 
         // Values are tiny, small, medium, large
-        public string red_sharpness_length {get; set;}
-        public string yellow_sharpness_length {get; set;}
-        public string green_sharpness_length {get; set;}
-        public string blue_sharpness_length {get; set;}
-        public string white_sharpness_length {get; set;}
+        public int red_sharpness_length {get; set;}
+        public int yellow_sharpness_length {get; set;}
+        public int green_sharpness_length {get; set;}
+        public int blue_sharpness_length {get; set;}
+        public int white_sharpness_length {get; set;}
     }
 
     [Table("CraftItems")]
