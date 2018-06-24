@@ -208,6 +208,7 @@ namespace Gensearch
 
         // Values are tiny, small, medium, large
         public int red_sharpness_length {get; set;}
+        public int orange_sharpness_length {get; set;}
         public int yellow_sharpness_length {get; set;}
         public int green_sharpness_length {get; set;}
         public int blue_sharpness_length {get; set;}

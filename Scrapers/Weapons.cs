@@ -49,9 +49,13 @@ namespace Gensearch.Scrapers
             await db.CreateTablesAsync<GreatSword, SharpnessValue>();
 
             string setname = page.QuerySelector("[itemprop=\"name\"]").TextContent.Split("/")[0].Trim();
-            ConsoleWriters.StartingPageMessage(setname, address);         
+            ConsoleWriters.StartingPageMessage(setname, address);       
 
-            await db.InsertAllAsync(GetSharpness(page, page.QuerySelector(".table"), 0));
+            List<SharpnessValue> sharpvalues = new List<SharpnessValue>();
+            foreach (var tr in page.QuerySelector(".table").QuerySelectorAll("tr")) {
+                sharpvalues.AddRange(GetSharpness(page, tr, 0));
+            }
+            await db.InsertAllAsync(sharpvalues);
         }
 
         public List<SharpnessValue> GetSharpness(IDocument page, IElement wrapper, int weaponid) {
@@ -60,13 +64,15 @@ namespace Gensearch.Scrapers
             foreach (var div in sharpvalues.QuerySelectorAll("div")) {
                 var spans = div.QuerySelectorAll("span");
                 int red_sharpness = Convert.ToInt32(intsOnly.Replace(page.DefaultView.GetComputedStyle(spans[0]).Width, "")) * 5;
-                int yellow_sharpness = Convert.ToInt32(intsOnly.Replace(page.DefaultView.GetComputedStyle(spans[1]).Width, "")) * 5;
-                int green_sharpness = Convert.ToInt32(intsOnly.Replace(page.DefaultView.GetComputedStyle(spans[2]).Width, "")) * 5;
-                int blue_sharpness = Convert.ToInt32(intsOnly.Replace(page.DefaultView.GetComputedStyle(spans[3]).Width, "")) * 5;
-                int white_sharpness = Convert.ToInt32(intsOnly.Replace(page.DefaultView.GetComputedStyle(spans[4]).Width, "")) * 5;
+                int orange_sharpness = Convert.ToInt32(intsOnly.Replace(page.DefaultView.GetComputedStyle(spans[1]).Width, "")) * 5;
+                int yellow_sharpness = Convert.ToInt32(intsOnly.Replace(page.DefaultView.GetComputedStyle(spans[2]).Width, "")) * 5;
+                int green_sharpness = Convert.ToInt32(intsOnly.Replace(page.DefaultView.GetComputedStyle(spans[3]).Width, "")) * 5;
+                int blue_sharpness = Convert.ToInt32(intsOnly.Replace(page.DefaultView.GetComputedStyle(spans[4]).Width, "")) * 5;
+                int white_sharpness = Convert.ToInt32(intsOnly.Replace(page.DefaultView.GetComputedStyle(spans[5]).Width, "")) * 5;
                 values.Add(new SharpnessValue() {
                     weapon_id = weaponid,
                     red_sharpness_length = red_sharpness,
+                    orange_sharpness_length = orange_sharpness,
                     yellow_sharpness_length = yellow_sharpness,
                     green_sharpness_length = green_sharpness,
                     blue_sharpness_length = blue_sharpness,
