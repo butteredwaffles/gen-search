@@ -6,6 +6,7 @@ using AngleSharp;
 using DeepEqual.Syntax;
 using SQLite;
 using Xunit;
+using Gensearch.Scrapers;
 
 namespace Gensearch.Tests
 {

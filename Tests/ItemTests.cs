@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using DeepEqual.Syntax;
+using Gensearch.Scrapers;
 using Xunit;
 
 namespace Gensearch.Tests

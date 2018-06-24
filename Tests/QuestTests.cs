@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading.Tasks;
 using AngleSharp;
 using DeepEqual.Syntax;
+using Gensearch.Scrapers;
 using SQLite;
 using Xunit;
 

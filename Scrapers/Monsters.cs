@@ -11,7 +11,7 @@ using AngleSharp.Dom.Html;
 using SQLite;
 using SQLiteNetExtensionsAsync.Extensions;
 
-namespace Gensearch
+namespace Gensearch.Scrapers
 {
     public class Monsters
     {

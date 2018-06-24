@@ -10,7 +10,7 @@ using AngleSharp.Dom.Html;
 using SQLite;
 using SQLiteNetExtensionsAsync;
 
-namespace Gensearch
+namespace Gensearch.Scrapers
 {
     public class Quests
     {

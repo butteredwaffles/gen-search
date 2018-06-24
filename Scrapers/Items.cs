@@ -7,7 +7,7 @@ using AngleSharp;
 using AngleSharp.Dom.Html;
 using SQLite;
 
-namespace Gensearch
+namespace Gensearch.Scrapers
 {
     class Items
     {

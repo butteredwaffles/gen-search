@@ -160,4 +160,74 @@ namespace Gensearch
         [OneToOne]
         public Quest quest {get; set;}
     }
+
+    [Table("GreatSwords")]
+    public class GreatSword {
+        [PrimaryKey, AutoIncrement]
+        public int gs_id {get; set;}
+        [Unique, NotNull]
+        public string gs_name {get; set;}
+        [NotNull]
+        public int raw_dmg {get; set;}
+        [ForeignKey(typeof(ElementDamage))]
+        public int elem_id {get; set;}
+        [ForeignKey(typeof(SharpnessValue)), NotNull]
+        public int sharp_id {get; set;}
+        [NotNull]
+        public int slots {get; set;}
+        [NotNull]
+        public int rarity {get; set;}
+        // Going by names instead of values because odds are the weapon it upgrades into will not be in the database yet
+        public string upgrades_into {get; set;}
+        [NotNull]
+        public int price {get; set;}
+
+
+        [OneToOne]
+        public ElementDamage element {get; set;}
+        [OneToOne]
+        public SharpnessValue sharpness {get; set;}
+    }
+
+    [Table("ElementDamages")]
+    public class ElementDamage {
+        [PrimaryKey, AutoIncrement]
+        public int elem_id {get; set;}
+        [NotNull]
+        public string elem_type {get; set;} // fire, water, ice, etc.
+        [NotNull]
+        public int elem_amount {get; set;}
+    }
+
+    [Table("SharpnessValues")]
+    public class SharpnessValue {
+        [PrimaryKey, AutoIncrement]
+        public int sharp_id {get; set;}
+        // Not setting the weapon_id as a primary key so it can be used across mulitple tables
+        [NotNull]
+        public int weapon_id {get; set;}
+
+        // Values are tiny, small, medium, large
+        public string red_sharpness_length {get; set;}
+        public string yellow_sharpness_length {get; set;}
+        public string green_sharpness_length {get; set;}
+        public string blue_sharpness_length {get; set;}
+        public string white_sharpness_length {get; set;}
+    }
+
+    [Table("CraftItems")]
+    public class CraftItem {
+        [PrimaryKey, AutoIncrement]
+        public int craft_id {get; set;}
+        // Because it can also be from a selected group of items such as "Ore" or "Insect", using names
+        public string item_name {get; set;}
+        [NotNull]
+        public int creation_id {get; set;}
+        [NotNull]
+        public int quantity {get; set;}
+        [NotNull]
+        public string unlocks_creation {get; set;} // either no or yes
+        public string is_scrap {get; set;} // if a scrap, it's a byproduct
+
+    }
 }
