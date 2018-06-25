@@ -52,7 +52,7 @@ namespace Gensearch.Scrapers
                 await db.CreateTablesAsync<GreatSword, SharpnessValue, ElementDamage>();
 
                 string setname = page.QuerySelector("[itemprop=\"name\"]").TextContent.Split("/")[0].Trim();
-                ConsoleWriters.StartingPageMessage($"Started work on the {setname} set. ({address})");
+                ConsoleWriters.StartingPageMessage($"Started work on the {setname} series. ({address})");
 
                 var crafting_table = page.QuerySelectorAll(".table")[1].QuerySelector("tbody");
                 int current_wpn_index = 0;
@@ -78,7 +78,7 @@ namespace Gensearch.Scrapers
                     int rarity = Convert.ToInt32(intsOnly.Replace(techinfo.Children[1].TextContent.Trim(), ""));
                     string upgrades_into = "none";
                     var upgradeinfo = crafting_table.Children[current_wpn_index].QuerySelectorAll("td");
-                    if (upgradeinfo[0].QuerySelector(".fonts-weight-bold") != null) {
+                    if (upgradeinfo[0].QuerySelector(".font-weight-bold") != null) {
                         upgrades_into = String.Join('\n', upgradeinfo[0].QuerySelectorAll("a").Select(a => a.TextContent.Trim()));
                     }
                     int price = Convert.ToInt32(upgradeinfo[1].TextContent.Replace("z", ""));
@@ -98,10 +98,14 @@ namespace Gensearch.Scrapers
                     if (element != null) {
                         gs.elem_id = element.elem_id;
                     }
+                    else {
+                        // Ints are non-nullable so setting it to a value that's impossible
+                        gs.elem_id = -1;
+                    }
                     await db.InsertAsync(gs);
                     current_wpn_index++;
                 }
-                ConsoleWriters.CompletionMessage($"Finished with the {setname} set!");
+                ConsoleWriters.CompletionMessage($"Finished with the {setname} series!");
             }
             catch (Exception ex) {
                 ConsoleWriters.ErrorMessage(ex.ToString());
