@@ -14,6 +14,7 @@ namespace Gensearch
 {
     class GenSearch
     {
+        public static SQLiteAsyncConnection db = new SQLiteAsyncConnection("data/mhgen.db");
         static void Main(string[] args)
         {
             Stopwatch stopwatch = new Stopwatch();
@@ -54,13 +55,22 @@ namespace Gensearch
             }
 
             if (args.Contains("--weapons")) {
+                Stopwatch indiv_weapon_watch = new Stopwatch();
                 var weaponManager = new Weapons();
                 ConsoleWriters.InfoMessage("Starting weapon retrieval...");
-                weaponManager.GetWeapons("http://mhgen.kiranico.com/greatsword").Wait();
-                timeSpan = TimeSpan.FromSeconds(Convert.ToInt32(stopwatch.Elapsed.TotalSeconds));
+                string[] weaponurls = new string[] {
+                    "greatsword", "longsword", "swordshield", "hammer", "lance", "insectglaive"
+                };
+                indiv_weapon_watch.Start();
+                foreach (string category in weaponurls) {
+                    weaponManager.GetWeapons($"http://mhgen.kiranico.com/{category}").Wait();
+                    timeSpan = TimeSpan.FromSeconds(Convert.ToInt32(indiv_weapon_watch.Elapsed.TotalSeconds));
+                    ConsoleWriters.InfoMessage($"Done with {category}s! Took {timeSpan.ToString("c")}.\n\n");
+                    indiv_weapon_watch.Restart();
+                }
+                indiv_weapon_watch.Stop();
                 ConsoleWriters.InfoMessage("Done with all weapons! Took " + timeSpan.ToString("c") + ".\n\n");
-                stopwatch.Reset();
-                stopwatch.Start();
+                stopwatch.Restart();
             }
             stopwatch.Stop();
         }

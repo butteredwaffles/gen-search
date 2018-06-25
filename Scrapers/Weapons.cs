@@ -15,25 +15,31 @@ namespace Gensearch.Scrapers
 {
     public class Weapons
     {
+        SQLiteAsyncConnection db = GenSearch.db;
         Regex intsOnly = new Regex(@"[^\d\+-]"); 
         public async Task GetWeapons(string addr) {
             int throttle = 3;
+            string[] special_weapons = new string[] {"/dualblades", "/gunlance", "/chargeblade", "/switchaxe", "/lightbowgun", "/heavybowgun", "/bow", "/huntinghorn"};
+            await db.CreateTablesAsync<SwordValues, SharpnessValue, ElementDamage, GreatSword, LongSword>();
+            await db.CreateTablesAsync<Lance, Hammer, SnS, InsectGlaive>();
             try {
                 List<Task> tasks = new List<Task>();
                 var config = Configuration.Default.WithDefaultLoader().WithJavaScript().WithCss();
                 var context = BrowsingContext.New(config);
                 var page = await context.OpenAsync(addr);
                 int page_length = Convert.ToInt32(page.ExecuteScript("window[\"mhgen\"][\"weapons\"].length"));
-                for (int i = 0; i < page_length; i++) {
-                    string address = (string) page.ExecuteScript($"window[\"mhgen\"][\"weapons\"][{i.ToString()}].url");
-                    tasks.Add(GetGreatSword(address));
+                if (!special_weapons.Any(w => addr.Contains(w))) {
+                    for (int i = 0; i < page_length; i++) {
+                        string address = (string) page.ExecuteScript($"window[\"mhgen\"][\"weapons\"][{i.ToString()}].url");
+                        tasks.Add(GetGenericSword(address));
 
-                    if (tasks.Count == throttle) {
-                        Task completed = await Task.WhenAny(tasks);
-                        tasks.Remove(completed);
+                        if (tasks.Count == throttle) {
+                            Task completed = await Task.WhenAny(tasks);
+                            tasks.Remove(completed);
+                        }
                     }
+                    await Task.WhenAll(tasks);
                 }
-                await Task.WhenAll(tasks);
             }
             catch (Exception ex) {
                 Console.WriteLine(ex.ToString());
@@ -43,73 +49,113 @@ namespace Gensearch.Scrapers
             }
         }
 
-        public async Task GetGreatSword(string address) {
+        /// <summary>
+        /// Gets greatswords, longswords, sword and shields, hammers, lances, and insect glaives.
+        /// The following weapons are excluded because of special characteristics:
+        ///     Switch Axe / Charge Blade - Phials
+        ///     LBG / HBG / Bow - Ammo
+        ///     Gunlance - Shells
+        ///     Dual Blades - Dual Elements
+        ///     Hunting Horn - Songs
+        /// </summary>
+        /// <param name="address">The URL of the weapon.</param>
+        public async Task GetGenericSword(string address) {
             try {
                 var config = Configuration.Default.WithDefaultLoader(l => l.IsResourceLoadingEnabled = true).WithCss();
                 var context = BrowsingContext.New(config);
                 var page = await context.OpenAsync(address);
-                SQLiteAsyncConnection db = new SQLiteAsyncConnection("data/mhgen.db");
-                await db.CreateTablesAsync<GreatSword, SharpnessValue, ElementDamage>();
-
                 string setname = page.QuerySelector("[itemprop=\"name\"]").TextContent.Split("/")[0].Trim();
                 ConsoleWriters.StartingPageMessage($"Started work on the {setname} series. ({address})");
 
                 var crafting_table = page.QuerySelectorAll(".table")[1].QuerySelector("tbody");
                 int current_wpn_index = 0;
                 foreach (var tr in page.QuerySelector(".table").QuerySelectorAll("tr")) {
-                    string weapon_name = tr.FirstElementChild.TextContent;
-                    int weapon_damage = Convert.ToInt32(tr.Children[1].TextContent);
-                    var specialinfo = tr.Children[2];
-                    ElementDamage element = null;
-                    int affinity = 0;
-                    foreach (var small in specialinfo.QuerySelectorAll("small")) {
-                        if (small.TextContent.Any(char.IsLetter)) {
-                            element = GetElement(tr);
-                            await db.InsertAsync(element);
-                        }
-                        else {
-                            affinity = Convert.ToInt32(intsOnly.Replace(small.TextContent.Trim(), ""));
-                        }
-                    }
-                    List<SharpnessValue> sharpvalues = GetSharpness(page, tr);
-                    await db.InsertAllAsync(sharpvalues);
-                    var techinfo = tr.Children[5];
-                    int slots = techinfo.FirstElementChild.TextContent.Count(c => c == '◯');
-                    int rarity = Convert.ToInt32(intsOnly.Replace(techinfo.Children[1].TextContent.Trim(), ""));
-                    string upgrades_into = "none";
-                    var upgradeinfo = crafting_table.Children[current_wpn_index].QuerySelectorAll("td");
-                    if (upgradeinfo[0].QuerySelector(".font-weight-bold") != null) {
-                        upgrades_into = String.Join('\n', upgradeinfo[0].QuerySelectorAll("a").Select(a => a.TextContent.Trim()));
-                    }
-                    int price = Convert.ToInt32(upgradeinfo[1].TextContent.Replace("z", ""));
-                    GreatSword gs = new GreatSword() {
-                        gs_name = weapon_name,
-                        gs_set_name = setname,
-                        raw_dmg = weapon_damage,
-                        affinity = affinity,
-                        sharp_0_id = sharpvalues[0].sharp_id,
-                        sharp_1_id = sharpvalues[1].sharp_id,
-                        sharp_2_id = sharpvalues[2].sharp_id,
-                        slots = slots,
-                        rarity = rarity,
-                        upgrades_into = upgrades_into,
-                        price = price
+                    SwordAttributes attributes = GetSwordAttributes(page, tr, crafting_table, current_wpn_index);
+                    await db.InsertAllAsync(attributes.sharpness_values);
+                    SwordValues sv = new SwordValues() {
+                        sword_name = attributes.weapon_name,
+                        sword_set_name = setname,
+                        raw_dmg = attributes.weapon_damage,
+                        affinity = attributes.affinity,
+                        sharp_0_id = attributes.sharpness_values[0].sharp_id,
+                        sharp_1_id = attributes.sharpness_values[1].sharp_id,
+                        sharp_2_id = attributes.sharpness_values[2].sharp_id,
+                        slots = attributes.slots,
+                        rarity = attributes.rarity,
+                        upgrades_into = attributes.upgrades_into,
+                        price = attributes.price
                     };
-                    if (element != null) {
-                        gs.elem_id = element.elem_id;
+                    if (attributes.element != null) {
+                        await db.InsertAsync(attributes.element);
+                        sv.elem_id = attributes.element.elem_id;
                     }
                     else {
                         // Ints are non-nullable so setting it to a value that's impossible
-                        gs.elem_id = -1;
+                        sv.elem_id = -1;
                     }
-                    await db.InsertAsync(gs);
+                    await db.InsertAsync(sv);
                     current_wpn_index++;
+
+                    if (address.Contains("/greatsword/")) {
+                        await db.InsertAsync(new GreatSword() {sword_id = sv.sword_id});
+                    }
+                    else if (address.Contains("/longsword/")) {
+                        await db.InsertAsync(new LongSword() {sword_id = sv.sword_id});
+                    }
+                    else if (address.Contains("/swordshield/")) {
+                        await db.InsertAsync(new SnS() {sword_id = sv.sword_id});
+                    }
+                    else if (address.Contains("/hammer/")) {
+                        await db.InsertAsync(new SnS() {sword_id = sv.sword_id});
+                    }
+                    else if (address.Contains("/lance/")) {
+                        await db.InsertAsync(new Lance() {sword_id = sv.sword_id});
+                    }
+                    else if (address.Contains("/insectglaive/")) {
+                        await db.InsertAsync(new InsectGlaive() {sword_id = sv.sword_id});
+                    }
                 }
                 ConsoleWriters.CompletionMessage($"Finished with the {setname} series!");
             }
             catch (Exception ex) {
                 ConsoleWriters.ErrorMessage(ex.ToString());
             }
+        }
+
+        public SwordAttributes GetSwordAttributes(IDocument page, IElement wrapper, IElement crafting, int current_index) {
+            string weapon_name = wrapper.FirstElementChild.TextContent;
+            int weapon_damage = Convert.ToInt32(wrapper.Children[1].TextContent);
+            var techinfo = wrapper.Children[5];
+            int slots = techinfo.FirstElementChild.TextContent.Count(c => c == '◯');
+            int rarity = Convert.ToInt32(intsOnly.Replace(techinfo.Children[1].TextContent.Trim(), ""));
+            string upgrades_into = "none";
+            var upgradeinfo = crafting.Children[current_index].QuerySelectorAll("td");
+            if (upgradeinfo[0].QuerySelector(".font-weight-bold") != null) {
+                upgrades_into = String.Join('\n', upgradeinfo[0].QuerySelectorAll("a").Select(a => a.TextContent.Trim()));
+            }
+            ElementDamage element = null;
+            int affinity = 0;
+            foreach (var small in wrapper.Children[2].QuerySelectorAll("small")) {
+                if (small.TextContent.Any(char.IsLetter)) {
+                    element = GetElement(wrapper);
+                }
+                else {
+                    affinity = Convert.ToInt32(intsOnly.Replace(small.TextContent.Trim(), ""));
+                }
+            }
+            int price = Convert.ToInt32(upgradeinfo[1].TextContent.Replace("z", ""));
+            List<SharpnessValue> sharpvalues = GetSharpness(page, wrapper);
+            return new SwordAttributes() {
+                weapon_name = weapon_name,
+                weapon_damage = weapon_damage,
+                slots = slots,
+                rarity = rarity,
+                upgrades_into = upgrades_into,
+                price = price,
+                element = element,
+                affinity = affinity,
+                sharpness_values = sharpvalues
+            };
         }
 
         public List<SharpnessValue> GetSharpness(IDocument page, IElement wrapper) {
@@ -146,5 +192,20 @@ namespace Gensearch.Scrapers
             };
 
         }
+    }
+
+    /// <summary>
+    /// Data class to hold attributes for generic sword weapons.
+    /// </summary>
+    public class SwordAttributes {
+        public string weapon_name {get; set;}
+        public int weapon_damage {get; set;}
+        public ElementDamage element {get; set;}
+        public int affinity {get; set;}
+        public int slots {get; set;}
+        public int rarity {get; set;}
+        public string upgrades_into {get; set;}
+        public int price {get; set;}
+        public List<SharpnessValue> sharpness_values {get; set;}
     }
 }
