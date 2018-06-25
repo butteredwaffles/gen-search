@@ -69,6 +69,7 @@ namespace Gensearch
                     indiv_weapon_watch.Restart();
                 }
                 indiv_weapon_watch.Stop();
+                timeSpan = TimeSpan.FromSeconds(Convert.ToInt32(stopwatch.Elapsed.TotalSeconds));
                 ConsoleWriters.InfoMessage("Done with all weapons! Took " + timeSpan.ToString("c") + ".\n\n");
                 stopwatch.Restart();
             }

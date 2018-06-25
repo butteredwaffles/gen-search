@@ -165,6 +165,7 @@ namespace Gensearch
     public class SwordValues {
         [PrimaryKey, AutoIncrement]
         public int sword_id {get; set;}
+        public string sword_class {get; set;}
         [Unique, NotNull]
         public string sword_name {get; set;}
         public string sword_set_name {get; set;}
@@ -198,55 +199,7 @@ namespace Gensearch
         [OneToOne]
         public SharpnessValue sharpness_2 {get; set;}
     }
-
-    [Table("GreatSwords")]
-    public class GreatSword {
-        [PrimaryKey, AutoIncrement]
-        public int gs_id {get; set;}
-        [ForeignKey(typeof(SwordValues))]
-        public int sword_id {get; set;}
-    }
-
-    [Table("LongSwords")]
-    public class LongSword {
-        [PrimaryKey, AutoIncrement]
-        public int ls_id {get; set;}
-        [ForeignKey(typeof(SwordValues))]
-        public int sword_id {get; set;}
-    }
-
-    [Table("SwordsAndShields")]
-    public class SnS {
-        [PrimaryKey, AutoIncrement]
-        public int sns_id {get; set;}
-        [ForeignKey(typeof(SwordValues))]
-        public int sword_id {get; set;}
-    }
-
-    [Table("Hammers")]
-    public class Hammer {
-        [PrimaryKey, AutoIncrement]
-        public int hammer_id {get; set;}
-        [ForeignKey(typeof(SwordValues))]
-        public int sword_id {get; set;}
-    }
-
-    [Table("Lances")]
-    public class Lance {
-        [PrimaryKey, AutoIncrement]
-        public int lance_id {get; set;}
-        [ForeignKey(typeof(SwordValues))]
-        public int sword_id {get; set;}
-    }
-
-    [Table("InsectGlaives")]
-    public class InsectGlaive {
-        [PrimaryKey, AutoIncrement]
-        public int hammer_id {get; set;}
-        [ForeignKey(typeof(SwordValues))]
-        public int sword_id {get; set;}
-    }
-
+    
     [Table("ElementDamages")]
     public class ElementDamage {
         [PrimaryKey, AutoIncrement]

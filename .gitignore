@@ -7,4 +7,5 @@
 bin/
 obj/
 ref/
-data/mhgen.db
+data/*.db
+data/*.db-journal

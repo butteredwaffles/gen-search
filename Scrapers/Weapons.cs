@@ -20,8 +20,7 @@ namespace Gensearch.Scrapers
         public async Task GetWeapons(string addr) {
             int throttle = 3;
             string[] special_weapons = new string[] {"/dualblades", "/gunlance", "/chargeblade", "/switchaxe", "/lightbowgun", "/heavybowgun", "/bow", "/huntinghorn"};
-            await db.CreateTablesAsync<SwordValues, SharpnessValue, ElementDamage, GreatSword, LongSword>();
-            await db.CreateTablesAsync<Lance, Hammer, SnS, InsectGlaive>();
+            await db.CreateTablesAsync<SwordValues, SharpnessValue, ElementDamage>();
             try {
                 List<Task> tasks = new List<Task>();
                 var config = Configuration.Default.WithDefaultLoader().WithJavaScript().WithCss();
@@ -72,6 +71,7 @@ namespace Gensearch.Scrapers
                 foreach (var tr in page.QuerySelector(".table").QuerySelectorAll("tr")) {
                     SwordAttributes attributes = GetSwordAttributes(page, tr, crafting_table, current_wpn_index);
                     await db.InsertAllAsync(attributes.sharpness_values);
+
                     SwordValues sv = new SwordValues() {
                         sword_name = attributes.weapon_name,
                         sword_set_name = setname,
@@ -93,27 +93,15 @@ namespace Gensearch.Scrapers
                         // Ints are non-nullable so setting it to a value that's impossible
                         sv.elem_id = -1;
                     }
-                    await db.InsertAsync(sv);
                     current_wpn_index++;
 
-                    if (address.Contains("/greatsword/")) {
-                        await db.InsertAsync(new GreatSword() {sword_id = sv.sword_id});
-                    }
-                    else if (address.Contains("/longsword/")) {
-                        await db.InsertAsync(new LongSword() {sword_id = sv.sword_id});
-                    }
-                    else if (address.Contains("/swordshield/")) {
-                        await db.InsertAsync(new SnS() {sword_id = sv.sword_id});
-                    }
-                    else if (address.Contains("/hammer/")) {
-                        await db.InsertAsync(new SnS() {sword_id = sv.sword_id});
-                    }
-                    else if (address.Contains("/lance/")) {
-                        await db.InsertAsync(new Lance() {sword_id = sv.sword_id});
-                    }
-                    else if (address.Contains("/insectglaive/")) {
-                        await db.InsertAsync(new InsectGlaive() {sword_id = sv.sword_id});
-                    }
+                    if (address.Contains("/greatsword/")) { sv.sword_class = "Great Sword"; }
+                    else if (address.Contains("/longsword/")) { sv.sword_class = "Long Sword"; }
+                    else if (address.Contains("/swordshield/")) { sv.sword_class = "Sword & Shield"; }
+                    else if (address.Contains("/hammer/")) { sv.sword_class = "Hammer"; }
+                    else if (address.Contains("/lance/")) { sv.sword_class = "Great Sword"; }
+                    else if (address.Contains("/insectglaive/")) {sv.sword_class = "Insect Glaive"; }
+                    await db.InsertAsync(sv);
                 }
                 ConsoleWriters.CompletionMessage($"Finished with the {setname} series!");
             }
@@ -127,7 +115,7 @@ namespace Gensearch.Scrapers
             int weapon_damage = Convert.ToInt32(wrapper.Children[1].TextContent);
             var techinfo = wrapper.Children[5];
             int slots = techinfo.FirstElementChild.TextContent.Count(c => c == '◯');
-            int rarity = Convert.ToInt32(intsOnly.Replace(techinfo.Children[1].TextContent.Trim(), ""));
+            int rarity = Convert.ToInt32(techinfo.Children[1].TextContent.Trim().Replace("RARE", ""));
             string upgrades_into = "none";
             var upgradeinfo = crafting.Children[current_index].QuerySelectorAll("td");
             if (upgradeinfo[0].QuerySelector(".font-weight-bold") != null) {
