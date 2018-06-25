@@ -15,9 +15,9 @@ namespace Gensearch.Scrapers
 {
     public class Weapons
     {
-        Regex intsOnly = new Regex(@"[^\d]"); 
+        Regex intsOnly = new Regex(@"[^\d\+-]"); 
         public async Task GetWeapons(string addr) {
-            int throttle = 6;
+            int throttle = 3;
             try {
                 List<Task> tasks = new List<Task>();
                 var config = Configuration.Default.WithDefaultLoader().WithJavaScript().WithCss();
@@ -52,10 +52,9 @@ namespace Gensearch.Scrapers
                 await db.CreateTablesAsync<GreatSword, SharpnessValue, ElementDamage>();
 
                 string setname = page.QuerySelector("[itemprop=\"name\"]").TextContent.Split("/")[0].Trim();
-                ConsoleWriters.StartingPageMessage(setname, address);
+                ConsoleWriters.StartingPageMessage($"Started work on the {setname} set. ({address})");
 
-                var crafting_table = page.QuerySelectorAll(".table")[1].QuerySelectorAll("tbody tr");
-                List<GreatSword> gses = new List<GreatSword>();
+                var crafting_table = page.QuerySelectorAll(".table")[1].QuerySelector("tbody");
                 int current_wpn_index = 0;
                 foreach (var tr in page.QuerySelector(".table").QuerySelectorAll("tr")) {
                     string weapon_name = tr.FirstElementChild.TextContent;
@@ -63,13 +62,13 @@ namespace Gensearch.Scrapers
                     var specialinfo = tr.Children[2];
                     ElementDamage element = null;
                     int affinity = 0;
-                    if (specialinfo.QuerySelector("small") != null) {
-                        if (specialinfo.QuerySelector("small").TextContent.Any(char.IsLetter)) {
+                    foreach (var small in specialinfo.QuerySelectorAll("small")) {
+                        if (small.TextContent.Any(char.IsLetter)) {
                             element = GetElement(tr);
                             await db.InsertAsync(element);
                         }
-                        if (specialinfo.QuerySelectorAll("div").Count() == 2) {
-                            affinity = Convert.ToInt32(intsOnly.Replace(specialinfo.QuerySelectorAll("small")[1].TextContent.Trim(), ""));
+                        else {
+                            affinity = Convert.ToInt32(intsOnly.Replace(small.TextContent.Trim(), ""));
                         }
                     }
                     List<SharpnessValue> sharpvalues = GetSharpness(page, tr);
@@ -78,11 +77,11 @@ namespace Gensearch.Scrapers
                     int slots = techinfo.FirstElementChild.TextContent.Count(c => c == '◯');
                     int rarity = Convert.ToInt32(intsOnly.Replace(techinfo.Children[1].TextContent.Trim(), ""));
                     string upgrades_into = "none";
-                    var upgradeinfo = crafting_table[current_wpn_index];
-                    if (upgradeinfo.FirstElementChild.QuerySelector(".font-weight-bold") != null) {
-                        upgrades_into = String.Join('\n', upgradeinfo.FirstElementChild.QuerySelectorAll("a").Select(a => a.TextContent.Trim()));
+                    var upgradeinfo = crafting_table.Children[current_wpn_index].QuerySelectorAll("td");
+                    if (upgradeinfo[0].QuerySelector(".fonts-weight-bold") != null) {
+                        upgrades_into = String.Join('\n', upgradeinfo[0].QuerySelectorAll("a").Select(a => a.TextContent.Trim()));
                     }
-                    int price = Convert.ToInt32(intsOnly.Replace(upgradeinfo.Children[1].TextContent, ""));
+                    int price = Convert.ToInt32(upgradeinfo[1].TextContent.Replace("z", ""));
                     GreatSword gs = new GreatSword() {
                         gs_name = weapon_name,
                         gs_set_name = setname,
@@ -99,16 +98,13 @@ namespace Gensearch.Scrapers
                     if (element != null) {
                         gs.elem_id = element.elem_id;
                     }
-                    gses.Add(gs);
+                    await db.InsertAsync(gs);
                     current_wpn_index++;
                 }
-                await db.InsertAllAsync(gses);
                 ConsoleWriters.CompletionMessage($"Finished with the {setname} set!");
             }
             catch (Exception ex) {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(ex.ToString());
-                Console.ResetColor();
+                ConsoleWriters.ErrorMessage(ex.ToString());
             }
         }
 

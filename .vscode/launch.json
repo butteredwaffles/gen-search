@@ -4,6 +4,17 @@
    // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
    "version": "0.2.0",
    "configurations": [
+       {
+           "name": "Debug Launch",
+           "type": "coreclr",
+           "request": "launch",
+           "preLaunchTask": "build",
+           "program": "${workspaceFolder}/bin/Debug/netcoreapp2.0/Gensearch.dll",
+           "args": ["--weapons"],
+           "cwd": "${workspaceFolder}",
+           "stopAtEntry": false,
+           "console": "internalConsole"
+       },
         {
             "name": ".NET Core Launch (console)",
             "type": "coreclr",

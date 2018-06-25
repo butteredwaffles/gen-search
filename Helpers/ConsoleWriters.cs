@@ -4,8 +4,10 @@ namespace Gensearch.Helpers
 {
     public static class ConsoleWriters
     {
-        public static void StartingPageMessage(string name, string address) {
-            Console.WriteLine($"Started work on {name} ({address}).");
+        public static void StartingPageMessage(string message) {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine(message);
+            Console.ResetColor();
         }
 
         public static void InsertionMessage(string message) {
@@ -22,6 +24,12 @@ namespace Gensearch.Helpers
 
         public static void InfoMessage(string message) {
             Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine(message);
+            Console.ResetColor();
+        }
+
+        public static void ErrorMessage(string message) {
+            Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(message);
             Console.ResetColor();
         }
