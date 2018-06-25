@@ -167,11 +167,18 @@ namespace Gensearch
         public int gs_id {get; set;}
         [Unique, NotNull]
         public string gs_name {get; set;}
-        public int gs_set_name {get; set;}
+        public string gs_set_name {get; set;}
         [NotNull]
         public int raw_dmg {get; set;}
         [ForeignKey(typeof(ElementDamage))]
         public int elem_id {get; set;}
+        public int affinity {get; set;}
+        [ForeignKey(typeof(SharpnessValue))]
+        public int sharp_0_id {get; set;}
+        [ForeignKey(typeof(SharpnessValue))]
+        public int sharp_1_id {get; set;}
+        [ForeignKey(typeof(SharpnessValue))]
+        public int sharp_2_id {get; set;}
         [NotNull]
         public int slots {get; set;}
         [NotNull]
@@ -185,7 +192,11 @@ namespace Gensearch
         [OneToOne]
         public ElementDamage element {get; set;}
         [OneToOne]
-        public SharpnessValue sharpness {get; set;}
+        public SharpnessValue sharpness_0 {get; set;}
+        [OneToOne]
+        public SharpnessValue sharpness_1 {get; set;}
+        [OneToOne]
+        public SharpnessValue sharpness_2 {get; set;}
     }
 
     [Table("ElementDamages")]
@@ -202,9 +213,8 @@ namespace Gensearch
     public class SharpnessValue {
         [PrimaryKey, AutoIncrement]
         public int sharp_id {get; set;}
-        // Not setting the weapon_id as a primary key so it can be used across mulitple tables
         [NotNull]
-        public int weapon_id {get; set;}
+        public int handicraft_modifier {get; set;}
 
         // Values are tiny, small, medium, large
         public int red_sharpness_length {get; set;}

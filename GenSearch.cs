@@ -8,6 +8,7 @@ using AngleSharp;
 using AngleSharp.Dom;
 using SQLite;
 using Gensearch.Scrapers;
+using Gensearch.Helpers;
 
 namespace Gensearch
 {
@@ -54,7 +55,12 @@ namespace Gensearch
 
             if (args.Contains("--weapons")) {
                 var weaponManager = new Weapons();
+                ConsoleWriters.InfoMessage("Starting weapon retrieval...");
                 weaponManager.GetWeapons("http://mhgen.kiranico.com/greatsword").Wait();
+                timeSpan = TimeSpan.FromSeconds(Convert.ToInt32(stopwatch.Elapsed.TotalSeconds));
+                ConsoleWriters.InfoMessage("Done with all weapons! Took " + timeSpan.ToString("c") + ".\n\n");
+                stopwatch.Reset();
+                stopwatch.Start();
             }
             stopwatch.Stop();
         }

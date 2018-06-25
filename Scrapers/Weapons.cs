@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -34,7 +35,8 @@ namespace Gensearch.Scrapers
                 }
                 await Task.WhenAll(tasks);
             }
-            catch {
+            catch (Exception ex) {
+                Console.WriteLine(ex.ToString());
                 Console.WriteLine("Error getting page. Pausing for sixty seconds.");
                 Thread.Sleep(60000);
                 
@@ -42,27 +44,79 @@ namespace Gensearch.Scrapers
         }
 
         public async Task GetGreatSword(string address) {
-            var config = Configuration.Default.WithDefaultLoader(l => l.IsResourceLoadingEnabled = true).WithCss();
-            var context = BrowsingContext.New(config);
-            var page = await context.OpenAsync(address);
-            SQLiteAsyncConnection db = new SQLiteAsyncConnection("data/mhgen.db");
-            await db.CreateTablesAsync<GreatSword, SharpnessValue>();
+            try {
+                var config = Configuration.Default.WithDefaultLoader(l => l.IsResourceLoadingEnabled = true).WithCss();
+                var context = BrowsingContext.New(config);
+                var page = await context.OpenAsync(address);
+                SQLiteAsyncConnection db = new SQLiteAsyncConnection("data/mhgen.db");
+                await db.CreateTablesAsync<GreatSword, SharpnessValue, ElementDamage>();
 
-            string setname = page.QuerySelector("[itemprop=\"name\"]").TextContent.Split("/")[0].Trim();
-            ConsoleWriters.StartingPageMessage(setname, address);       
+                string setname = page.QuerySelector("[itemprop=\"name\"]").TextContent.Split("/")[0].Trim();
+                ConsoleWriters.StartingPageMessage(setname, address);
 
-            List<SharpnessValue> sharpvalues = new List<SharpnessValue>();
-            foreach (var tr in page.QuerySelector(".table").QuerySelectorAll("tr")) {
-                sharpvalues.AddRange(GetSharpness(page, tr, 0));
+                var crafting_table = page.QuerySelectorAll(".table")[1].QuerySelectorAll("tbody tr");
+                List<GreatSword> gses = new List<GreatSword>();
+                int current_wpn_index = 0;
+                foreach (var tr in page.QuerySelector(".table").QuerySelectorAll("tr")) {
+                    string weapon_name = tr.FirstElementChild.TextContent;
+                    int weapon_damage = Convert.ToInt32(tr.Children[1].TextContent);
+                    var specialinfo = tr.Children[2];
+                    ElementDamage element = null;
+                    int affinity = 0;
+                    if (specialinfo.QuerySelector("small") != null) {
+                        if (specialinfo.QuerySelector("small").TextContent.Any(char.IsLetter)) {
+                            element = GetElement(tr);
+                            await db.InsertAsync(element);
+                        }
+                        if (specialinfo.QuerySelectorAll("div").Count() == 2) {
+                            affinity = Convert.ToInt32(intsOnly.Replace(specialinfo.QuerySelectorAll("small")[1].TextContent.Trim(), ""));
+                        }
+                    }
+                    List<SharpnessValue> sharpvalues = GetSharpness(page, tr);
+                    await db.InsertAllAsync(sharpvalues);
+                    var techinfo = tr.Children[5];
+                    int slots = techinfo.FirstElementChild.TextContent.Count(c => c == '◯');
+                    int rarity = Convert.ToInt32(intsOnly.Replace(techinfo.Children[1].TextContent.Trim(), ""));
+                    string upgrades_into = "none";
+                    var upgradeinfo = crafting_table[current_wpn_index];
+                    if (upgradeinfo.FirstElementChild.QuerySelector(".font-weight-bold") != null) {
+                        upgrades_into = String.Join('\n', upgradeinfo.FirstElementChild.QuerySelectorAll("a").Select(a => a.TextContent.Trim()));
+                    }
+                    int price = Convert.ToInt32(intsOnly.Replace(upgradeinfo.Children[1].TextContent, ""));
+                    GreatSword gs = new GreatSword() {
+                        gs_name = weapon_name,
+                        gs_set_name = setname,
+                        raw_dmg = weapon_damage,
+                        affinity = affinity,
+                        sharp_0_id = sharpvalues[0].sharp_id,
+                        sharp_1_id = sharpvalues[1].sharp_id,
+                        sharp_2_id = sharpvalues[2].sharp_id,
+                        slots = slots,
+                        rarity = rarity,
+                        upgrades_into = upgrades_into,
+                        price = price
+                    };
+                    if (element != null) {
+                        gs.elem_id = element.elem_id;
+                    }
+                    gses.Add(gs);
+                    current_wpn_index++;
+                }
+                await db.InsertAllAsync(gses);
+                ConsoleWriters.CompletionMessage($"Finished with the {setname} set!");
             }
-            await db.InsertAllAsync(sharpvalues);
+            catch (Exception ex) {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.ToString());
+                Console.ResetColor();
+            }
         }
 
-        public List<SharpnessValue> GetSharpness(IDocument page, IElement wrapper, int weaponid) {
+        public List<SharpnessValue> GetSharpness(IDocument page, IElement wrapper) {
             List<SharpnessValue> values = new List<SharpnessValue>();
-            var sharpvalues = wrapper.QuerySelectorAll("td")[3];
-            foreach (var div in sharpvalues.QuerySelectorAll("div")) {
-                var spans = div.QuerySelectorAll("span");
+            var sharpvalues = wrapper.Children[3].QuerySelectorAll("div");
+            for (int i = 0; i <= 2; i++) {
+                var spans = sharpvalues[i].QuerySelectorAll("span");
                 int red_sharpness = Convert.ToInt32(intsOnly.Replace(page.DefaultView.GetComputedStyle(spans[0]).Width, "")) * 5;
                 int orange_sharpness = Convert.ToInt32(intsOnly.Replace(page.DefaultView.GetComputedStyle(spans[1]).Width, "")) * 5;
                 int yellow_sharpness = Convert.ToInt32(intsOnly.Replace(page.DefaultView.GetComputedStyle(spans[2]).Width, "")) * 5;
@@ -70,7 +124,7 @@ namespace Gensearch.Scrapers
                 int blue_sharpness = Convert.ToInt32(intsOnly.Replace(page.DefaultView.GetComputedStyle(spans[4]).Width, "")) * 5;
                 int white_sharpness = Convert.ToInt32(intsOnly.Replace(page.DefaultView.GetComputedStyle(spans[5]).Width, "")) * 5;
                 values.Add(new SharpnessValue() {
-                    weapon_id = weaponid,
+                    handicraft_modifier = i,
                     red_sharpness_length = red_sharpness,
                     orange_sharpness_length = orange_sharpness,
                     yellow_sharpness_length = yellow_sharpness,
@@ -80,6 +134,17 @@ namespace Gensearch.Scrapers
                 });
             }
             return values;
+        }
+
+        public ElementDamage GetElement(IElement wrapper) {
+            var div = wrapper.Children[2].QuerySelector("div");
+            int elem_amount = Convert.ToInt32(intsOnly.Replace(div.TextContent.Trim(), ""));
+            string elem_type = div.TextContent.Trim().Split(" ").Last();
+            return new ElementDamage() {
+                elem_type = elem_type,
+                elem_amount = elem_amount,
+            };
+
         }
     }
 }
