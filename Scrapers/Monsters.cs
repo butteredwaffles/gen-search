@@ -15,6 +15,7 @@ namespace Gensearch.Scrapers
 {
     public class Monsters
     {
+        static SQLiteAsyncConnection db = GenSearch.db;
         public async Task GetMonsters() {
             var config = Configuration.Default.WithDefaultLoader();
             var context = BrowsingContext.New(config);
@@ -34,10 +35,14 @@ namespace Gensearch.Scrapers
             await Task.WhenAll(tasks);
         }
 
+        public static async Task<Monster> GetMonsterFromDB(string name) {
+            var monsters = await db.Table<Monster>().Where(m => m.mon_name == name).ToListAsync();
+            return monsters[0];
+        }
+
         public async Task GetMonster(string address) {
             try {
                 var page = await BrowsingContext.New(Configuration.Default.WithDefaultLoader()).OpenAsync(address);
-                var db = new SQLiteAsyncConnection("data/mhgen.db");
                 await db.CreateTablesAsync<Monster, MonsterDrop, MonsterPart>();
                 // Adds basic monster info into the database.
                 var intvalues = page.QuerySelectorAll(".lead");

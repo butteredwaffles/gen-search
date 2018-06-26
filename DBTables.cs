@@ -169,6 +169,8 @@ namespace Gensearch
         [Unique, NotNull]
         public string sword_name {get; set;}
         public string sword_set_name {get; set;}
+        [ForeignKey(typeof(Monster))]
+        public int monster_id {get; set;}
         [NotNull]
         public int raw_dmg {get; set;}
         [ForeignKey(typeof(ElementDamage))]
@@ -198,8 +200,10 @@ namespace Gensearch
         public SharpnessValue sharpness_1 {get; set;}
         [OneToOne]
         public SharpnessValue sharpness_2 {get; set;}
+        [OneToOne]
+        public Monster monster {get; set;}
     }
-    
+
     [Table("ElementDamages")]
     public class ElementDamage {
         [PrimaryKey, AutoIncrement]
@@ -239,6 +243,7 @@ namespace Gensearch
         [NotNull]
         public string unlocks_creation {get; set;} // either no or yes
         public string is_scrap {get; set;} // if a scrap, it's a byproduct
+        public string usage {get; set;} // create or upgrade
 
     }
 }
