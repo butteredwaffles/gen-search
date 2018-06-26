@@ -19,9 +19,14 @@ namespace Gensearch.Scrapers
     {
         SQLiteAsyncConnection db = GenSearch.db;
         Regex intsOnly = new Regex(@"[^\d\+-]"); 
+
+        /// <summary>
+        /// Iterates through all the weapon URLS on a page and feeds each one into the database.
+        /// </summary>
+        /// <param name="addr">The address to pull from.</param>
         public async Task GetWeapons(string addr) {
             int throttle = 3;
-            string[] special_weapons = new string[] {"/dualblades", "/gunlance", "/chargeblade", "/switchaxe", "/lightbowgun", "/heavybowgun", "/bow", "/huntinghorn"};
+            string[] special_weapons = new string[] {"/gunlance", "/chargeblade", "/switchaxe", "/lightbowgun", "/heavybowgun", "/bow", "/huntinghorn"};
             await db.CreateTablesAsync<SwordValues, SharpnessValue, ElementDamage, CraftItem>();
             try {
                 List<Task> tasks = new List<Task>();
@@ -51,13 +56,13 @@ namespace Gensearch.Scrapers
         }
 
         /// <summary>
-        /// Gets greatswords, longswords, sword and shields, hammers, lances, and insect glaives.
-        /// The following weapons are excluded because of special characteristics:
-        ///     Switch Axe / Charge Blade - Phials
-        ///     LBG / HBG / Bow - Ammo
-        ///     Gunlance - Shells
-        ///     Dual Blades - Dual Elements
-        ///     Hunting Horn - Songs
+        /// Retrieves weapon information for greatswords, longswords, sword and shields, hammers, lances, and insect glaives.
+        /// <para>The following weapons are excluded because of special characteristics:</para>
+        ///     <para/>
+        ///     <para/>Switch Axe / Charge Blade - Phials
+        ///     <para/>LBG / HBG / Bow - Ammo
+        ///     <para/>Gunlance - Shells
+        ///     <para/>Hunting Horn - Songs
         /// </summary>
         /// <param name="address">The URL of the weapon.</param>
         public async Task GetGenericSword(string address) {
@@ -79,14 +84,6 @@ namespace Gensearch.Scrapers
                     sv.sharp_1_id = sharpvalues[1].sharp_id;
                     sv.sharp_2_id = sharpvalues[2].sharp_id;
                     sv.sword_set_name = setname;
-                    if (sv.element != null) {
-                        await db.InsertAsync(sv.element);
-                        sv.elem_id = sv.element.elem_id;
-                    }
-                    else {
-                        // Ints are non-nullable so setting it to a value that's impossible
-                        sv.elem_id = -1;
-                    }
 
                     if (address.Contains("/greatsword/")) { sv.sword_class = "Great Sword"; }
                     else if (address.Contains("/longsword/")) { sv.sword_class = "Long Sword"; }
@@ -94,12 +91,17 @@ namespace Gensearch.Scrapers
                     else if (address.Contains("/hammer/")) { sv.sword_class = "Hammer"; }
                     else if (address.Contains("/lance/")) { sv.sword_class = "Great Sword"; }
                     else if (address.Contains("/insectglaive/")) {sv.sword_class = "Insect Glaive"; }
+                    else if (address.Contains("/dualblades/")) {sv.sword_class = "Dual Blades";}
                     await db.InsertAsync(sv);
 
                     List<CraftItem> craftitems = GetCraftItems(crafting_table.Children[current_wpn_index]);
                     foreach (CraftItem item in craftitems) {
                         item.creation_id = sv.sword_id;
                     }
+                    foreach (ElementDamage element in sv.element) {
+                        element.weapon_id = sv.sword_id;
+                    }
+                    await db.InsertAllAsync(sv.element);
                     await db.InsertAllAsync(craftitems);
                     current_wpn_index++;
                 }
@@ -110,7 +112,15 @@ namespace Gensearch.Scrapers
                 await GetGenericSword(address);
             }
         }
-
+        
+        /// <summary>
+        /// Gets general weapon information. Blademaster only.
+        /// </summary>
+        /// <param name="page">The IDocument holding the page information.</param>
+        /// <param name="wrapper">The table row element holding the weapon information.</param>
+        /// <param name="crafting">The table containing information on price, upgrades, and items.</param>
+        /// <param name="current_index">The index of the wrapper element in its parent table.</param>
+        /// <returns>Returns a SwordValues object containing the retrieved information.</returns>
         public async Task<SwordValues> GetSwordAttributes(IDocument page, IElement wrapper, IElement crafting, int current_index) {
             string weapon_name = wrapper.FirstElementChild.TextContent;
             int weapon_damage = Convert.ToInt32(wrapper.Children[1].TextContent);
@@ -122,11 +132,11 @@ namespace Gensearch.Scrapers
             if (upgradeinfo[0].QuerySelector(".font-weight-bold") != null) {
                 upgrades_into = String.Join('\n', upgradeinfo[0].QuerySelectorAll("a").Select(a => a.TextContent.Trim()));
             }
-            ElementDamage element = null;
+            List<ElementDamage> elements = new List<ElementDamage>();
             int affinity = 0;
             foreach (var small in wrapper.Children[2].QuerySelectorAll("small")) {
                 if (small.TextContent.Any(char.IsLetter)) {
-                    element = GetElement(wrapper);
+                    elements.Add(GetElement(small));
                 }
                 else {
                     affinity = Convert.ToInt32(intsOnly.Replace(small.TextContent.Trim(), ""));
@@ -144,12 +154,22 @@ namespace Gensearch.Scrapers
                 rarity = rarity,
                 upgrades_into = upgrades_into,
                 price = price,
-                element = element,
+                element = elements,
                 affinity = affinity,
                 monster_id = monsterid,
             };
         }
 
+        /// <summary>
+        /// Retrieves weapon sharpness information. Blademaster only.
+        /// </summary>
+        /// <param name="page">The IDocument holding the page information.</param>
+        /// <param name="wrapper">The table row element holding the weapon information.</param>
+        /// <returns>
+        /// <para>Returns a list of SharpnessValue objects.</para>
+        /// <para>Index zero is the base weapon sharpness, index one is the sharpness with the skill Sharpness+1, and index two
+        /// is the sharpness with Sharpness+2.</para>
+        /// </returns>
         public List<SharpnessValue> GetSharpness(IDocument page, IElement wrapper) {
             List<SharpnessValue> values = new List<SharpnessValue>();
             var sharpvalues = wrapper.Children[3].QuerySelectorAll("div");
@@ -173,11 +193,19 @@ namespace Gensearch.Scrapers
             }
             return values;
         }
-
-        public ElementDamage GetElement(IElement wrapper) {
-            var div = wrapper.Children[2].QuerySelector("div");
-            int elem_amount = Convert.ToInt32(intsOnly.Replace(div.TextContent.Trim(), ""));
-            string elem_type = div.TextContent.Trim().Split(" ").Last();
+        
+        /// <summary>
+        /// Gets the special elements related to the weapon. May be used for both Blademaster and Gunner weapons.
+        /// <para>The term "elements" includes literal elemental qualitites (such as 28 Poison), status damage
+        /// (such as 14 Para), and defense that the weapon adds on top of your armor (such as 20 Def).</para>
+        /// </summary>
+        /// <param name="small">The <c>small</c> element containing the element information.</param>
+        /// <returns>
+        /// Returns an <c>ElementDamage</c> object with the element information.
+        /// </returns>
+        public ElementDamage GetElement(IElement small) {
+            int elem_amount = Convert.ToInt32(intsOnly.Replace(small.TextContent.Trim(), ""));
+            string elem_type = small.TextContent.Trim().Split(" ").Last();
             return new ElementDamage() {
                 elem_type = elem_type,
                 elem_amount = elem_amount,

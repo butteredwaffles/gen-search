@@ -173,8 +173,6 @@ namespace Gensearch
         public int monster_id {get; set;}
         [NotNull]
         public int raw_dmg {get; set;}
-        [ForeignKey(typeof(ElementDamage))]
-        public int elem_id {get; set;}
         public int affinity {get; set;}
         [ForeignKey(typeof(SharpnessValue))]
         public int sharp_0_id {get; set;}
@@ -191,9 +189,6 @@ namespace Gensearch
         [NotNull]
         public int price {get; set;}
 
-
-        [OneToOne]
-        public ElementDamage element {get; set;}
         [OneToOne]
         public SharpnessValue sharpness_0 {get; set;}
         [OneToOne]
@@ -202,12 +197,17 @@ namespace Gensearch
         public SharpnessValue sharpness_2 {get; set;}
         [OneToOne]
         public Monster monster {get; set;}
+
+        [Ignore]
+        public List<ElementDamage> element {get; set;}
     }
 
     [Table("ElementDamages")]
     public class ElementDamage {
         [PrimaryKey, AutoIncrement]
         public int elem_id {get; set;}
+        [ForeignKey(typeof(SwordValues)), NotNull]
+        public int weapon_id {get; set;}
         [NotNull]
         public string elem_type {get; set;} // fire, water, ice, etc.
         [NotNull]
