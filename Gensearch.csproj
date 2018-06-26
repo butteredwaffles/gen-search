@@ -3,7 +3,11 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <GenerateProgramFile>false</GenerateProgramFile>
-    <NoWarn>NU1701</NoWarn>
+    <NoWarn>NU1701, 1591</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <DocumentationFile>bin\docs.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <None Update="data/mhgen.db">

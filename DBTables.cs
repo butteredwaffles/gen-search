@@ -202,6 +202,15 @@ namespace Gensearch
         public List<ElementDamage> element {get; set;}
     }
 
+    [Table("HuntingHorns")]
+    public class HuntingHorn {
+        [PrimaryKey, AutoIncrement]
+        public int hh_id {get; set;}
+        [ForeignKey(typeof(SwordValues)), NotNull]
+        public int sword_id {get; set;}
+        public string notes {get; set;}
+    }
+
     [Table("ElementDamages")]
     public class ElementDamage {
         [PrimaryKey, AutoIncrement]
