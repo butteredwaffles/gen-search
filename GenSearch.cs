@@ -59,7 +59,7 @@ namespace Gensearch
                 var weaponManager = new Weapons();
                 ConsoleWriters.InfoMessage("Starting weapon retrieval...");
                 string[] weaponurls = new string[] {
-                    "huntinghorn", "dualblades", "greatsword", "longsword", "swordshield", "hammer", "lance", "insectglaive"
+                    "gunlance", "chargeblade", "switchaxe", "huntinghorn", "dualblades", "greatsword", "longsword", "swordshield", "hammer", "lance", "insectglaive"
                 };
                 indiv_weapon_watch.Start();
                 foreach (string category in weaponurls) {

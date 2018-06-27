@@ -211,6 +211,15 @@ namespace Gensearch
         public string notes {get; set;}
     }
 
+    [Table("PhialAndShellWeapons")]
+    public class PhialOrShellWeapon {
+        [PrimaryKey, AutoIncrement]
+        public int pw_id {get; set;}
+        [ForeignKey(typeof(SwordValues)), NotNull]
+        public int sword_id {get; set;}
+        public string phial_or_shell_type {get; set;}
+    }
+
     [Table("ElementDamages")]
     public class ElementDamage {
         [PrimaryKey, AutoIncrement]

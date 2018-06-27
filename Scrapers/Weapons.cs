@@ -28,15 +28,18 @@ namespace Gensearch.Scrapers
             int throttle = 3;
             string[] special_weapons = new string[] {"/gunlance", "/chargeblade", "/switchaxe", "/lightbowgun", "/heavybowgun", "/bow", "/huntinghorn"};
             await db.CreateTablesAsync<SwordValues, SharpnessValue, ElementDamage, CraftItem, HuntingHorn>();
+            await db.CreateTableAsync<PhialOrShellWeapon>();
+
             try {
                 List<Task> tasks = new List<Task>();
                 var config = Configuration.Default.WithDefaultLoader().WithJavaScript().WithCss();
                 var context = BrowsingContext.New(config);
                 var page = await context.OpenAsync(addr);
                 int page_length = Convert.ToInt32(page.ExecuteScript("window[\"mhgen\"][\"weapons\"].length"));
+                string address;
                 if (!special_weapons.Any(w => addr.Contains(w))) {
                     for (int i = 0; i < page_length; i++) {
-                        string address = (string) page.ExecuteScript($"window[\"mhgen\"][\"weapons\"][{i.ToString()}].url");
+                        address = (string) page.ExecuteScript($"window[\"mhgen\"][\"weapons\"][{i.ToString()}].url");
                         tasks.Add(GetGenericSword(address));
 
                         if (tasks.Count == throttle) {
@@ -48,13 +51,25 @@ namespace Gensearch.Scrapers
                 }
                 else if (addr.Contains("/huntinghorn")) {
                     for (int i = 0; i < page_length; i++) {
-                        string address = (string) page.ExecuteScript($"window[\"mhgen\"][\"weapons\"][{i.ToString()}].url");
+                        address = (string) page.ExecuteScript($"window[\"mhgen\"][\"weapons\"][{i.ToString()}].url");
                         int[] notes = new int[] {
                             Convert.ToInt32((double) page.ExecuteScript($"window[\"mhgen\"][\"weapons\"][{i}][\"levels\"][0][\"hhnotes\"][0][\"color_1\"]")),
                             Convert.ToInt32((double) page.ExecuteScript($"window[\"mhgen\"][\"weapons\"][{i}][\"levels\"][0][\"hhnotes\"][0][\"color_2\"]")),
                             Convert.ToInt32((double) page.ExecuteScript($"window[\"mhgen\"][\"weapons\"][{i}][\"levels\"][0][\"hhnotes\"][0][\"color_3\"]")),
                         };
                         tasks.Add(GetHuntingHorn(address, notes));
+
+                        if (tasks.Count == throttle) {
+                            Task completed = await Task.WhenAny(tasks);
+                            tasks.Remove(completed);
+                        }
+                    }
+                    await Task.WhenAll(tasks);
+                }
+                else if (addr.Contains("/switchaxe") || addr.Contains("/chargeblade") || addr.Contains("/gunlance")) {
+                    for (int i = 0; i < page_length; i++) {
+                        address = (string) page.ExecuteScript($"window[\"mhgen\"][\"weapons\"][{i.ToString()}].url");
+                        tasks.Add(GetPhialAndShellWeapons(address));
 
                         if (tasks.Count == throttle) {
                             Task completed = await Task.WhenAny(tasks);
@@ -74,15 +89,10 @@ namespace Gensearch.Scrapers
 
         /// <summary>
         /// Retrieves weapon information for greatswords, longswords, sword and shields, hammers, lances, and insect glaives.
-        /// <para>The following weapons are excluded because of special characteristics:</para>
-        ///     <para/>
-        ///     <para/>Switch Axe / Charge Blade - Phials
-        ///     <para/>LBG / HBG / Bow - Ammo
-        ///     <para/>Gunlance - Shells
-        ///     <para/>Hunting Horn - Songs
         /// </summary>
         /// <param name="address">The URL of the weapon.</param>
         /// <para><see cref="GetHuntingHorn(string, int[])"></see> if you wish to gather information on hunting horns.</para>
+        /// <para><see cref="GetPhialAndShellWeapons(string)"></see> if you wish to gather information on switch axes, charge blades, and gunlances..</para>
         public async Task GetGenericSword(string address) {
             try {
                 var config = Configuration.Default.WithDefaultLoader(l => l.IsResourceLoadingEnabled = true).WithCss();
@@ -211,6 +221,58 @@ namespace Gensearch.Scrapers
             catch (Exception ex) {
                 ConsoleWriters.ErrorMessage(ex.ToString());
                 await GetHuntingHorn(address, notes);
+            }
+        }
+
+        public async Task GetPhialAndShellWeapons(string address) {
+            try {
+                var config = Configuration.Default.WithDefaultLoader(l => l.IsResourceLoadingEnabled = true).WithCss();
+                var context = BrowsingContext.New(config);
+                var page = await context.OpenAsync(address);
+                string setname = page.QuerySelector("[itemprop=\"name\"]").TextContent.Split("/")[0].Trim();
+                ConsoleWriters.StartingPageMessage($"Started work on the {setname} series. ({address})");
+
+                var crafting_table = page.QuerySelectorAll(".table")[1].QuerySelector("tbody");
+                int current_wpn_index = 0;
+                foreach (var tr in page.QuerySelector(".table").QuerySelectorAll("tr")) {
+
+                    SwordValues sv = await GetSwordAttributes(page, tr, crafting_table, current_wpn_index);
+                    List<SharpnessValue> sharpvalues = GetSharpness(page, tr);
+                    await db.InsertAllAsync(sharpvalues);
+                    sv.sharp_0_id = sharpvalues[0].sharp_id;
+                    sv.sharp_1_id = sharpvalues[1].sharp_id;
+                    sv.sharp_2_id = sharpvalues[2].sharp_id;
+                    sv.sword_set_name = setname;
+
+                    if (address.Contains("/chargeblade/")) { sv.sword_class = "Charge Blade"; }
+                    else if (address.Contains("/gunlance/")) { sv.sword_class = "Gunlance"; }
+                    else { sv.sword_class = "Switch Axe"; }
+                    await db.InsertAsync(sv);
+
+                    List<CraftItem> craftitems = GetCraftItems(crafting_table.Children[current_wpn_index]);
+                    foreach (CraftItem item in craftitems) {
+                        item.creation_id = sv.sword_id;
+                    }
+                    foreach (ElementDamage element in sv.element) {
+                        element.weapon_id = sv.sword_id;
+                    }
+                    await db.InsertAllAsync(sv.element);
+                    await db.InsertAllAsync(craftitems);
+
+                    string phialtype = GetPhialType(tr, sv.sword_class);
+                    PhialOrShellWeapon weapon = new PhialOrShellWeapon() {
+                        sword_id = sv.sword_id,
+                        phial_or_shell_type = phialtype
+                    };
+                    await db.InsertAsync(weapon);
+
+                    current_wpn_index++;
+                }
+                ConsoleWriters.CompletionMessage($"Finished with the {setname} series!");
+            }
+            catch (Exception ex) {
+                ConsoleWriters.ErrorMessage(ex.ToString());
+                await GetPhialAndShellWeapons(address);
             }
         }
         
@@ -374,6 +436,18 @@ namespace Gensearch.Scrapers
             }
             
             return items; 
+        }
+
+        /// <summary>
+        /// Get the phial and/or shell name from a weapon. For charge blades, switch axes, and gunlances.
+        /// </summary>
+        /// <param name="wrapper">The table row element containing the weapon information.</param>
+        /// <param name="type">The type of weapon.</param>
+        /// <returns>Returns a string with the phial type.</returns>
+        public string GetPhialType(IElement wrapper, string type) {
+            var phialinfo = wrapper.Children[4].TextContent;
+            if (type == "Gunlance") {return phialinfo.Trim(); }
+            else { return phialinfo.Split(':')[1].Trim(); }
         }
     }
 }
