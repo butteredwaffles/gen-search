@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AngleSharp;
@@ -44,11 +45,17 @@ namespace Gensearch.Scrapers
                 var techinfo = tr.Children[5];
                 int slots = techinfo.FirstElementChild.TextContent.Count(c => c == '◯');
                 int rarity = Convert.ToInt32(techinfo.Children[1].TextContent.Trim().Replace("RARE", ""));
+
+                int monsterid = -1;
+                if (page.QuerySelectorAll(".lead").Count() == 3) {
+                    monsterid = (await Monsters.GetMonsterFromDB(page.QuerySelectorAll(".lead")[2].TextContent.Trim())).id;
+                }
                 
                 Bow bow = new Bow() {
+                    monster_id = monsterid,
                     bow_name = weapon_name,
                     bow_damage = weapon_damage,
-                    arc_type = bow_shots[0].Split(":")[1].Trim().ToLower(),
+                    arc_type = bow_shots[0].Split(":")[1].Trim(),
                     level_one_charge = bow_shots[1],
                     level_two_charge = bow_shots[2],
                     level_three_charge = bow_shots[3],

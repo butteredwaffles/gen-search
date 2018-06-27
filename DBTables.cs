@@ -272,6 +272,8 @@ namespace Gensearch
         [PrimaryKey, AutoIncrement]
         public int bow_id {get; set;}
         [NotNull]
+        [ForeignKey(typeof(Monster))]
+        public int monster_id {get; set;}
         public string bow_name {get; set;}
         [NotNull]
         public int bow_damage {get; set;}
@@ -289,5 +291,100 @@ namespace Gensearch
         [NotNull]
         public int rarity {get; set;}
 
+        [OneToOne]
+        public Monster monster {get; set;}
+
+    }
+
+    [Table("Bowguns")]
+    public class Bowgun {
+        [PrimaryKey, AutoIncrement]
+        public int bg_id {get; set;}
+        [NotNull]
+        [ForeignKey(typeof(Monster))]
+        public int monster_id {get; set;}
+        public string bg_name {get; set;}
+        [NotNull]
+        public int bg_damage {get; set;}
+        [NotNull]
+        public string reload_speed {get; set;}
+        [NotNull]
+        public string recoil {get; set;}
+        [NotNull]
+        public string deviation {get; set;}
+        public int slots {get; set;}
+        public int rarity {get; set;}
+
+        [OneToOne]
+        public Monster monster {get; set;}
+    }
+
+    [Table("BowgunAmmo")]
+    public class BowgunAmmo {
+        [PrimaryKey, AutoIncrement]
+        public int ammo_id {get; set;}
+        [ForeignKey(typeof(Bowgun)), NotNull]
+        public int bowgun_id {get; set;}
+
+        public string normal_1 {get; set;}
+        public string normal_2 {get; set;}
+        public string normal_3 {get; set;}
+        public string recover_1 {get; set;}
+        public string recover_2 {get; set;}
+        public string fire {get; set;}
+
+        public string pierce_1 {get; set;}
+        public string pierce_2 {get; set;}
+        public string pierce_3 {get; set;}
+        public string poison_1 {get; set;}
+        public string poison_2 {get; set;}
+        public string water {get; set;}
+
+        public string pellet_1 {get; set;}
+        public string pellet_2 {get; set;}
+        public string pellet_3 {get; set;}
+        public string paralysis_1 {get; set;}
+        public string paralysis_2 {get; set;}
+        public string thunder {get; set;}
+
+        public string crag_1 {get; set;}
+        public string crag_2 {get; set;}
+        public string crag_3 {get; set;}
+        public string sleep_1 {get; set;}
+        public string sleep_2 {get; set;}
+        public string ice {get; set;}
+
+        public string clust_1 {get; set;}
+        public string clust_2 {get; set;}
+        public string clust_3 {get; set;}
+        public string exhaust_1 {get; set;}
+        public string exhaust_2 {get; set;}
+        public string dragon {get; set;}
+    }
+
+    [Table("InternalBowgunAmmo")]
+    public class InternalBowgunAmmo {
+        [PrimaryKey, AutoIncrement]
+        public int int_bg_id {get; set;}
+        [ForeignKey(typeof(Bowgun)), NotNull]
+        public int bowgun_id {get; set;}
+        public string ammo_name {get; set;}
+        public int total_ammo {get; set;}
+        public int load_amt {get; set;}
+    }
+
+    [Table("SpecialBowgunAmmo")]
+    public class SpecialBowgunAmmo {
+        [PrimaryKey, AutoIncrement]
+        public int sp_bg_id {get; set;}
+        [ForeignKey(typeof(Bowgun)), NotNull]
+        public int bowgun_id {get; set;}
+        public string ammo_type {get; set;} // rapid fire or crouching fire
+        public string ammo_name {get; set;}
+        public int shots {get; set;}
+
+        // these two only apply to LBGs/rapid fire
+        public int multiplier {get; set;}
+        public int wait {get; set;}
     }
 }

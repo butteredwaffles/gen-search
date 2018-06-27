@@ -27,7 +27,7 @@ namespace Gensearch.Scrapers
         /// </summary>
         /// <param name="addr">The address to pull from.</param>
         public async Task GetWeapons(string addr) {
-            int throttle = 3;
+            int throttle = 5;
             string[] special_weapons = new string[] {"/gunlance", "/chargeblade", "/switchaxe", "/lightbowgun", "/heavybowgun", "/bow", "/huntinghorn"};
             await db.CreateTablesAsync<SwordValues, SharpnessValue, ElementDamage, CraftItem, HuntingHorn>();
             await db.CreateTablesAsync<PhialOrShellWeapon, Bow>();
