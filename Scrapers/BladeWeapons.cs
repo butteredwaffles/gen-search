@@ -34,7 +34,7 @@ namespace Gensearch.Scrapers
                 foreach (var tr in page.QuerySelector(".table").QuerySelectorAll("tr")) {
 
                     SwordValues sv = await GetSwordAttributes(page, tr, crafting_table, current_wpn_index);
-                    List<SharpnessValue> sharpvalues = GetSharpness(page, tr);
+                    List<SharpnessValue> sharpvalues = GetSharpness(tr);
                     await db.InsertAllAsync(sharpvalues);
                     sv.sharp_0_id = sharpvalues[0].sharp_id;
                     sv.sharp_1_id = sharpvalues[1].sharp_id;
@@ -117,7 +117,7 @@ namespace Gensearch.Scrapers
                 int current_wpn_index = 0;
                 foreach (var tr in page.QuerySelector(".table").QuerySelectorAll("tr")) {
                     SwordValues sv = await GetSwordAttributes(page, tr, crafting_table, current_wpn_index);
-                    List<SharpnessValue> sharpvalues = GetSharpness(page, tr);
+                    List<SharpnessValue> sharpvalues = GetSharpness(tr);
                     await db.InsertAllAsync(sharpvalues);
                     sv.sharp_0_id = sharpvalues[0].sharp_id;
                     sv.sharp_1_id = sharpvalues[1].sharp_id;
@@ -167,7 +167,7 @@ namespace Gensearch.Scrapers
                 foreach (var tr in page.QuerySelector(".table").QuerySelectorAll("tr")) {
 
                     SwordValues sv = await GetSwordAttributes(page, tr, crafting_table, current_wpn_index);
-                    List<SharpnessValue> sharpvalues = GetSharpness(page, tr);
+                    List<SharpnessValue> sharpvalues = GetSharpness(tr);
                     await db.InsertAllAsync(sharpvalues);
                     sv.sharp_0_id = sharpvalues[0].sharp_id;
                     sv.sharp_1_id = sharpvalues[1].sharp_id;
@@ -257,24 +257,23 @@ namespace Gensearch.Scrapers
         /// <summary>
         /// Retrieves weapon sharpness information. Blademaster only.
         /// </summary>
-        /// <param name="page">The IDocument holding the page information.</param>
         /// <param name="wrapper">The table row element holding the weapon information.</param>
         /// <returns>
         /// <para>Returns a list of SharpnessValue objects.</para>
         /// <para>Index zero is the base weapon sharpness, index one is the sharpness with the skill Sharpness+1, and index two
         /// is the sharpness with Sharpness+2.</para>
         /// </returns>
-        public List<SharpnessValue> GetSharpness(IDocument page, IElement wrapper) {
+        public List<SharpnessValue> GetSharpness(IElement wrapper) {
             List<SharpnessValue> values = new List<SharpnessValue>();
             var sharpvalues = wrapper.Children[3].QuerySelectorAll("div");
             for (int i = 0; i <= 2; i++) {
                 var spans = sharpvalues[i].QuerySelectorAll("span");
-                int red_sharpness = Convert.ToInt32(intsOnly.Replace(page.DefaultView.GetComputedStyle(spans[0]).Width, "")) * 5;
-                int orange_sharpness = Convert.ToInt32(intsOnly.Replace(page.DefaultView.GetComputedStyle(spans[1]).Width, "")) * 5;
-                int yellow_sharpness = Convert.ToInt32(intsOnly.Replace(page.DefaultView.GetComputedStyle(spans[2]).Width, "")) * 5;
-                int green_sharpness = Convert.ToInt32(intsOnly.Replace(page.DefaultView.GetComputedStyle(spans[3]).Width, "")) * 5;
-                int blue_sharpness = Convert.ToInt32(intsOnly.Replace(page.DefaultView.GetComputedStyle(spans[4]).Width, "")) * 5;
-                int white_sharpness = Convert.ToInt32(intsOnly.Replace(page.DefaultView.GetComputedStyle(spans[5]).Width, "")) * 5;
+                int red_sharpness = Convert.ToInt32(intsOnly.Replace(spans[0].Style.Width, "")) * 5;
+                int orange_sharpness = Convert.ToInt32(intsOnly.Replace(spans[1].Style.Width, "")) * 5;
+                int yellow_sharpness = Convert.ToInt32(intsOnly.Replace(spans[2].Style.Width, "")) * 5;
+                int green_sharpness = Convert.ToInt32(intsOnly.Replace(spans[3].Style.Width, "")) * 5;
+                int blue_sharpness = Convert.ToInt32(intsOnly.Replace(spans[4].Style.Width, "")) * 5;
+                int white_sharpness = Convert.ToInt32(intsOnly.Replace(spans[5].Style.Width, "")) * 5;
                 values.Add(new SharpnessValue() {
                     handicraft_modifier = i,
                     red_sharpness_length = red_sharpness,

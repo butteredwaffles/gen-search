@@ -48,7 +48,7 @@ namespace Gensearch.Scrapers
                 Bow bow = new Bow() {
                     bow_name = weapon_name,
                     bow_damage = weapon_damage,
-                    arc_type = bow_shots[0],
+                    arc_type = bow_shots[0].Split(":")[1].Trim().ToLower(),
                     level_one_charge = bow_shots[1],
                     level_two_charge = bow_shots[2],
                     level_three_charge = bow_shots[3],
