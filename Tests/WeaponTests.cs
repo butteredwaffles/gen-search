@@ -18,7 +18,7 @@ namespace Gensearch.Tests
             var context = BrowsingContext.New(config);
             var page = await context.OpenAsync("http://mhgen.kiranico.com/greatsword/sentoryo-calamity");
 
-            List<SharpnessValue> sharpness_data = weaponManager.GetSharpness(page, page.QuerySelector(".table").QuerySelector("tr"));
+            List<SharpnessValue> sharpness_data = weaponManager.bw.GetSharpness(page, page.QuerySelector(".table").QuerySelector("tr"));
             SharpnessValue sharpness_value = new SharpnessValue() {
                 red_sharpness_length = 80,
                 orange_sharpness_length = 40,
