@@ -13,7 +13,8 @@ namespace Gensearch.Scrapers
     public class BladeWeapons
     {
         SQLiteAsyncConnection db = GenSearch.db;
-        Regex intsOnly = new Regex(@"[^\d\+-]"); 
+        Regex intsOnly = new Regex(@"[^\d\+-]");
+
         /// <summary>
         /// Retrieves weapon information for greatswords, longswords, sword and shields, hammers, lances, and insect glaives.
         /// </summary>
@@ -49,9 +50,10 @@ namespace Gensearch.Scrapers
                     else if (address.Contains("/dualblades/")) {sv.sword_class = "Dual Blades";}
                     await db.InsertAsync(sv);
 
-                    List<CraftItem> craftitems = GetCraftItems(crafting_table.Children[current_wpn_index]);
+                    List<CraftItem> craftitems = Weapons.GetCraftItems(crafting_table.Children[current_wpn_index]);
                     foreach (CraftItem item in craftitems) {
                         item.creation_id = sv.sword_id;
+                        item.creation_type = "Blademaster";
                     }
                     foreach (ElementDamage element in sv.element) {
                         element.weapon_id = sv.sword_id;
@@ -124,9 +126,10 @@ namespace Gensearch.Scrapers
                     sv.sword_class = "Hunting Horn";
                     await db.InsertAsync(sv);
 
-                    List<CraftItem> craftitems = GetCraftItems(crafting_table.Children[current_wpn_index]);
+                    List<CraftItem> craftitems = Weapons.GetCraftItems(crafting_table.Children[current_wpn_index]);
                     foreach (CraftItem item in craftitems) {
                         item.creation_id = sv.sword_id;
+                        item.creation_type = "Blademaster";
                     }
                     foreach (ElementDamage element in sv.element) {
                         element.weapon_id = sv.sword_id;
@@ -176,9 +179,10 @@ namespace Gensearch.Scrapers
                     else { sv.sword_class = "Switch Axe"; }
                     await db.InsertAsync(sv);
 
-                    List<CraftItem> craftitems = GetCraftItems(crafting_table.Children[current_wpn_index]);
+                    List<CraftItem> craftitems = Weapons.GetCraftItems(crafting_table.Children[current_wpn_index]);
                     foreach (CraftItem item in craftitems) {
                         item.creation_id = sv.sword_id;
+                        item.creation_type = "Blademaster";
                     }
                     foreach (ElementDamage element in sv.element) {
                         element.weapon_id = sv.sword_id;
@@ -226,7 +230,7 @@ namespace Gensearch.Scrapers
             int affinity = 0;
             foreach (var small in wrapper.Children[2].QuerySelectorAll("small")) {
                 if (small.TextContent.Any(char.IsLetter)) {
-                    elements.Add(GetElement(small));
+                    elements.Add(Weapons.GetElement(small));
                 }
                 else {
                     affinity = Convert.ToInt32(intsOnly.Replace(small.TextContent.Trim(), ""));
@@ -282,87 +286,6 @@ namespace Gensearch.Scrapers
                 });
             }
             return values;
-        }
-        
-        /// <summary>
-        /// Gets the special elements related to the weapon. May be used for both Blademaster and Gunner weapons.
-        /// <para>The term "elements" includes literal elemental qualitites (such as 28 Poison), status damage
-        /// (such as 14 Para), and defense that the weapon adds on top of your armor (such as 20 Def).</para>
-        /// </summary>
-        /// <param name="small">The <c>small</c> element containing the element information.</param>
-        /// <returns>
-        /// Returns an <c>ElementDamage</c> object with the element information.
-        /// </returns>
-        public ElementDamage GetElement(IElement small) {
-            int elem_amount = Convert.ToInt32(intsOnly.Replace(small.TextContent.Trim(), ""));
-            string elem_type = small.TextContent.Trim().Split(" ").Last();
-            return new ElementDamage() {
-                elem_type = elem_type,
-                elem_amount = elem_amount,
-            };
-        }
-
-        public List<CraftItem> GetCraftItems(IElement wrapper) {
-            var tds = wrapper.QuerySelectorAll("td");
-            List<CraftItem> items = new List<CraftItem>();
-            var upgrade_children = tds[3].Children;
-            var create_children = tds[2].Children;
-
-            bool is_scrap = false;
-            foreach (var child in create_children) {
-                if (child.NodeName == "DIV" && child.TextContent == "Scraps") {
-                    is_scrap = true;
-                }
-                else if (child.NodeName == "A") {
-                    string item_name = child.TextContent.Trim();
-                    int quantity;
-                    string unlocks_creation = "no";
-                    if (child.GetAttribute("data-toggle") != null) {
-                        quantity = Convert.ToInt32(intsOnly.Replace(child.TextContent, ""));
-                    }
-                    else {
-                        quantity = Convert.ToInt32(intsOnly.Replace(child.NextSibling.TextContent, ""));
-                        if (child.NextSibling.TextContent.Contains("Unlock")) {
-                            unlocks_creation = "yes";
-                        }
-                    }
-                    
-                    items.Add(new CraftItem() {
-                        item_name = item_name,
-                        quantity = quantity,
-                        is_scrap = is_scrap ? "yes" : "no",
-                        unlocks_creation = unlocks_creation,
-                        usage = is_scrap ? "byproduct" : "create"
-                    });
-                }
-            }
-            is_scrap = false;
-
-            foreach (var child in upgrade_children) {
-                if (child.NodeName == "DIV" && child.TextContent == "Scraps") {
-                    is_scrap = true;
-                }
-                else if (child.NodeName == "A") {
-                    string item_name = child.TextContent.Trim();
-                    int quantity;
-                    if (child.GetAttribute("data-toggle") != null) {
-                        quantity = Convert.ToInt32(intsOnly.Replace(child.TextContent, ""));
-                    }
-                    else {
-                        quantity = Convert.ToInt32(intsOnly.Replace(child.NextSibling.TextContent, ""));
-                    }
-                    
-                    items.Add(new CraftItem() {
-                        item_name = item_name,
-                        quantity = quantity,
-                        is_scrap = is_scrap ? "yes" : "no",
-                        unlocks_creation = "no",
-                        usage = is_scrap ? "byproduct" : "upgrade"
-                    });
-                }
-            }
-            
-            return items; 
         }
 
         /// <summary>

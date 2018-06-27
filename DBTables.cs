@@ -224,7 +224,7 @@ namespace Gensearch
     public class ElementDamage {
         [PrimaryKey, AutoIncrement]
         public int elem_id {get; set;}
-        [ForeignKey(typeof(SwordValues)), NotNull]
+        [NotNull]
         public int weapon_id {get; set;}
         [NotNull]
         public string elem_type {get; set;} // fire, water, ice, etc.
@@ -255,6 +255,8 @@ namespace Gensearch
         // Because it can also be from a selected group of items such as "Ore" or "Insect", using names
         public string item_name {get; set;}
         [NotNull]
+        public string creation_type {get; set;}
+        [NotNull]
         public int creation_id {get; set;}
         [NotNull]
         public int quantity {get; set;}
@@ -262,6 +264,30 @@ namespace Gensearch
         public string unlocks_creation {get; set;} // either no or yes
         public string is_scrap {get; set;} // if a scrap, it's a byproduct
         public string usage {get; set;} // create or upgrade
+
+    }
+
+    [Table("Bows")]
+    public class Bow {
+        [PrimaryKey, AutoIncrement]
+        public int bow_id {get; set;}
+        [NotNull]
+        public string bow_name {get; set;}
+        [NotNull]
+        public int bow_damage {get; set;}
+        [NotNull]
+        public string arc_type {get; set;}
+
+        public string level_one_charge {get; set;}
+        public string level_two_charge {get; set;}
+        public string level_three_charge {get; set;}
+        public string level_four_charge {get; set;}
+
+        public string supported_coatings {get; set;}
+        [NotNull]
+        public int slots {get; set;}
+        [NotNull]
+        public int rarity {get; set;}
 
     }
 }
