@@ -59,6 +59,8 @@ namespace Gensearch
                 var weaponManager = new Weapons();
                 ConsoleWriters.InfoMessage("Starting weapon retrieval...");
                 string[] weaponurls = new string[] {
+                    "heavybowgun",
+                    "lightbowgun",
                     "bow", 
                     "gunlance", 
                     "chargeblade", 

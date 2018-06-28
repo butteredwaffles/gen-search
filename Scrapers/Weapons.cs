@@ -31,6 +31,7 @@ namespace Gensearch.Scrapers
             string[] special_weapons = new string[] {"/gunlance", "/chargeblade", "/switchaxe", "/lightbowgun", "/heavybowgun", "/bow", "/huntinghorn"};
             await db.CreateTablesAsync<SwordValues, SharpnessValue, ElementDamage, CraftItem, HuntingHorn>();
             await db.CreateTablesAsync<PhialOrShellWeapon, Bow>();
+            await db.CreateTablesAsync<Bowgun, BowgunAmmo, InternalBowgunAmmo, SpecialBowgunAmmo>();
 
             try {
                 List<Task> tasks = new List<Task>();
@@ -84,6 +85,18 @@ namespace Gensearch.Scrapers
                     for (int i = 0; i < page_length; i++) {
                         address = (string) page.ExecuteScript($"window[\"mhgen\"][\"weapons\"][{i.ToString()}].url");
                         tasks.Add(gw.GetBow(address));
+
+                        if (tasks.Count == throttle) {
+                            Task completed = await Task.WhenAny(tasks);
+                            tasks.Remove(completed);
+                        }
+                    }
+                    await Task.WhenAll(tasks);
+                }
+                else {
+                    for (int i = 0; i < page_length; i++) {
+                        address = (string) page.ExecuteScript($"window[\"mhgen\"][\"weapons\"][{i.ToString()}].url");
+                        tasks.Add(gw.GetBowgun(address));
 
                         if (tasks.Count == throttle) {
                             Task completed = await Task.WhenAny(tasks);

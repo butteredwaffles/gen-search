@@ -271,13 +271,11 @@ namespace Gensearch
     public class Bow {
         [PrimaryKey, AutoIncrement]
         public int bow_id {get; set;}
-        [NotNull]
         [ForeignKey(typeof(Monster))]
         public int monster_id {get; set;}
         public string bow_name {get; set;}
-        [NotNull]
         public int bow_damage {get; set;}
-        [NotNull]
+        public int affinity {get; set;}
         public string arc_type {get; set;}
 
         public string level_one_charge {get; set;}
@@ -286,9 +284,8 @@ namespace Gensearch
         public string level_four_charge {get; set;}
 
         public string supported_coatings {get; set;}
-        [NotNull]
+
         public int slots {get; set;}
-        [NotNull]
         public int rarity {get; set;}
 
         [OneToOne]
@@ -300,17 +297,14 @@ namespace Gensearch
     public class Bowgun {
         [PrimaryKey, AutoIncrement]
         public int bg_id {get; set;}
-        [NotNull]
         [ForeignKey(typeof(Monster))]
         public int monster_id {get; set;}
         public string bg_name {get; set;}
-        [NotNull]
+        
         public int bg_damage {get; set;}
-        [NotNull]
+        public int affinity {get; set;}
         public string reload_speed {get; set;}
-        [NotNull]
         public string recoil {get; set;}
-        [NotNull]
         public string deviation {get; set;}
         public int slots {get; set;}
         public int rarity {get; set;}
@@ -323,7 +317,7 @@ namespace Gensearch
     public class BowgunAmmo {
         [PrimaryKey, AutoIncrement]
         public int ammo_id {get; set;}
-        [ForeignKey(typeof(Bowgun)), NotNull]
+        [ForeignKey(typeof(Bowgun))]
         public int bowgun_id {get; set;}
 
         public string normal_1 {get; set;}
@@ -385,6 +379,6 @@ namespace Gensearch
 
         // these two only apply to LBGs/rapid fire
         public int multiplier {get; set;}
-        public int wait {get; set;}
+        public string wait {get; set;}
     }
 }
