@@ -48,6 +48,13 @@ namespace Gensearch.Tests
             expected.ShouldDeepEqual(received);
         }
 
+        /// <summary>
+        /// Assures that <c>BladeWeapons.GetPhialType</c> is returning the correct value.
+        /// </summary>
+        /// <param name="address">The URL of the weapon.</param>
+        /// <param name="index">The index of the weapon in its hierarchy.</param>
+        /// <param name="type">The type of weapon (ie Switch Axe, Gunlance).</param>
+        /// <param name="expected">The value the test is expected to return.</param>
         [Theory]
         [ClassData(typeof(PhialShellTestData))]
         public async Task PhialShellTest(string address, int index, string type, string expected) {
