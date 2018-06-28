@@ -15,6 +15,12 @@ namespace Gensearch.Tests
         private static IConfiguration config = Configuration.Default.WithDefaultLoader(l => l.IsResourceLoadingEnabled = true).WithCss();
         private static IBrowsingContext context = BrowsingContext.New(config);
 
+        /// <summary>
+        /// Assures that <c>GunnerWeapons.GetBowShots</c> returns the correct values.
+        /// </summary>
+        /// <param name="address">The URL of the weapon.</param>
+        /// <param name="index">The index of the weapon in its hierachy.</param>
+        /// <param name="expected">The value the test is exoected to return.</param>
         [Theory]
         [ClassData(typeof(BowShotsTestData))]
         public async Task BowShotsTest(string address, int index, string[] expected) {
