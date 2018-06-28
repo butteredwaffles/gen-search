@@ -31,6 +31,12 @@ namespace Gensearch.Tests
             sharpness_value.ShouldDeepEqual(sharpness_data[0]);
         }
 
+        /// <summary>
+        /// Assures that <c>BladeWeapons.GetSwordAttributes</c> is returning the correct values.
+        /// </summary>
+        /// <param name="address">The URL of the weapon.</param>
+        /// <param name="index">The index of the weapon in its hierarchy.</param>
+        /// <param name="expected">The value the test is expected to return.</param>
         [Theory]
         [ClassData(typeof(SwordAttributeTestData))]
         public async Task SwordAttributesTest(string address, int index, SwordValues expected) {
@@ -41,6 +47,17 @@ namespace Gensearch.Tests
             SwordValues received = weaponManager.GetSwordAttributes(page, trs[index], crafting, index).Result;
             expected.ShouldDeepEqual(received);
         }
+
+        [Theory]
+        [ClassData(typeof(PhialShellTestData))]
+        public async Task PhialShellTest(string address, int index, string type, string expected) {
+            var page = await context.OpenAsync(address);
+            var trs = page.QuerySelector(".table").QuerySelectorAll("tr");
+
+            string received = weaponManager.GetPhialType(trs[index], type);
+            Assert.Equal(expected, received);
+        }
+        
 
         public class SwordAttributeTestData : IEnumerable<object[]>
         {
@@ -91,6 +108,19 @@ namespace Gensearch.Tests
                     affinity = -20,
                     monster_id = Monsters.GetMonsterFromDB("Tetsucabra").Result.id,
                 }};
+            }
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        }
+
+        public class PhialShellTestData : IEnumerable<object[]>
+        {
+            public IEnumerator<object[]> GetEnumerator() {
+                yield return new object[] {"http://mhgen.kiranico.com/gunlance/bone-gunlance", 1, "Gunlance", "Normal Lv1"};
+                yield return new object[] {"http://mhgen.kiranico.com/gunlance/seditious-gunlance", 2, "Gunlance", "Long Lv4"};
+                yield return new object[] {"http://mhgen.kiranico.com/switchaxe/motor-burst", 0, "Switch Axe", "Element"};
+                yield return new object[] {"http://mhgen.kiranico.com/switchaxe/arzuros-axe", 0, "Switch Axe", "Poison 24"};
+                yield return new object[] {"http://mhgen.kiranico.com/chargeblade/type-31-wyvernslayer", 0, "Charge Blade", "Impact"};
+                yield return new object[] {"http://mhgen.kiranico.com/chargeblade/cuddly-cat", 0, "Charge Blade", "Impact"};
             }
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
