@@ -8,6 +8,8 @@ There are different arguments you can run if you only wish to fetch certain part
 
 `dotnet run --items`
 
-...would only fill the database with the items. Valid arguments are `--items`, `--monsters`, `--quests`, or `--all`. If you simply run `dotnet run` without params, it defaults to `--all`.
+...would only fill the database with the items. If you simply run `dotnet run` without params, it defaults to `--all`.
+
+Valid arguments are `--items, --monsters, --quests, --weapons, --skills, --arts, and --all.`
 
 If you made edits, use `dotnet test` to run the test cases.
