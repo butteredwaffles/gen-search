@@ -102,7 +102,6 @@ namespace Gensearch.Scrapers
         /// <returns>Returns a hunting horn object.</returns>
         public HuntingHorn GetHuntingHorn(int[] notes, int sword_id) {
             string notestring = "";
-
             foreach (int note in notes) {
                 switch(note) {
                     case 1:
@@ -128,7 +127,6 @@ namespace Gensearch.Scrapers
                         break;
                 }
             }
-
             notestring = notestring.Trim().Replace(" ", ", ");
             HuntingHorn horn = new HuntingHorn() {
                 sword_id = sword_id,
