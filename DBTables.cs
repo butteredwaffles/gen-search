@@ -394,4 +394,23 @@ namespace Gensearch
         public int skill_value {get; set;}
         public string skill_description {get; set;}
     }
+
+    [Table("HunterArts")]
+    public class HunterArt {
+        [PrimaryKey, AutoIncrement]
+        public int art_id {get; set;}
+        public string art_name {get; set;}
+        public int art_gauge {get; set;}
+        public string art_description {get; set;}
+    }
+
+    [Table("HunterArtUnlocks")]
+    public class HunterArtUnlock {
+        [PrimaryKey, AutoIncrement]
+        public int unlock_id {get; set;}
+        [ForeignKey(typeof(HunterArt))]
+        public int art_id {get; set;}
+        [ForeignKey(typeof(Quest))]
+        public int quest_id {get; set;}
+    }
 }

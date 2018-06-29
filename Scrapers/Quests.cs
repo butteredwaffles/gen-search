@@ -14,6 +14,13 @@ namespace Gensearch.Scrapers
 {
     public class Quests
     {
+        private static SQLiteAsyncConnection db = GenSearch.db;
+
+        public static async Task<Quest> GetQuestFromDB(string name) {
+            var quests = await db.Table<Quest>().Where(q => q.quest_name == name).ToArrayAsync();
+            return quests[0];
+        }
+
         public async Task GetQuests(string addr) {
             int throttle = 3;
             try {
@@ -70,7 +77,6 @@ namespace Gensearch.Scrapers
         public async Task GetQuest(bool isKey, bool isUnstable, bool isProwler, string address) {
             try {
                 var page = await BrowsingContext.New(Configuration.Default.WithDefaultLoader()).OpenAsync(address);
-                var db = new SQLiteAsyncConnection("data/mhgen.db");
                 await db.CreateTablesAsync<Quest, Goal, QuestMonster, QuestBoxItem, QuestUnlock>();
                 Regex intsOnly = new Regex(@"[^\d]");
 
@@ -82,8 +88,8 @@ namespace Gensearch.Scrapers
                 string questDescription = page.QuerySelector("[itemprop=\"description\"]").TextContent;
                 int timeLimit = Convert.ToInt32(intsOnly.Replace(general_qdata[2].TextContent, ""));
                 int contractFee = Convert.ToInt32(intsOnly.Replace(general_qdata[3].TextContent, ""));
-                Goal goal = await GetGoal(general_qdata[0], db);
-                Goal subgoal = await GetGoal(general_qdata[1], db);
+                Goal goal = await GetGoal(general_qdata[0]);
+                Goal subgoal = await GetGoal(general_qdata[1]);
                 var is_none = await db.QueryAsync<Goal>("select * from QuestGoals where goal_description = ?", "None");
                 await db.InsertAsync(goal);
                 if (subgoal.goal_description != "None"){
@@ -112,11 +118,11 @@ namespace Gensearch.Scrapers
 
                 foreach (var box in page.QuerySelectorAll(".card-header")) {
                     string box_type = box.TextContent.Trim();
-                    await db.InsertAllAsync(await GetBox(box.NextElementSibling, box_type, quest.id, db));
+                    await db.InsertAllAsync(await GetBox(box.NextElementSibling, box_type, quest.id));
                 }
 
                 var mon_table = page.QuerySelectorAll("h3")[1].NextElementSibling;
-                List<QuestMonster> mons = await GetQuestMonsters(mon_table, db, quest.id);
+                List<QuestMonster> mons = await GetQuestMonsters(mon_table, quest.id);
                 if (mons != null) {
                     await db.InsertAllAsync(mons);
                 }
@@ -145,7 +151,7 @@ namespace Gensearch.Scrapers
             }
         }
 
-        public async Task<Goal> GetGoal(IElement wrapper, SQLiteAsyncConnection db) {
+        public async Task<Goal> GetGoal(IElement wrapper) {
             Regex rewardRegex = new Regex(@"\d*");
             string goalDescription = wrapper.TextContent;
             var no_goal = await db.QueryAsync<Goal>("select * from QuestGoals where goal_description = ?", "None");
@@ -173,7 +179,7 @@ namespace Gensearch.Scrapers
             };
         }
 
-        public async Task<List<QuestBoxItem>> GetBox(IElement wrapper, string boxname, int quest_id, SQLiteAsyncConnection db) {
+        public async Task<List<QuestBoxItem>> GetBox(IElement wrapper, string boxname, int quest_id) {
             Regex intsOnly = new Regex(@"[^\d]");
             List<QuestBoxItem> items = new List<QuestBoxItem>();
             if (boxname != "Supplies") {
@@ -212,7 +218,7 @@ namespace Gensearch.Scrapers
             return items;
         }
 
-        public async Task<List<QuestMonster>> GetQuestMonsters(IElement wrapper, SQLiteAsyncConnection db, int quest_id) {
+        public async Task<List<QuestMonster>> GetQuestMonsters(IElement wrapper, int quest_id) {
             // Sometimes there are no monsters that can appear in a quest
             if (wrapper == null) {return null;}
 

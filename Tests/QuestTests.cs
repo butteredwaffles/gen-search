@@ -13,7 +13,7 @@ namespace Gensearch.Tests
     public class QuestTests
     {
         private Quests questManager = new Quests();
-        private SQLiteAsyncConnection db = new SQLiteAsyncConnection(@"data\mhgen.db");
+        private SQLiteAsyncConnection db = GenSearch.db;
         private string testAddress = "http://mhgen.kiranico.com/quest/guild/0.1-flames-of-savagery-at-usj";
 
         [Fact]
@@ -29,7 +29,7 @@ namespace Gensearch.Tests
                 goal_description = "Hunt a Glavenus"
             };
             
-            Goal goal_data = await questManager.GetGoal(goal_element, db);
+            Goal goal_data = await questManager.GetGoal(goal_element);
             goal_values.ShouldDeepEqual(goal_data);
         }
 
@@ -46,7 +46,7 @@ namespace Gensearch.Tests
                 new QuestBoxItem() {box_type = "Main Reward C", questid = 0, itemid = 1880, quantity = 3, appear_chance = 10}           
             };
             
-            List<QuestBoxItem> items_data = await questManager.GetBox(box_element, "Main Reward C", 0, db);
+            List<QuestBoxItem> items_data = await questManager.GetBox(box_element, "Main Reward C", 0);
             items_values.ShouldDeepEqual(items_data);
         }
 
@@ -68,7 +68,7 @@ namespace Gensearch.Tests
                 stag_multiplier = 1.3, atk_multiplier = 2.3, def_multiplier = .85, exh_multiplier = 1.5,
                 diz_multiplier = 1.2, mnt_multiplier = 1.6},
             };
-            List<QuestMonster> monster_data = await questManager.GetQuestMonsters(box_element, db, 0);
+            List<QuestMonster> monster_data = await questManager.GetQuestMonsters(box_element, 0);
             monster_values.ShouldDeepEqual(monster_data);
         }
     }

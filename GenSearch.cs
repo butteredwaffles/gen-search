@@ -96,6 +96,15 @@ namespace Gensearch
                 stopwatch.Restart();
             }
 
+            if (args.Contains("--arts") || args.Contains("--all") || args.Length == 0) {
+                var artManager = new HunterArts();
+                ConsoleWriters.InfoMessage("Starting hunter art retrieval...\n\n");
+                artManager.GetArts("http://mhgen.kiranico.com/hunter-art").Wait();
+                timeSpan = TimeSpan.FromSeconds(Convert.ToInt32(stopwatch.Elapsed.TotalSeconds));
+                ConsoleWriters.InfoMessage("Done with all hunter arts! Took " + timeSpan.ToString("c") + ".\n\n");
+                stopwatch.Restart();
+            }
+
             stopwatch.Stop();
         }
     }
