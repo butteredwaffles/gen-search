@@ -14,13 +14,13 @@ namespace Gensearch.Scrapers
     {
         SQLiteAsyncConnection db = GenSearch.db;
         Regex intsOnly = new Regex(@"[^\d\+-]");
+        string[] spblade_weapons = {"switchaxe", "chargeblade", "gunlance"};
 
         /// <summary>
-        /// Retrieves weapon information for greatswords, longswords, sword and shields, hammers, lances, and insect glaives.
+        /// Retrieves weapon information for all blademaster weapons except the Hunting Horn.
         /// </summary>
         /// <param name="address">The URL of the weapon.</param>
         /// <para><see cref="GetHuntingHorn(string, int[])"></see> if you wish to gather information on hunting horns.</para>
-        /// <para><see cref="GetPhialAndShellWeapons(string)"></see> if you wish to gather information on switch axes, charge blades, and gunlances..</para>
         public async Task GetGenericSword(string address) {
             try {
                 var config = Configuration.Default.WithDefaultLoader(l => l.IsResourceLoadingEnabled = true).WithCss();
@@ -41,7 +41,7 @@ namespace Gensearch.Scrapers
                     sv.sharp_2_id = sharpvalues[2].sharp_id;
                     sv.sword_set_name = flav[0];
                     sv.description = sv.sword_name.Contains(flav[0]) ? flav[2] : flav[3];
-
+                    bool already_inserted = false;
                     if (address.Contains("/greatsword/")) { sv.sword_class = "Great Sword"; }
                     else if (address.Contains("/longsword/")) { sv.sword_class = "Long Sword"; }
                     else if (address.Contains("/swordshield/")) { sv.sword_class = "Sword & Shield"; }
@@ -49,7 +49,22 @@ namespace Gensearch.Scrapers
                     else if (address.Contains("/lance/")) { sv.sword_class = "Great Sword"; }
                     else if (address.Contains("/insectglaive/")) {sv.sword_class = "Insect Glaive"; }
                     else if (address.Contains("/dualblades/")) {sv.sword_class = "Dual Blades";}
-                    await db.InsertAsync(sv);
+                    else if (spblade_weapons.Any(b => address.Contains(b))) {
+                        if (address.Contains("/chargeblade/")) { sv.sword_class = "Charge Blade"; }
+                        else if (address.Contains("/switchaxe/")) { sv.sword_class = "Switch Axe"; }
+                        else if (address.Contains("/gunlance/")) { sv.sword_class = "Gunlance"; }
+                        await db.InsertAsync(sv);
+                        already_inserted = true;
+
+                        string phialtype = GetPhialType(tr, sv.sword_class);
+                        PhialOrShellWeapon weapon = new PhialOrShellWeapon() {
+                            sword_id = sv.sword_id,
+                            phial_or_shell_type = phialtype
+                        };
+                        await db.InsertAsync(weapon);
+                    }
+                    if (!already_inserted) { await db.InsertAsync(sv); }
+                    
 
                     List<CraftItem> craftitems = Weapons.GetCraftItems(crafting_table.Children[current_wpn_index]);
                     foreach (CraftItem item in craftitems) {
@@ -156,60 +171,7 @@ namespace Gensearch.Scrapers
             }
         }
 
-        public async Task GetPhialAndShellWeapons(string address) {
-            try {
-                var config = Configuration.Default.WithDefaultLoader(l => l.IsResourceLoadingEnabled = true).WithCss();
-                var context = BrowsingContext.New(config);
-                var page = await context.OpenAsync(address);
-                string[] flav = Weapons.GetFlavorText(page);
-                ConsoleWriters.StartingPageMessage($"Started work on the {flav[0]} series. ({address})");
 
-                var crafting_table = page.QuerySelectorAll(".table")[1].QuerySelector("tbody");
-                int current_wpn_index = 0;
-                foreach (var tr in page.QuerySelector(".table").QuerySelectorAll("tr")) {
-
-                    SwordValues sv = await GetSwordAttributes(page, tr, crafting_table, current_wpn_index);
-                    List<SharpnessValue> sharpvalues = GetSharpness(tr);
-                    await db.InsertAllAsync(sharpvalues);
-                    sv.sharp_0_id = sharpvalues[0].sharp_id;
-                    sv.sharp_1_id = sharpvalues[1].sharp_id;
-                    sv.sharp_2_id = sharpvalues[2].sharp_id;
-                    sv.sword_set_name = flav[0];
-                    sv.description = sv.sword_name.Contains(flav[0]) ? flav[2] : flav[3];
-
-                    if (address.Contains("/chargeblade/")) { sv.sword_class = "Charge Blade"; }
-                    else if (address.Contains("/gunlance/")) { sv.sword_class = "Gunlance"; }
-                    else { sv.sword_class = "Switch Axe"; }
-                    await db.InsertAsync(sv);
-
-                    List<CraftItem> craftitems = Weapons.GetCraftItems(crafting_table.Children[current_wpn_index]);
-                    foreach (CraftItem item in craftitems) {
-                        item.creation_id = sv.sword_id;
-                        item.creation_type = "Blademaster";
-                    }
-                    foreach (ElementDamage element in sv.element) {
-                        element.weapon_id = sv.sword_id;
-                    }
-                    await db.InsertAllAsync(sv.element);
-                    await db.InsertAllAsync(craftitems);
-
-                    string phialtype = GetPhialType(tr, sv.sword_class);
-                    PhialOrShellWeapon weapon = new PhialOrShellWeapon() {
-                        sword_id = sv.sword_id,
-                        phial_or_shell_type = phialtype
-                    };
-                    await db.InsertAsync(weapon);
-
-                    current_wpn_index++;
-                }
-                ConsoleWriters.CompletionMessage($"Finished with the {flav[0]} series!");
-            }
-            catch (Exception ex) {
-                ConsoleWriters.ErrorMessage(ex.ToString());
-                await GetPhialAndShellWeapons(address);
-            }
-        }
-        
         /// <summary>
         /// Gets general weapon information. Blademaster only.
         /// </summary>

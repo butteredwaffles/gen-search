@@ -29,10 +29,7 @@ namespace Gensearch.Scrapers
         /// <param name="addr">The address to pull from.</param>
         public async Task GetWeapons(string addr) {
             int throttle = 5;
-            string[] special_weapons = new string[] {"/gunlance", "/chargeblade", "/switchaxe", "/lightbowgun", "/heavybowgun", "/bow", "/huntinghorn"};
-            await db.CreateTablesAsync<SwordValues, SharpnessValue, ElementDamage, CraftItem, HuntingHorn>();
-            await db.CreateTablesAsync<PhialOrShellWeapon, Bow>();
-            await db.CreateTablesAsync<Bowgun, BowgunAmmo, InternalBowgunAmmo, SpecialBowgunAmmo>();
+            string[] special_weapons = new string[] {"/lightbowgun", "/heavybowgun", "/bow", "/huntinghorn"};
 
             try {
                 List<Task> tasks = new List<Task>();
@@ -42,6 +39,7 @@ namespace Gensearch.Scrapers
                 int page_length = Convert.ToInt32(page.ExecuteScript("window[\"mhgen\"][\"weapons\"].length"));
                 string address;
                 if (!special_weapons.Any(w => addr.Contains(w))) {
+                    await db.CreateTablesAsync<SwordValues, SharpnessValue, ElementDamage, CraftItem, PhialOrShellWeapon>();
                     for (int i = 0; i < page_length; i++) {
                         address = (string) page.ExecuteScript($"window[\"mhgen\"][\"weapons\"][{i.ToString()}].url");
                         tasks.Add(bw.GetGenericSword(address));
@@ -53,6 +51,7 @@ namespace Gensearch.Scrapers
                     }
                 }
                 else if (addr.Contains("/huntinghorn")) {
+                    await db.CreateTablesAsync<SwordValues, SharpnessValue, ElementDamage, CraftItem, HuntingHorn>();
                     for (int i = 0; i < page_length; i++) {
                         address = (string) page.ExecuteScript($"window[\"mhgen\"][\"weapons\"][{i.ToString()}].url");
                         int[] notes = new int[] {
@@ -68,18 +67,8 @@ namespace Gensearch.Scrapers
                         }
                     }
                 }
-                else if (addr.Contains("/switchaxe") || addr.Contains("/chargeblade") || addr.Contains("/gunlance")) {
-                    for (int i = 0; i < page_length; i++) {
-                        address = (string) page.ExecuteScript($"window[\"mhgen\"][\"weapons\"][{i.ToString()}].url");
-                        tasks.Add(bw.GetPhialAndShellWeapons(address));
-
-                        if (tasks.Count == throttle) {
-                            Task completed = await Task.WhenAny(tasks);
-                            tasks.Remove(completed);
-                        }
-                    }
-                }
                 else if (addr.Contains("/bow")) {
+                    await db.CreateTableAsync<Bow>();
                     for (int i = 0; i < page_length; i++) {
                         address = (string) page.ExecuteScript($"window[\"mhgen\"][\"weapons\"][{i.ToString()}].url");
                         tasks.Add(gw.GetBow(address));
@@ -91,6 +80,7 @@ namespace Gensearch.Scrapers
                     }
                 }
                 else {
+                    await db.CreateTablesAsync<Bowgun, BowgunAmmo, InternalBowgunAmmo, SpecialBowgunAmmo>();
                     for (int i = 0; i < page_length; i++) {
                         address = (string) page.ExecuteScript($"window[\"mhgen\"][\"weapons\"][{i.ToString()}].url");
                         tasks.Add(gw.GetBowgun(address));
