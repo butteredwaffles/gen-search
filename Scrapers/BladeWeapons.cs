@@ -17,11 +17,11 @@ namespace Gensearch.Scrapers
         string[] spblade_weapons = {"switchaxe", "chargeblade", "gunlance"};
 
         /// <summary>
-        /// Retrieves weapon information for all blademaster weapons except the Hunting Horn.
+        /// Retrieves weapon information for all blademaster weapons.
         /// </summary>
         /// <param name="address">The URL of the weapon.</param>
-        /// <para><see cref="GetHuntingHorn(string, int[])"></see> if you wish to gather information on hunting horns.</para>
-        public async Task GetGenericSword(string address) {
+        /// <param name="notes">If the weapon is a hunting horn, this is the int array containing the note information.</param>
+        public async Task GetBlademasterWeapon(string address, int[] notes = null) {
             try {
                 var config = Configuration.Default.WithDefaultLoader(l => l.IsResourceLoadingEnabled = true).WithCss();
                 var context = BrowsingContext.New(config);
@@ -63,6 +63,14 @@ namespace Gensearch.Scrapers
                         };
                         await db.InsertAsync(weapon);
                     }
+                    else if (address.Contains("/huntinghorn/") && notes != null) {
+                        sv.sword_class = "Hunting Horn";
+                        await db.InsertAsync(sv);
+                        already_inserted = true;
+
+                        HuntingHorn horn = GetHuntingHorn(notes, sv.sword_id);
+                        await db.InsertAsync(horn);
+                    }
                     if (!already_inserted) { await db.InsertAsync(sv); }
                     
 
@@ -82,93 +90,51 @@ namespace Gensearch.Scrapers
             }
             catch (Exception ex) {
                 ConsoleWriters.ErrorMessage(ex.ToString());
-                await GetGenericSword(address);
+                await GetBlademasterWeapon(address, notes);
             }
         }
 
         /// <summary>
-        /// Retrieves weapon information for hunting horns.
+        /// Retrieves note information for hunting horns.
         /// </summary>
-        /// <param name="address">The URL of the weapon.</param>
         /// <param name="notes">An array of ints corresponding to the horn's note values.</param>
-        /// <returns></returns>
-        public async Task GetHuntingHorn(string address, int[] notes) {
-            try {
-                var config = Configuration.Default.WithDefaultLoader(l => l.IsResourceLoadingEnabled = true).WithCss();
-                var context = BrowsingContext.New(config);
-                var page = await context.OpenAsync(address);
-                string[] flav = Weapons.GetFlavorText(page);
-                ConsoleWriters.StartingPageMessage($"Started work on the {flav[0]} series. ({address})");
-                string notestring = "";
+        /// <param name="sword_id">The ID of the hunting horn in the database.</param>
+        /// <returns>Returns a hunting horn object.</returns>
+        public HuntingHorn GetHuntingHorn(int[] notes, int sword_id) {
+            string notestring = "";
 
-                foreach (int note in notes) {
-                    switch(note) {
-                        case 1:
-                            notestring += "white ";
-                            break;
-                        case 2:
-                            notestring += "purple ";
-                            break;
-                        case 3:
-                            notestring += "red ";
-                            break;
-                        case 4:
-                            notestring += "blue ";
-                            break;
-                        case 5:
-                            notestring += "green ";
-                            break;
-                        case 6:
-                            notestring += "yellow ";
-                            break;
-                        case 7:
-                            notestring += "light_blue ";
-                            break;
-                    }
+            foreach (int note in notes) {
+                switch(note) {
+                    case 1:
+                        notestring += "white ";
+                        break;
+                    case 2:
+                        notestring += "purple ";
+                        break;
+                    case 3:
+                        notestring += "red ";
+                        break;
+                    case 4:
+                        notestring += "blue ";
+                        break;
+                    case 5:
+                        notestring += "green ";
+                        break;
+                    case 6:
+                        notestring += "yellow ";
+                        break;
+                    case 7:
+                        notestring += "light_blue ";
+                        break;
                 }
-
-                notestring = notestring.Trim().Replace(" ", ", ");
-
-                var crafting_table = page.QuerySelectorAll(".table")[1].QuerySelector("tbody");
-                int current_wpn_index = 0;
-                foreach (var tr in page.QuerySelector(".table").QuerySelectorAll("tr")) {
-                    SwordValues sv = await GetSwordAttributes(page, tr, crafting_table, current_wpn_index);
-                    List<SharpnessValue> sharpvalues = GetSharpness(tr);
-                    await db.InsertAllAsync(sharpvalues);
-                    sv.sharp_0_id = sharpvalues[0].sharp_id;
-                    sv.sharp_1_id = sharpvalues[1].sharp_id;
-                    sv.sharp_2_id = sharpvalues[2].sharp_id;
-                    sv.sword_set_name = flav[0];
-                    sv.sword_class = "Hunting Horn";
-                    sv.description = sv.sword_name.Contains(flav[0]) ? flav[2] : flav[3];
-                    await db.InsertAsync(sv);
-
-                    List<CraftItem> craftitems = Weapons.GetCraftItems(crafting_table.Children[current_wpn_index]);
-                    foreach (CraftItem item in craftitems) {
-                        item.creation_id = sv.sword_id;
-                        item.creation_type = "Blademaster";
-                    }
-                    foreach (ElementDamage element in sv.element) {
-                        element.weapon_id = sv.sword_id;
-                    }
-                    await db.InsertAllAsync(sv.element);
-                    await db.InsertAllAsync(craftitems);
-
-                    HuntingHorn horn = new HuntingHorn() {
-                        sword_id = sv.sword_id,
-                        notes = notestring
-                    };
-
-                    await db.InsertAsync(horn);
-
-                    current_wpn_index++;
-                }
-                ConsoleWriters.CompletionMessage($"Finished with the {flav[0]} series!");
             }
-            catch (Exception ex) {
-                ConsoleWriters.ErrorMessage(ex.ToString());
-                await GetHuntingHorn(address, notes);
-            }
+
+            notestring = notestring.Trim().Replace(" ", ", ");
+            HuntingHorn horn = new HuntingHorn() {
+                sword_id = sword_id,
+                notes = notestring
+            };
+            return horn;
         }
 
 

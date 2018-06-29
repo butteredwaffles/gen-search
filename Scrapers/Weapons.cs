@@ -42,7 +42,7 @@ namespace Gensearch.Scrapers
                     await db.CreateTablesAsync<SwordValues, SharpnessValue, ElementDamage, CraftItem, PhialOrShellWeapon>();
                     for (int i = 0; i < page_length; i++) {
                         address = (string) page.ExecuteScript($"window[\"mhgen\"][\"weapons\"][{i.ToString()}].url");
-                        tasks.Add(bw.GetGenericSword(address));
+                        tasks.Add(bw.GetBlademasterWeapon(address));
 
                         if (tasks.Count == throttle) {
                             Task completed = await Task.WhenAny(tasks);
@@ -59,7 +59,7 @@ namespace Gensearch.Scrapers
                             Convert.ToInt32((double) page.ExecuteScript($"window[\"mhgen\"][\"weapons\"][{i}][\"levels\"][0][\"hhnotes\"][0][\"color_2\"]")),
                             Convert.ToInt32((double) page.ExecuteScript($"window[\"mhgen\"][\"weapons\"][{i}][\"levels\"][0][\"hhnotes\"][0][\"color_3\"]")),
                         };
-                        tasks.Add(bw.GetHuntingHorn(address, notes));
+                        tasks.Add(bw.GetBlademasterWeapon(address, notes));
 
                         if (tasks.Count == throttle) {
                             Task completed = await Task.WhenAny(tasks);
