@@ -27,7 +27,6 @@ namespace Gensearch.Scrapers
                 var context = BrowsingContext.New(config);
                 var page = await context.OpenAsync(address);
                 string[] flav = Weapons.GetFlavorText(page);
-                ConsoleWriters.StartingPageMessage($"Started work on the {flav[0]} series. ({address})");
 
                 var crafting_table = page.QuerySelectorAll(".table")[1].QuerySelector("tbody");
                 int current_wpn_index = 0;
@@ -86,7 +85,6 @@ namespace Gensearch.Scrapers
                     await db.InsertAllAsync(craftitems);
                     current_wpn_index++;
                 }
-                ConsoleWriters.CompletionMessage($"Finished with the {flav[0]} series!");
             }
             catch (Exception ex) {
                 ConsoleWriters.ErrorMessage(ex.ToString());

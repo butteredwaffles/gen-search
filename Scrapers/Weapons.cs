@@ -12,6 +12,7 @@ using AngleSharp.Dom.Html;
 using AngleSharp.Extensions;
 using AngleSharp.Parser.Html;
 using Gensearch.Helpers;
+using ShellProgressBar;
 using SQLite;
 
 namespace Gensearch.Scrapers
@@ -38,60 +39,67 @@ namespace Gensearch.Scrapers
                 var page = await context.OpenAsync(addr);
                 int page_length = Convert.ToInt32(page.ExecuteScript("window[\"mhgen\"][\"weapons\"].length"));
                 string address;
-                if (!special_weapons.Any(w => addr.Contains(w))) {
-                    await db.CreateTablesAsync<SwordValues, SharpnessValue, ElementDamage, CraftItem, PhialOrShellWeapon>();
-                    for (int i = 0; i < page_length; i++) {
-                        address = (string) page.ExecuteScript($"window[\"mhgen\"][\"weapons\"][{i.ToString()}].url");
-                        tasks.Add(bw.GetBlademasterWeapon(address));
+                using (var progress = new ProgressBar(page_length, "")) {
+                    if (!special_weapons.Any(w => addr.Contains(w))) {
+                        await db.CreateTablesAsync<SwordValues, SharpnessValue, ElementDamage, CraftItem, PhialOrShellWeapon>();
+                        for (int i = 0; i < page_length; i++) {
+                            address = (string) page.ExecuteScript($"window[\"mhgen\"][\"weapons\"][{i.ToString()}].url");
+                            tasks.Add(bw.GetBlademasterWeapon(address));
 
-                        if (tasks.Count == throttle) {
-                            Task completed = await Task.WhenAny(tasks);
-                            tasks.Remove(completed);
+                            if (tasks.Count == throttle) {
+                                Task completed = await Task.WhenAny(tasks);
+                                tasks.Remove(completed);
+                                progress.Tick();
+                            }
                         }
                     }
-                }
-                else if (addr.Contains("/huntinghorn")) {
-                    await db.CreateTablesAsync<SwordValues, SharpnessValue, ElementDamage, CraftItem, HuntingHorn>();
-                    for (int i = 0; i < page_length; i++) {
-                        address = (string) page.ExecuteScript($"window[\"mhgen\"][\"weapons\"][{i.ToString()}].url");
-                        int[] notes = new int[] {
-                            Convert.ToInt32((double) page.ExecuteScript($"window[\"mhgen\"][\"weapons\"][{i}][\"levels\"][0][\"hhnotes\"][0][\"color_1\"]")),
-                            Convert.ToInt32((double) page.ExecuteScript($"window[\"mhgen\"][\"weapons\"][{i}][\"levels\"][0][\"hhnotes\"][0][\"color_2\"]")),
-                            Convert.ToInt32((double) page.ExecuteScript($"window[\"mhgen\"][\"weapons\"][{i}][\"levels\"][0][\"hhnotes\"][0][\"color_3\"]")),
-                        };
-                        tasks.Add(bw.GetBlademasterWeapon(address, notes));
+                    else if (addr.Contains("/huntinghorn")) {
+                        await db.CreateTablesAsync<SwordValues, SharpnessValue, ElementDamage, CraftItem, HuntingHorn>();
+                        for (int i = 0; i < page_length; i++) {
+                            address = (string) page.ExecuteScript($"window[\"mhgen\"][\"weapons\"][{i.ToString()}].url");
+                            int[] notes = new int[] {
+                                Convert.ToInt32((double) page.ExecuteScript($"window[\"mhgen\"][\"weapons\"][{i}][\"levels\"][0][\"hhnotes\"][0][\"color_1\"]")),
+                                Convert.ToInt32((double) page.ExecuteScript($"window[\"mhgen\"][\"weapons\"][{i}][\"levels\"][0][\"hhnotes\"][0][\"color_2\"]")),
+                                Convert.ToInt32((double) page.ExecuteScript($"window[\"mhgen\"][\"weapons\"][{i}][\"levels\"][0][\"hhnotes\"][0][\"color_3\"]")),
+                            };
+                            tasks.Add(bw.GetBlademasterWeapon(address, notes));
 
-                        if (tasks.Count == throttle) {
-                            Task completed = await Task.WhenAny(tasks);
-                            tasks.Remove(completed);
+                            if (tasks.Count == throttle) {
+                                Task completed = await Task.WhenAny(tasks);
+                                tasks.Remove(completed);
+                                progress.Tick();
+                            }
                         }
                     }
-                }
-                else if (addr.Contains("/bow")) {
-                    await db.CreateTableAsync<Bow>();
-                    for (int i = 0; i < page_length; i++) {
-                        address = (string) page.ExecuteScript($"window[\"mhgen\"][\"weapons\"][{i.ToString()}].url");
-                        tasks.Add(gw.GetBow(address));
+                    else if (addr.Contains("/bow")) {
+                        await db.CreateTablesAsync<Bow, CraftItem>();
+                        for (int i = 0; i < page_length; i++) {
+                            address = (string) page.ExecuteScript($"window[\"mhgen\"][\"weapons\"][{i.ToString()}].url");
+                            tasks.Add(gw.GetBow(address));
 
-                        if (tasks.Count == throttle) {
-                            Task completed = await Task.WhenAny(tasks);
-                            tasks.Remove(completed);
+                            if (tasks.Count == throttle) {
+                                Task completed = await Task.WhenAny(tasks);
+                                tasks.Remove(completed);
+                                progress.Tick();
+                            }
                         }
                     }
-                }
-                else {
-                    await db.CreateTablesAsync<Bowgun, BowgunAmmo, InternalBowgunAmmo, SpecialBowgunAmmo>();
-                    for (int i = 0; i < page_length; i++) {
-                        address = (string) page.ExecuteScript($"window[\"mhgen\"][\"weapons\"][{i.ToString()}].url");
-                        tasks.Add(gw.GetBowgun(address));
+                    else {
+                        await db.CreateTablesAsync<Bowgun, BowgunAmmo, InternalBowgunAmmo, SpecialBowgunAmmo, CraftItem>();
+                        for (int i = 0; i < page_length; i++) {
+                            address = (string) page.ExecuteScript($"window[\"mhgen\"][\"weapons\"][{i.ToString()}].url");
+                            tasks.Add(gw.GetBowgun(address));
 
-                        if (tasks.Count == throttle) {
-                            Task completed = await Task.WhenAny(tasks);
-                            tasks.Remove(completed);
+                            if (tasks.Count == throttle) {
+                                Task completed = await Task.WhenAny(tasks);
+                                tasks.Remove(completed);
+                                progress.Tick();
+                            }
                         }
                     }
+                    await Task.WhenAll(tasks);
+                    progress.Tick(progress.MaxTicks, "Done!");
                 }
-                await Task.WhenAll(tasks);
             }
             catch (Exception ex) {
                 Console.WriteLine(ex.ToString());

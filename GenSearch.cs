@@ -57,7 +57,6 @@ namespace Gensearch
             if (args.Contains("--weapons") || args.Contains("--all") || args.Length == 0) {
                 Stopwatch indiv_weapon_watch = new Stopwatch();
                 var weaponManager = new Weapons();
-                ConsoleWriters.InfoMessage("Starting weapon retrieval...");
                 string[] weaponurls = new string[] {
                     "heavybowgun",
                     "lightbowgun",
@@ -76,6 +75,7 @@ namespace Gensearch
                 };
                 indiv_weapon_watch.Start();
                 foreach (string category in weaponurls) {
+                    ConsoleWriters.InfoMessage($"Starting {category} retrieval...");
                     weaponManager.GetWeapons($"http://mhgen.kiranico.com/{category}").Wait();
                     timeSpan = TimeSpan.FromSeconds(Convert.ToInt32(indiv_weapon_watch.Elapsed.TotalSeconds));
                     ConsoleWriters.InfoMessage($"Done with {category}s! Took {timeSpan.ToString("c")}.\n\n");

@@ -20,11 +20,7 @@ namespace Gensearch.Scrapers
             var trs = page.QuerySelector(".table").QuerySelectorAll("tr");
             string current_skill = "";
 
-            var options = new ProgressBarOptions
-            {
-                ProgressBarOnBottom = true
-            };
-
+            var options = new ProgressBarOptions { ProgressBarOnBottom = true };
             using (var progress = new ProgressBar(trs.Length, "Starting skill retrieval.", options)) {
                 foreach (var tr in trs) {
                     if (tr.QuerySelector("a") != null) {
