@@ -184,6 +184,7 @@ namespace Gensearch
         public int slots {get; set;}
         [NotNull]
         public int rarity {get; set;}
+        public string description {get; set;}
         // Going by names instead of values because odds are the weapon it upgrades into will not be in the database yet
         public string upgrades_into {get; set;}
         [NotNull]
@@ -287,6 +288,7 @@ namespace Gensearch
 
         public int slots {get; set;}
         public int rarity {get; set;}
+        public string description {get; set;}
 
         [OneToOne]
         public Monster monster {get; set;}
@@ -308,6 +310,7 @@ namespace Gensearch
         public string deviation {get; set;}
         public int slots {get; set;}
         public int rarity {get; set;}
+        public string description {get; set;}
 
         [OneToOne]
         public Monster monster {get; set;}

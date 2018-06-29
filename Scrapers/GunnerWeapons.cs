@@ -20,8 +20,8 @@ namespace Gensearch.Scrapers
             var config = Configuration.Default.WithDefaultLoader(l => l.IsResourceLoadingEnabled = true).WithCss();
             var context = BrowsingContext.New(config);
             var page = await context.OpenAsync(address);
-            string setname = page.QuerySelector("[itemprop=\"name\"]").TextContent.Split("/")[0].Trim();
-            ConsoleWriters.StartingPageMessage($"Started work on the {setname} series. ({address})");
+            string[] flav = Weapons.GetFlavorText(page);
+            ConsoleWriters.StartingPageMessage($"Started work on the {flav[0]} series. ({address})");
 
             var crafting_table = page.QuerySelectorAll(".table")[1].QuerySelector("tbody");
             int current_wpn_index = 0;
@@ -42,9 +42,7 @@ namespace Gensearch.Scrapers
 
                 string[] bow_shots = GetBowShots(tr);
                 string supported_coatings = GetBowCoatings(tr);
-                var techinfo = tr.Children[5];
-                int slots = techinfo.FirstElementChild.TextContent.Count(c => c == '◯');
-                int rarity = Convert.ToInt32(techinfo.Children[1].TextContent.Trim().Replace("RARE", ""));
+                int slots = tr.Children[5].FirstElementChild.TextContent.Count(c => c == '◯');
 
                 int monsterid = -1;
                 if (page.QuerySelectorAll(".lead").Count() == 3) {
@@ -63,7 +61,8 @@ namespace Gensearch.Scrapers
                     level_four_charge = bow_shots[4],
                     supported_coatings = supported_coatings,
                     slots = slots,
-                    rarity = rarity
+                    rarity = Convert.ToInt32(flav[4]),
+                    description = weapon_name.Contains(flav[0]) ? flav[2] : flav[3]
                 };
                 await db.InsertAsync(bow);
 
@@ -78,7 +77,7 @@ namespace Gensearch.Scrapers
                 await db.InsertAllAsync(craftitems);
                 current_wpn_index++;
             }
-            ConsoleWriters.CompletionMessage($"Finished with the {setname} series!");
+            ConsoleWriters.CompletionMessage($"Finished with the {flav[0]} series!");
         }
 
         public string[] GetBowShots(IElement wrapper) {
@@ -98,8 +97,8 @@ namespace Gensearch.Scrapers
             var config = Configuration.Default.WithDefaultLoader(l => l.IsResourceLoadingEnabled = true).WithCss();
             var context = BrowsingContext.New(config);
             var page = await context.OpenAsync(address);
-            string setname = page.QuerySelector("[itemprop=\"name\"]").TextContent.Split("/")[0].Trim();
-            ConsoleWriters.StartingPageMessage($"Started work on the {setname} series. ({address})");
+            string[] flav = Weapons.GetFlavorText(page);
+            ConsoleWriters.StartingPageMessage($"Started work on the {flav[0]} series. ({address})");
 
             var crafting_table = page.QuerySelectorAll(".table")[1].QuerySelector("tbody");
             int current_wpn_index = 0;
@@ -119,9 +118,7 @@ namespace Gensearch.Scrapers
                 }
                 
                 string[] gun_characteristics = GetBowgunInformation(tr);
-                var techinfo = tr.Children[5];
-                int slots = techinfo.FirstElementChild.TextContent.Count(c => c == '◯');
-                int rarity = Convert.ToInt32(techinfo.Children[1].TextContent.Trim().Replace("RARE", ""));
+                int slots = tr.Children[5].FirstElementChild.TextContent.Count(c => c == '◯');
 
                 int monsterid = -1;
                 if (page.QuerySelectorAll(".lead").Count() == 3) {
@@ -134,10 +131,11 @@ namespace Gensearch.Scrapers
                     bg_damage = weapon_damage,
                     affinity = affinity,
                     slots = slots,
-                    rarity = rarity,
+                    rarity = Convert.ToInt32(flav[4]),
                     reload_speed = gun_characteristics[0],
                     recoil = gun_characteristics[1],
-                    deviation = gun_characteristics[2]
+                    deviation = gun_characteristics[2],
+                    description = weapon_name.Contains(flav[0]) ? flav[2] : flav[3]
                 };
                 await db.InsertAsync(bowgun);
 
@@ -168,7 +166,7 @@ namespace Gensearch.Scrapers
                 await db.InsertAllAsync(craftitems);
                 current_wpn_index++;
             }
-            ConsoleWriters.CompletionMessage($"Finished with the {setname} series!");
+            ConsoleWriters.CompletionMessage($"Finished with the {flav[0]} series!");
         }
 
         public string[] GetBowgunInformation(IElement wrapper) {

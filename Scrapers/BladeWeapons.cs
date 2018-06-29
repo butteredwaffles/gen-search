@@ -26,8 +26,8 @@ namespace Gensearch.Scrapers
                 var config = Configuration.Default.WithDefaultLoader(l => l.IsResourceLoadingEnabled = true).WithCss();
                 var context = BrowsingContext.New(config);
                 var page = await context.OpenAsync(address);
-                string setname = page.QuerySelector("[itemprop=\"name\"]").TextContent.Split("/")[0].Trim();
-                ConsoleWriters.StartingPageMessage($"Started work on the {setname} series. ({address})");
+                string[] flav = Weapons.GetFlavorText(page);
+                ConsoleWriters.StartingPageMessage($"Started work on the {flav[0]} series. ({address})");
 
                 var crafting_table = page.QuerySelectorAll(".table")[1].QuerySelector("tbody");
                 int current_wpn_index = 0;
@@ -39,7 +39,8 @@ namespace Gensearch.Scrapers
                     sv.sharp_0_id = sharpvalues[0].sharp_id;
                     sv.sharp_1_id = sharpvalues[1].sharp_id;
                     sv.sharp_2_id = sharpvalues[2].sharp_id;
-                    sv.sword_set_name = setname;
+                    sv.sword_set_name = flav[0];
+                    sv.description = sv.sword_name.Contains(flav[0]) ? flav[2] : flav[3];
 
                     if (address.Contains("/greatsword/")) { sv.sword_class = "Great Sword"; }
                     else if (address.Contains("/longsword/")) { sv.sword_class = "Long Sword"; }
@@ -62,7 +63,7 @@ namespace Gensearch.Scrapers
                     await db.InsertAllAsync(craftitems);
                     current_wpn_index++;
                 }
-                ConsoleWriters.CompletionMessage($"Finished with the {setname} series!");
+                ConsoleWriters.CompletionMessage($"Finished with the {flav[0]} series!");
             }
             catch (Exception ex) {
                 ConsoleWriters.ErrorMessage(ex.ToString());
@@ -81,8 +82,8 @@ namespace Gensearch.Scrapers
                 var config = Configuration.Default.WithDefaultLoader(l => l.IsResourceLoadingEnabled = true).WithCss();
                 var context = BrowsingContext.New(config);
                 var page = await context.OpenAsync(address);
-                string setname = page.QuerySelector("[itemprop=\"name\"]").TextContent.Split("/")[0].Trim();
-                ConsoleWriters.StartingPageMessage($"Started work on the {setname} series. ({address})");
+                string[] flav = Weapons.GetFlavorText(page);
+                ConsoleWriters.StartingPageMessage($"Started work on the {flav[0]} series. ({address})");
                 string notestring = "";
 
                 foreach (int note in notes) {
@@ -122,8 +123,9 @@ namespace Gensearch.Scrapers
                     sv.sharp_0_id = sharpvalues[0].sharp_id;
                     sv.sharp_1_id = sharpvalues[1].sharp_id;
                     sv.sharp_2_id = sharpvalues[2].sharp_id;
-                    sv.sword_set_name = setname;
+                    sv.sword_set_name = flav[0];
                     sv.sword_class = "Hunting Horn";
+                    sv.description = sv.sword_name.Contains(flav[0]) ? flav[2] : flav[3];
                     await db.InsertAsync(sv);
 
                     List<CraftItem> craftitems = Weapons.GetCraftItems(crafting_table.Children[current_wpn_index]);
@@ -146,7 +148,7 @@ namespace Gensearch.Scrapers
 
                     current_wpn_index++;
                 }
-                ConsoleWriters.CompletionMessage($"Finished with the {setname} series!");
+                ConsoleWriters.CompletionMessage($"Finished with the {flav[0]} series!");
             }
             catch (Exception ex) {
                 ConsoleWriters.ErrorMessage(ex.ToString());
@@ -159,8 +161,8 @@ namespace Gensearch.Scrapers
                 var config = Configuration.Default.WithDefaultLoader(l => l.IsResourceLoadingEnabled = true).WithCss();
                 var context = BrowsingContext.New(config);
                 var page = await context.OpenAsync(address);
-                string setname = page.QuerySelector("[itemprop=\"name\"]").TextContent.Split("/")[0].Trim();
-                ConsoleWriters.StartingPageMessage($"Started work on the {setname} series. ({address})");
+                string[] flav = Weapons.GetFlavorText(page);
+                ConsoleWriters.StartingPageMessage($"Started work on the {flav[0]} series. ({address})");
 
                 var crafting_table = page.QuerySelectorAll(".table")[1].QuerySelector("tbody");
                 int current_wpn_index = 0;
@@ -172,7 +174,8 @@ namespace Gensearch.Scrapers
                     sv.sharp_0_id = sharpvalues[0].sharp_id;
                     sv.sharp_1_id = sharpvalues[1].sharp_id;
                     sv.sharp_2_id = sharpvalues[2].sharp_id;
-                    sv.sword_set_name = setname;
+                    sv.sword_set_name = flav[0];
+                    sv.description = sv.sword_name.Contains(flav[0]) ? flav[2] : flav[3];
 
                     if (address.Contains("/chargeblade/")) { sv.sword_class = "Charge Blade"; }
                     else if (address.Contains("/gunlance/")) { sv.sword_class = "Gunlance"; }
@@ -199,7 +202,7 @@ namespace Gensearch.Scrapers
 
                     current_wpn_index++;
                 }
-                ConsoleWriters.CompletionMessage($"Finished with the {setname} series!");
+                ConsoleWriters.CompletionMessage($"Finished with the {flav[0]} series!");
             }
             catch (Exception ex) {
                 ConsoleWriters.ErrorMessage(ex.ToString());

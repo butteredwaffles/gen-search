@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -50,7 +51,6 @@ namespace Gensearch.Scrapers
                             tasks.Remove(completed);
                         }
                     }
-                    await Task.WhenAll(tasks);
                 }
                 else if (addr.Contains("/huntinghorn")) {
                     for (int i = 0; i < page_length; i++) {
@@ -67,7 +67,6 @@ namespace Gensearch.Scrapers
                             tasks.Remove(completed);
                         }
                     }
-                    await Task.WhenAll(tasks);
                 }
                 else if (addr.Contains("/switchaxe") || addr.Contains("/chargeblade") || addr.Contains("/gunlance")) {
                     for (int i = 0; i < page_length; i++) {
@@ -79,7 +78,6 @@ namespace Gensearch.Scrapers
                             tasks.Remove(completed);
                         }
                     }
-                    await Task.WhenAll(tasks);
                 }
                 else if (addr.Contains("/bow")) {
                     for (int i = 0; i < page_length; i++) {
@@ -91,7 +89,6 @@ namespace Gensearch.Scrapers
                             tasks.Remove(completed);
                         }
                     }
-                    await Task.WhenAll(tasks);
                 }
                 else {
                     for (int i = 0; i < page_length; i++) {
@@ -103,8 +100,8 @@ namespace Gensearch.Scrapers
                             tasks.Remove(completed);
                         }
                     }
-                    await Task.WhenAll(tasks);
                 }
+                await Task.WhenAll(tasks);
             }
             catch (Exception ex) {
                 Console.WriteLine(ex.ToString());
@@ -193,6 +190,25 @@ namespace Gensearch.Scrapers
             }
             
             return items; 
+        }
+
+        /// <summary>
+        /// Gets information on a weapon set.
+        /// </summary>
+        /// <param name="page">The IDocument containing the weapon page.</param>
+        /// <returns>Returns the names of the weapons, their descriptions, and their rarity.</returns>
+        public static string[] GetFlavorText(IDocument page) {
+            string[] setname = page.QuerySelector("[itemprop=\"name\"]").TextContent.Split('/');
+            string first_weapon = setname[0].Trim();
+            string last_weapon = setname[1].Trim();
+            string both_descriptions = page.QuerySelector("[itemprop=\"description\"]").TextContent;
+            both_descriptions = WebUtility.HtmlDecode(both_descriptions);
+            string[] split_desc = both_descriptions.Split('/');
+            string first_desc = split_desc[0].Trim();
+            string last_desc = split_desc[1].Trim();
+            string rarity = page.QuerySelector(".lead").TextContent;
+            
+            return new string[] {first_weapon, last_weapon, first_desc, last_desc, rarity};
         }
     }
 }
