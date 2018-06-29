@@ -413,4 +413,35 @@ namespace Gensearch
         [ForeignKey(typeof(Quest))]
         public int quest_id {get; set;}
     }
+
+    [Table("Decorations")]
+    public class Decoration {
+        [PrimaryKey, AutoIncrement]
+        public int deco_id {get; set;}
+        public string deco_name {get; set;}
+        public int deco_slot_requirement {get; set;}
+        [ForeignKey(typeof(Skill))]
+        public int positive_skill_id {get; set;}
+        public int positive_skill_effect {get; set;}
+        [ForeignKey(typeof(Skill))]
+        public int negative_skill_id {get; set;}
+        public int negative_skill_effect {get; set;}
+    }
+
+    [Table("DecorationCombinations")]
+    public class DecorationCombination {
+        [PrimaryKey, AutoIncrement]
+        public int deco_comb_id {get; set;}
+        [ForeignKey(typeof(Decoration))]
+        public int deco_id {get; set;}
+        [ForeignKey(typeof(Item))]
+        public int item_1_id {get; set;}
+        public int item_1_quantity {get; set;}
+        [ForeignKey(typeof(Item))]
+        public int item_2_id {get; set;}
+        public int item_2_quantity {get; set;}
+        [ForeignKey(typeof(Item))]
+        public int item_3_id {get; set;}
+        public int item_3_quantity {get; set;}
+    }
 }
