@@ -23,5 +23,6 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="*"/>
     <PackageReference Include="DeepEqual" Version="*"/>
     <PackageReference Include="AngleSharp.Scripting.JavaScript" Version="*"/>
+    <PackageReference Include="ShellProgressBar" Version="4.0.0"/>
   </ItemGroup>
 </Project>

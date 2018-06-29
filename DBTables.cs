@@ -384,4 +384,14 @@ namespace Gensearch
         public int multiplier {get; set;}
         public string wait {get; set;}
     }
+
+    [Table("Skills")]
+    public class Skill {
+        [PrimaryKey, AutoIncrement]
+        public int skill_id {get; set;}
+        public string skill_tree {get; set;}
+        public string skill_name {get; set;}
+        public int skill_value {get; set;}
+        public string skill_description {get; set;}
+    }
 }

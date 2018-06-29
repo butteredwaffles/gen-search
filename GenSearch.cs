@@ -54,7 +54,7 @@ namespace Gensearch
                 stopwatch.Start();
             }
 
-            if (args.Contains("--weapons")) {
+            if (args.Contains("--weapons") || args.Contains("--all") || args.Length == 0) {
                 Stopwatch indiv_weapon_watch = new Stopwatch();
                 var weaponManager = new Weapons();
                 ConsoleWriters.InfoMessage("Starting weapon retrieval...");
@@ -86,6 +86,16 @@ namespace Gensearch
                 ConsoleWriters.InfoMessage("Done with all weapons! Took " + timeSpan.ToString("c") + ".\n\n");
                 stopwatch.Restart();
             }
+
+            if (args.Contains("--skills") || args.Contains("--all") || args.Length == 0) {
+                var skillManager = new Skills();
+                ConsoleWriters.InfoMessage("Starting skill retrieval...\n\n");
+                skillManager.GetSkills("http://mhgen.kiranico.com/skill").Wait();
+                timeSpan = TimeSpan.FromSeconds(Convert.ToInt32(stopwatch.Elapsed.TotalSeconds));
+                ConsoleWriters.InfoMessage("Done with all skills! Took " + timeSpan.ToString("c") + ".\n\n");
+                stopwatch.Restart();
+            }
+
             stopwatch.Stop();
         }
     }
