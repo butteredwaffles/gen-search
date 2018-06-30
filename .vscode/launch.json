@@ -10,7 +10,7 @@
            "request": "launch",
            "preLaunchTask": "build",
            "program": "${workspaceFolder}/bin/Debug/netcoreapp2.0/Gensearch.dll",
-           "args": ["--weapons"],
+           "args": ["--decorations"],
            "cwd": "${workspaceFolder}",
            "stopAtEntry": false,
            "console": "internalConsole"

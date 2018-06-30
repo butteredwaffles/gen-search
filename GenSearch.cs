@@ -105,6 +105,14 @@ namespace Gensearch
                 stopwatch.Restart();
             }
 
+            if (args.Contains("--decorations") || args.Contains("--all") || args.Length == 0) {
+                var decoManager = new Decorations();
+                ConsoleWriters.InfoMessage("Starting decoration retrieval...\n\n");
+                decoManager.GetDecorations("http://mhgen.kiranico.com/decoration").Wait();
+                timeSpan = TimeSpan.FromSeconds(Convert.ToInt32(stopwatch.Elapsed.TotalSeconds));
+                ConsoleWriters.InfoMessage("Done with all decorations! Took " + timeSpan.ToString("c") + ".\n\n");
+                stopwatch.Restart();
+            }
             stopwatch.Stop();
         }
     }

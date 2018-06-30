@@ -12,13 +12,18 @@ namespace Gensearch.Scrapers
     class Items
     {
         public string itaddress = "http://mhgen.kiranico.com/item";
+        private static SQLiteAsyncConnection db = GenSearch.db;
+
+        public static async Task<Item> GetItemFromDB(string name) {
+            var items = await db.Table<Item>().Where(i => i.item_name == name).ToArrayAsync();
+            return items[0];
+        }
 
         public async Task GetItemList() {
             var config = Configuration.Default.WithDefaultLoader();
             var context = BrowsingContext.New(config);
             var page = await context.OpenAsync(itaddress);
             var rows = page.QuerySelector(".table").QuerySelectorAll("td a").OfType<IHtmlAnchorElement>().ToArray();
-            var db = new SQLiteAsyncConnection("data/mhgen.db");
             await db.CreateTableAsync<Item>();
             List<Task> tasks = new List<Task>();
             foreach (IHtmlAnchorElement item in rows) {

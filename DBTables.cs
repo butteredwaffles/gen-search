@@ -420,11 +420,9 @@ namespace Gensearch
         public int deco_id {get; set;}
         public string deco_name {get; set;}
         public int deco_slot_requirement {get; set;}
-        [ForeignKey(typeof(Skill))]
-        public int positive_skill_id {get; set;}
+        public string positive_skill_tree {get; set;}
         public int positive_skill_effect {get; set;}
-        [ForeignKey(typeof(Skill))]
-        public int negative_skill_id {get; set;}
+        public string negative_skill_tree {get; set;}
         public int negative_skill_effect {get; set;}
     }
 

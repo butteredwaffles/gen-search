@@ -9,7 +9,12 @@ namespace Gensearch.Scrapers
 {
     public class Skills
     {
-        private SQLiteAsyncConnection db = GenSearch.db;
+        private static SQLiteAsyncConnection db = GenSearch.db;
+
+        public static async Task<Skill> GetSkillFromDB(string name) {
+            var skills = await db.Table<Skill>().Where(s => s.skill_tree == name).ToArrayAsync();
+            return skills[0];
+        }
 
         public async Task GetSkills(string address) {
             var config = Configuration.Default.WithDefaultLoader().WithJavaScript().WithCss();
