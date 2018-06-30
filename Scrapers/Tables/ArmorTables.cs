@@ -26,10 +26,10 @@ namespace Gensearch.Scrapers
         [ForeignKey(typeof(Monster))]
         public int monster_id {get; set;}
 
-        public string is_blademaster {get; set;}
-        public string is_gunner {get; set;}
-        public string is_male {get; set;}
-        public string is_female {get; set;}
+        public bool is_blademaster {get; set;}
+        public bool is_gunner {get; set;}
+        public bool is_male {get; set;}
+        public bool is_female {get; set;}
 
         [OneToMany(CascadeOperations = CascadeOperation.All)]
         public List<ArmorSkill> skills {get; set;}
