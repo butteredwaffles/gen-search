@@ -108,7 +108,6 @@ namespace Gensearch.Scrapers
         public string unlocks_creation {get; set;} // either no or yes
         public string is_scrap {get; set;} // if a scrap, it's a byproduct
         public string usage {get; set;} // create or upgrade
-
     }
 
     [Table("Bows")]

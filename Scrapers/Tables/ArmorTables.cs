@@ -45,4 +45,39 @@ namespace Gensearch.Scrapers
         public int skill_id {get; set;}
         public int skill_quantity {get; set;}
     }
+
+    [Table("ArmorCraftItems")]
+    public class ArmorCraftItem {
+        [PrimaryKey, AutoIncrement]
+        public int aci_id {get; set;}
+        [ForeignKey(typeof(Armor))]
+        public int armor_id {get; set;}
+        [ForeignKey(typeof(Item))]
+        public int item_id {get; set;}
+        public int quantity {get; set;}
+        public bool unlocks_armor {get; set;}
+    }
+
+    [Table("ArmorScrapRewards")]
+    public class ArmorScrapReward {
+        [PrimaryKey, AutoIncrement]
+        public int asr_id {get; set;}
+        [ForeignKey(typeof(Armor))]
+        public int armor_id {get; set;}
+        [ForeignKey(typeof(Item))]
+        public int item_id {get; set;}
+        public int quantity {get; set;}
+    }
+
+    [Table("ArmorUpgradeItems")]
+    public class ArmorUpgradeItem {
+        [PrimaryKey, AutoIncrement]
+        public int aui_id {get; set;}
+        [ForeignKey(typeof(Armor))]
+        public int armor_id {get; set;}
+        public string upgrade_level {get; set;}
+        [ForeignKey(typeof(Item))]
+        public int item_id {get; set;}
+        public int quantity {get; set;}
+    }
 }
