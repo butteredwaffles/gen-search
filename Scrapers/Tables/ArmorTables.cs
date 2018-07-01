@@ -45,6 +45,4 @@ namespace Gensearch.Scrapers
         public int skill_id {get; set;}
         public int skill_quantity {get; set;}
     }
-
-
 }
