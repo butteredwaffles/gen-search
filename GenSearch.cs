@@ -123,6 +123,15 @@ namespace Gensearch
                 ConsoleWriters.InfoMessage("Done with all armors! Took " + timeSpan.ToString("c") + ".\n\n");
                 stopwatch.Restart();
             }
+
+            if (args.Contains("--palico") || args.Contains("--palico-skills") || args.Contains("--all") || args.Length == 0) {
+                var palico = new Palicoes();
+                ConsoleWriters.StartingPageMessage("Starting palico skill retrieval...\n\n");
+                palico.GetPalicoSkills("http://mhgen.kiranico.com/palico-skill").Wait();
+                timeSpan = TimeSpan.FromSeconds(Convert.ToInt32(stopwatch.Elapsed.TotalSeconds));
+                ConsoleWriters.InfoMessage("Done with all palico things! Took " + timeSpan.ToString("c") + ".\n\n");
+                stopwatch.Restart();
+            }
             stopwatch.Stop();
         }
     }
