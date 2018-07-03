@@ -13,7 +13,8 @@
            "args": ["--armor"],
            "cwd": "${workspaceFolder}",
            "stopAtEntry": false,
-           "console": "internalConsole"
+           "console": "internalConsole",
+           "requireExactSource": false
        },
         {
             "name": ".NET Core Launch (console)",

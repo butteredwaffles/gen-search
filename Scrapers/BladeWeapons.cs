@@ -13,7 +13,6 @@ namespace Gensearch.Scrapers
     public class BladeWeapons
     {
         SQLiteAsyncConnection db = GenSearch.db;
-        Regex intsOnly = new Regex(@"[^\d\+-]");
         string[] spblade_weapons = {"switchaxe", "chargeblade", "gunlance"};
 
         /// <summary>
@@ -160,10 +159,10 @@ namespace Gensearch.Scrapers
                     elements.Add(Weapons.GetElement(small));
                 }
                 else {
-                    affinity = Convert.ToInt32(intsOnly.Replace(small.TextContent.Trim(), ""));
+                    affinity = small.TextContent.Trim().ToInt();
                 }
             }
-            int price = Convert.ToInt32(upgradeinfo[1].TextContent.Replace("z", ""));
+            int price = upgradeinfo[1].TextContent.Replace("z", "").ToInt();
             int monsterid = -1;
             if (page.QuerySelectorAll(".lead").Count() == 3) {
                 monsterid = (await Monsters.GetMonsterFromDB(page.QuerySelectorAll(".lead")[2].TextContent.Trim())).id;
@@ -195,12 +194,12 @@ namespace Gensearch.Scrapers
             var sharpvalues = wrapper.Children[3].QuerySelectorAll("div");
             for (int i = 0; i <= 2; i++) {
                 var spans = sharpvalues[i].QuerySelectorAll("span");
-                int red_sharpness = Convert.ToInt32(intsOnly.Replace(spans[0].Style.Width, "")) * 5;
-                int orange_sharpness = Convert.ToInt32(intsOnly.Replace(spans[1].Style.Width, "")) * 5;
-                int yellow_sharpness = Convert.ToInt32(intsOnly.Replace(spans[2].Style.Width, "")) * 5;
-                int green_sharpness = Convert.ToInt32(intsOnly.Replace(spans[3].Style.Width, "")) * 5;
-                int blue_sharpness = Convert.ToInt32(intsOnly.Replace(spans[4].Style.Width, "")) * 5;
-                int white_sharpness = Convert.ToInt32(intsOnly.Replace(spans[5].Style.Width, "")) * 5;
+                int red_sharpness = spans[0].Style.Width.ToInt() * 5;
+                int orange_sharpness = spans[1].Style.Width.ToInt() * 5;
+                int yellow_sharpness = spans[2].Style.Width.ToInt() * 5;
+                int green_sharpness = spans[3].Style.Width.ToInt() * 5;
+                int blue_sharpness = spans[4].Style.Width.ToInt() * 5;
+                int white_sharpness = spans[5].Style.Width.ToInt() * 5;
                 values.Add(new SharpnessValue() {
                     handicraft_modifier = i,
                     red_sharpness_length = red_sharpness,

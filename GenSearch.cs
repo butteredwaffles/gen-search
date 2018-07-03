@@ -116,10 +116,9 @@ namespace Gensearch
 
             if (args.Contains("--armor") || args.Contains("--all") || args.Length == 0) {
                 var armor = new Armors();
-                ConsoleWriters.InfoMessage("Starting armor retrieval...\n\n");
-                for (int i = 1; i < 9; i++) {
-                    armor.GetArmors($"http://mhgen.kiranico.com/armor?rare={i}").Wait();
-                }
+                 for (int i = 1; i < 9; i++) {
+                     armor.GetArmors($"http://mhgen.kiranico.com/armor?rare={i}").Wait();
+                 }
                 timeSpan = TimeSpan.FromSeconds(Convert.ToInt32(stopwatch.Elapsed.TotalSeconds));
                 ConsoleWriters.InfoMessage("Done with all armors! Took " + timeSpan.ToString("c") + ".\n\n");
                 stopwatch.Restart();

@@ -23,22 +23,20 @@ namespace Gensearch.Scrapers
             var page = await context.OpenAsync(address);
             var rows = page.QuerySelector(".table").QuerySelectorAll("tr.table-active");
             int throttle = 3;
-            await db.CreateTablesAsync<Armor, ArmorSkill>();
+            await db.CreateTablesAsync<Armor, ArmorSkill, ArmorCraftItem, ArmorScrapReward, ArmorUpgradeItem>();
             
             List<Task> tasks = new List<Task>();
-            var options = new ProgressBarOptions { ProgressBarOnBottom = true };
-            using (var progress = new ProgressBar(rows.Length, $"Starting armor retrieval. ({address})", options)) {
-                foreach (var row in rows) {
-                    string addr = ((IHtmlAnchorElement) row.NextElementSibling.FirstElementChild.FirstElementChild).Href;
-                    tasks.Add(GetArmor(addr));
+            foreach (var row in rows) {
+                string addr = ((IHtmlAnchorElement) row.NextElementSibling.FirstElementChild.FirstElementChild).Href;
+                tasks.Add(GetArmor(addr));
 
-                    if (tasks.Count == throttle) {
-                        Task completed = await Task.WhenAny(tasks);
-                        tasks.Remove(completed);
-                    }
+                if (tasks.Count == throttle) {
+                    Task completed = await Task.WhenAny(tasks);
+                    tasks.Remove(completed);
                 }
             }
             await Task.WhenAll(tasks);
+            ConsoleWriters.CompletionMessage($"\nFinished with page! ({address}).\n");
         }
 
         public async Task GetArmor(string address) {
@@ -47,10 +45,15 @@ namespace Gensearch.Scrapers
             var page = await context.OpenAsync(address);
             
             SetInfo setinfo = GetSetInfo(page);
+            ConsoleWriters.StartingPageMessage($"Starting the {setinfo.armor_set} set.");
             List<Armor> armor_pieces = new List<Armor>();
-            var skill_table = page.QuerySelectorAll(".table")[1].Children[1].Children.ToArray();
+            var tables = page.QuerySelectorAll(".table");
+            var defense_trs = tables[0].QuerySelectorAll("tbody tr").SkipLast(1);
+            var skill_table = tables[1].Children[1].Children.ToArray();
+            var create_table = tables[2].Children[1].Children.ToArray();
+            var upgrade_table = tables[4].Children[1].Children.ToArray();
             // Skip the last tr, because that is the total
-            foreach (var tr in page.QuerySelector(".table").QuerySelectorAll("tbody tr").SkipLast(1)) {
+            foreach (var tr in defense_trs) {
                 DefenseInfo definfo = GetArmorPieceDefenseInfo(tr);
                 int tr_index = tr.ParentElement.Children.Index(tr);
                 ArmorSkillInfo asi = GetArmorSkills(skill_table[tr_index]);
@@ -73,12 +76,25 @@ namespace Gensearch.Scrapers
                     ice_def = definfo.ice_defense,
                     dragon_def = definfo.dragon_def,
                     slots = asi.slots,
-                    skills = asi.skills
                 };
+                await db.InsertAsync(piece);
+                List<ArmorScrapReward> create_scraps = GetArmorScraps(create_table[tr_index], "create", piece.armor_id);
+                List<ArmorScrapReward> upgrade_scraps = GetArmorScraps(upgrade_table[tr_index], "upgrade", piece.armor_id);
+                List<ArmorCraftItem> craft_items = GetArmorCrafts(create_table[tr_index], piece.armor_id);
+                List<ArmorUpgradeItem> upgrade_items = GetArmorUpgradeItems(upgrade_table[tr_index], piece.armor_id);
+                await db.InsertAllAsync(create_scraps);
+                await db.InsertAllAsync(upgrade_scraps);
+                await db.InsertAllAsync(craft_items);
+                await db.InsertAllAsync(upgrade_items);
 
-                armor_pieces.Add(piece);
+                foreach (ArmorSkill skill in asi.skills) {
+                    skill.armor_id = piece.armor_id;
+                }
+                await db.InsertAllAsync(asi.skills);
             }
+
             await db.InsertAllWithChildrenAsync(armor_pieces);
+            ConsoleWriters.CompletionMessage($"Finished with the {setinfo.armor_set} set!");
         }
 
         public SetInfo GetSetInfo(IDocument page) {
@@ -92,7 +108,7 @@ namespace Gensearch.Scrapers
             string set_name = page.QuerySelector("[itemprop=\"name\"]").TextContent.Replace("Armor Set", "").Trim();
             int monster_id = -1;
             string[] piece_descriptions;
-            if (divs[6].FirstElementChild.TagName == "A") {
+            if (divs[6].FirstElementChild != null) {
                 monster_id = Monsters.GetMonsterFromDB(divs[6].FirstElementChild.TextContent).Result.id;
                 piece_descriptions = divs.Skip(7).Select(d => d.NextElementSibling.TextContent).ToArray();
             }
@@ -121,10 +137,11 @@ namespace Gensearch.Scrapers
             foreach (var small in tds[2].QuerySelectorAll("small")) {
                 string skill_name = String.Join(' ', small.TextContent.Trim().Split(' ').SkipLast(1));
                 int skill_id = Skills.GetSkillFromDB(skill_name).Result.skill_id;
+
                 int skill_value = small.TextContent.ToInt();
                 skills.Add(new ArmorSkill() {
                     skill_id = skill_id,
-                    skill_quantity = skill_value
+                    skill_quantity = skill_value,
                 });
             }
             return new ArmorSkillInfo() {
@@ -148,6 +165,69 @@ namespace Gensearch.Scrapers
                 ice_defense = tr.Children[5].TextContent.ToInt(),
                 dragon_def = tr.Children[6].TextContent.ToInt(),
             }; 
+        }
+
+        public List<ArmorCraftItem> GetArmorCrafts(IElement tr, int armor_id) {
+            List<ArmorCraftItem> items = new List<ArmorCraftItem>();
+            foreach (var div in tr.Children[1].QuerySelectorAll("div")) {
+                string item_name = div.TextContent.Trim();
+                var oof = String.Join(' ', item_name.Replace("  (Unlock)", "").Split(' ').SkipLast(1));
+                int quantity = item_name.Replace("(", " ").Replace(")", " ").ToInt();
+                bool unlocks = false;
+                if (item_name.Contains("Unlock")) {
+                    unlocks = true;
+                }
+                items.Add(new ArmorCraftItem() {
+                    armor_id = armor_id,
+                    item_name = item_name,
+                    quantity = quantity,
+                    unlocks_armor = unlocks
+                });
+            }
+            return items;
+        }
+
+        public List<ArmorScrapReward> GetArmorScraps(IElement tr, string type, int armor_id) {
+            List<ArmorScrapReward> scraps = new List<ArmorScrapReward>();
+            foreach (var node in tr.Children[2].QuerySelectorAll("a")) {
+                if (node.NodeName == "A") {
+                    int item_id = Items.GetItemFromDB(node.TextContent).Result.id;
+                    int quantity = node.NextSibling.TextContent.ToInt();
+                    int level = -1;
+                    if (node.Parent.NodeName == "SMALL") {
+                        level = node.PreviousSibling.TextContent.ToInt();
+                    }
+                    scraps.Add(new ArmorScrapReward() {
+                        item_id = item_id,
+                        armor_id = armor_id,
+                        quantity = quantity,
+                        type = type,
+                        level = level
+                    });
+                }
+            }
+            return scraps;
+        }
+
+        public List<ArmorUpgradeItem> GetArmorUpgradeItems(IElement tr, int armor_id) {
+            List<ArmorUpgradeItem> items = new List<ArmorUpgradeItem>();
+            foreach (var div in tr.Children[1].QuerySelectorAll("div")) {
+                string[] div_texts = div.TextContent.Trim().Split(' ');
+
+                int level = div_texts[0].ToInt();
+                int quantity = String.Join(' ', div_texts.Skip(1)).ToInt();
+                string oof = String.Join(' ', div_texts.Skip(1).SkipLast(1));
+                if (oof.Contains('(')) {
+                    oof = String.Join(' ', div_texts.Skip(1).SkipLast(2));
+                }
+                items.Add(new ArmorUpgradeItem() {
+                    armor_id = armor_id,
+                    upgrade_level = level,
+                    quantity = quantity,
+                    item_name = oof
+                });
+            }
+            return items;
         }
 
         public class SetInfo {

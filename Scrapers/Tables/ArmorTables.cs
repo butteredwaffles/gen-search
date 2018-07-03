@@ -30,9 +30,6 @@ namespace Gensearch.Scrapers
         public bool is_gunner {get; set;}
         public bool is_male {get; set;}
         public bool is_female {get; set;}
-
-        [OneToMany(CascadeOperations = CascadeOperation.All)]
-        public List<ArmorSkill> skills {get; set;}
     }
 
     [Table("ArmorSkills")]
@@ -52,8 +49,7 @@ namespace Gensearch.Scrapers
         public int aci_id {get; set;}
         [ForeignKey(typeof(Armor))]
         public int armor_id {get; set;}
-        [ForeignKey(typeof(Item))]
-        public int item_id {get; set;}
+        public string item_name {get; set;}
         public int quantity {get; set;}
         public bool unlocks_armor {get; set;}
     }
@@ -67,6 +63,8 @@ namespace Gensearch.Scrapers
         [ForeignKey(typeof(Item))]
         public int item_id {get; set;}
         public int quantity {get; set;}
+        public string type {get; set;}
+        public int level {get; set;}
     }
 
     [Table("ArmorUpgradeItems")]
@@ -75,9 +73,8 @@ namespace Gensearch.Scrapers
         public int aui_id {get; set;}
         [ForeignKey(typeof(Armor))]
         public int armor_id {get; set;}
-        public string upgrade_level {get; set;}
-        [ForeignKey(typeof(Item))]
-        public int item_id {get; set;}
+        public int upgrade_level {get; set;}
+        public string item_name {get; set;}
         public int quantity {get; set;}
     }
 }
