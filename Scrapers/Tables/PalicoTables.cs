@@ -43,6 +43,18 @@ namespace Gensearch.Scrapers.Tables
         public int pa_dragon {get; set;}
     }
 
+    [Table("PalicoSkills")]
+    public class PalicoSkill {
+        [PrimaryKey, AutoIncrement]
+        public int ps_id {get; set;}
+        public string ps_name {get; set;}
+        // Defensive, offensive, or passive
+        public string ps_type {get; set;}
+        public string ps_description {get; set;}
+        public int ps_memory_req {get; set;}
+        public int ps_learn_level {get; set;}
+    }
+
     [Table("PalicoCraftItems")]
     public class PalicoCraftItems {
         [PrimaryKey, AutoIncrement]
