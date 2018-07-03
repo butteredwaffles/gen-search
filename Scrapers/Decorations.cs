@@ -70,7 +70,7 @@ namespace Gensearch.Scrapers
                         item_2_id = (await Items.GetItemFromDB(divs[1].FirstElementChild.TextContent)).id,
                         item_2_quantity = Convert.ToInt32(intsOnly.Replace(divs[1].TextContent, "")),
                         item_3_id = -1,
-                        item_3_quantity = -1
+                        item_3_quantity = 0
                     });
                     break;
                 case 3:
@@ -101,7 +101,7 @@ namespace Gensearch.Scrapers
                         item_2_id = (await Items.GetItemFromDB(divs[4].FirstElementChild.TextContent)).id,
                         item_2_quantity = Convert.ToInt32(intsOnly.Replace(divs[4].TextContent, "")),
                         item_3_id = -1,
-                        item_3_quantity = -1,
+                        item_3_quantity = 0,
                     });
                     break;
                 case 6:
