@@ -42,7 +42,7 @@ namespace Gensearch.Scrapers
             string positive_skill = (await Skills.GetSkillFromDB(tds[2].TextContent)).skill_tree;
             int positive_skill_effect = Convert.ToInt32(tds[3].TextContent);
             string negative_skill = "none";
-            int negative_skill_effect = -1;
+            int negative_skill_effect = 0;
             if (tds[4].TextContent != "") {
                 negative_skill = (await Skills.GetSkillFromDB(tds[4].TextContent)).skill_tree;
                 negative_skill_effect = Convert.ToInt32(tds[5].TextContent);
