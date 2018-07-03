@@ -26,16 +26,34 @@ namespace Gensearch.Scrapers.Tables
         public int pw_defense {get; set;}
     }
 
-    [Table("PalicoWeaponCraftItems")]
-    public class PalicoWeaponCraftItem {
+    [Table("PalicoArmor")]
+    public class PalicoArmor {
         [PrimaryKey, AutoIncrement]
-        public int pwc_id {get; set;}
-        [ForeignKey(typeof(PalicoWeapon))]
-        public int pw_id {get; set;}
+        public int pa_id {get; set;}
+        public string pa_name {get; set;}
+        public string pa_description {get; set;}
+        public int pa_rarity {get; set;}
+        public int pa_price {get; set;}
+
+        public int pa_defense {get; set;}
+        public int pa_fire {get; set;}
+        public int pa_water {get; set;}
+        public int pa_thunder {get; set;}
+        public int pa_ice {get; set;}
+        public int pa_dragon {get; set;}
+    }
+
+    [Table("PalicoCraftItems")]
+    public class PalicoCraftItems {
+        [PrimaryKey, AutoIncrement]
+        public int pc_id {get; set;}
+        // The name of the item being crafted
+        public string palico_item {get; set;}
         [ForeignKey(typeof(Item))]
         public int item_id {get; set;}
         public int quantity {get; set;}
     }
+
 
 
 }
