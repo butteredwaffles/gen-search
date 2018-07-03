@@ -46,7 +46,6 @@ namespace Gensearch.Scrapers
             
             SetInfo setinfo = GetSetInfo(page);
             ConsoleWriters.StartingPageMessage($"Starting the {setinfo.armor_set} set.");
-            List<Armor> armor_pieces = new List<Armor>();
             var tables = page.QuerySelectorAll(".table");
             var defense_trs = tables[0].QuerySelectorAll("tbody tr").SkipLast(1);
             var skill_table = tables[1].Children[1].Children.ToArray();
@@ -78,22 +77,17 @@ namespace Gensearch.Scrapers
                     slots = asi.slots,
                 };
                 await db.InsertAsync(piece);
-                List<ArmorScrapReward> create_scraps = GetArmorScraps(create_table[tr_index], "create", piece.armor_id);
-                List<ArmorScrapReward> upgrade_scraps = GetArmorScraps(upgrade_table[tr_index], "upgrade", piece.armor_id);
-                List<ArmorCraftItem> craft_items = GetArmorCrafts(create_table[tr_index], piece.armor_id);
-                List<ArmorUpgradeItem> upgrade_items = GetArmorUpgradeItems(upgrade_table[tr_index], piece.armor_id);
-                await db.InsertAllAsync(create_scraps);
-                await db.InsertAllAsync(upgrade_scraps);
-                await db.InsertAllAsync(craft_items);
-                await db.InsertAllAsync(upgrade_items);
-
                 foreach (ArmorSkill skill in asi.skills) {
                     skill.armor_id = piece.armor_id;
                 }
-                await db.InsertAllAsync(asi.skills);
+                await Task.WhenAll(
+                    db.InsertAllAsync(asi.skills),
+                    db.InsertAllAsync(GetArmorScraps(create_table[tr_index], "create", piece.armor_id)),
+                    db.InsertAllAsync(GetArmorScraps(upgrade_table[tr_index], "upgrade", piece.armor_id)),
+                    db.InsertAllAsync(GetArmorCrafts(create_table[tr_index], piece.armor_id)),
+                    db.InsertAllAsync(GetArmorUpgradeItems(upgrade_table[tr_index], piece.armor_id))
+                );
             }
-
-            await db.InsertAllWithChildrenAsync(armor_pieces);
             ConsoleWriters.CompletionMessage($"Finished with the {setinfo.armor_set} set!");
         }
 
