@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using SQLite;
 using SQLiteNetExtensions.Attributes;
 
@@ -41,6 +42,9 @@ namespace Gensearch.Scrapers.Tables
         public int pa_thunder {get; set;}
         public int pa_ice {get; set;}
         public int pa_dragon {get; set;}
+
+        [Ignore]
+        public List<PalicoCraftItem> craft_items {get; set;}
     }
 
     [Table("PalicoSkills")]
@@ -56,7 +60,7 @@ namespace Gensearch.Scrapers.Tables
     }
 
     [Table("PalicoCraftItems")]
-    public class PalicoCraftItems {
+    public class PalicoCraftItem {
         [PrimaryKey, AutoIncrement]
         public int pc_id {get; set;}
         // The name of the item being crafted
@@ -65,7 +69,4 @@ namespace Gensearch.Scrapers.Tables
         public int item_id {get; set;}
         public int quantity {get; set;}
     }
-
-
-
 }

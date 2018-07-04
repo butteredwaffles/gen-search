@@ -124,12 +124,23 @@ namespace Gensearch
                 stopwatch.Restart();
             }
 
-            if (args.Contains("--palico") || args.Contains("--palico-skills") || args.Contains("--all") || args.Length == 0) {
+            if (args.Contains("--palico-skills") || args.Contains("--all") || args.Length == 0) {
                 var palico = new Palicoes();
                 ConsoleWriters.StartingPageMessage("Starting palico skill retrieval...\n\n");
                 palico.GetPalicoSkills("http://mhgen.kiranico.com/palico-skill").Wait();
                 timeSpan = TimeSpan.FromSeconds(Convert.ToInt32(stopwatch.Elapsed.TotalSeconds));
-                ConsoleWriters.InfoMessage("Done with all palico things! Took " + timeSpan.ToString("c") + ".\n\n");
+                ConsoleWriters.InfoMessage("Done with all palico skills! Took " + timeSpan.ToString("c") + ".\n\n");
+                stopwatch.Restart();
+            }
+
+            if (args.Contains("--palico-armor") || args.Contains("--all") || args.Length == 0) {
+                var palico = new Palicoes();
+                ConsoleWriters.StartingPageMessage("Starting palico armor retrieval...\n\n");
+                for (int i = 1; i < 5; i++) {
+                     palico.GetPalicoArmors($"http://mhgen.kiranico.com/palico-armor?page={i}").Wait();
+                 }
+                timeSpan = TimeSpan.FromSeconds(Convert.ToInt32(stopwatch.Elapsed.TotalSeconds));
+                ConsoleWriters.InfoMessage("Done with all palico armors! Took " + timeSpan.ToString("c") + ".\n\n");
                 stopwatch.Restart();
             }
             stopwatch.Stop();
