@@ -19,12 +19,19 @@ namespace Gensearch.Scrapers.Tables
         // cutting or blunt
         public string pw_damage_type {get; set;}
         public int pw_affinity {get; set;}
+        public string pw_element {get; set;}
+        public int pw_element_amt {get; set;}
         // Palico sharpness is thankfully different from hunter sharpness, so it can be stored in a single string
         public string pw_sharpness {get; set;}
         public int pw_boomerang_damage {get; set;}
         public int pw_boomerang_affinity {get; set;}
+        public string pw_boomerang_element {get; set;}
+        public int pw_boomerang_element_amt {get; set;}
 
         public int pw_defense {get; set;}
+
+        [Ignore]
+        public List<PalicoCraftItem> craft_items {get; set;}
     }
 
     [Table("PalicoArmor")]

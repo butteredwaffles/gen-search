@@ -105,18 +105,110 @@ namespace Gensearch.Scrapers
                 craft_items = new List<PalicoCraftItem>()
             };
             var craft_table = page.QuerySelector(".table-sm").FirstElementChild.QuerySelectorAll("td");
-            for (int i = 0; i < craft_table.Length; i += 2) {
-                int item_id = (await Items.GetItemFromDB(craft_table[i].TextContent)).id;
-                int quantity = craft_table[i+1].TextContent.ToInt();
-                string armor_name = armor.pa_name;
-                armor.craft_items.Add(new PalicoCraftItem() {
-                    palico_item = armor_name,
+            armor.craft_items = GetPalicoCrafts(craft_table, armor.pa_name);
+            ConsoleWriters.CompletionMessage($"Finished adding the {name} palico armor!");
+            return armor;
+        }
+
+        public List<PalicoCraftItem> GetPalicoCrafts(IHtmlCollection<IElement> tds, string palico_item) {
+            List<PalicoCraftItem> items = new List<PalicoCraftItem>();
+            for (int i = 0; i < tds.Length; i += 2) {
+                int item_id = Items.GetItemFromDB(tds[i].TextContent).Result.id;
+                int quantity = tds[i+1].TextContent.ToInt();
+                items.Add(new PalicoCraftItem() {
+                    palico_item = palico_item,
                     item_id = item_id,
                     quantity = quantity
                 });
             }
-            ConsoleWriters.CompletionMessage($"Finished adding the {name} palico armor!");
-            return armor;
+            return items;
+        }
+
+        public async Task GetPalicoWeapons(string address) {
+            var page = await context.OpenAsync(address);
+            await db.CreateTablesAsync<PalicoWeapon, PalicoCraftItem>();
+
+            int throttle = 7;
+            List<Task<PalicoWeapon>> tasks = new List<Task<PalicoWeapon>>();
+            List<PalicoWeapon> weapons = new List<PalicoWeapon>();
+            foreach (var tr in page.QuerySelector(".table").QuerySelectorAll("tr").Skip(1)) {
+                string wpn_address = tr.QuerySelector("a").GetAttribute("href");
+                string wpn_type = tr.QuerySelector("small").TextContent;
+                string wpn_damage_type = tr.QuerySelector("div").TextContent.Split(' ')[1].Replace("(", "").Replace(")", "");
+
+                tasks.Add(GetPalicoWeapon(wpn_address, wpn_type, wpn_damage_type));
+                if (tasks.Count() == throttle) {
+                    Task<PalicoWeapon> completed = await Task.WhenAny(tasks);
+                    weapons.Add(completed.Result);
+                    tasks.Remove(completed);
+                }
+            }
+            weapons.Concat(await Task.WhenAll(tasks));
+            await db.InsertAllAsync(weapons);
+            List<PalicoCraftItem> all_craft_items = new List<PalicoCraftItem>();
+            foreach (var list in weapons.Select(w => w.craft_items)) {
+                all_craft_items.AddRange(list);
+            }
+            await db.InsertAllAsync(all_craft_items);
+        }
+
+        public async Task<PalicoWeapon> GetPalicoWeapon(string address, string weapon_type, string weapon_damage_type) {
+            var page = await context.OpenAsync(address);
+            var basicinfo = page.QuerySelector("[itemprop=\"gameItem\"]");
+            string name = basicinfo.FirstElementChild.TextContent;
+            string description = basicinfo.Children[1].TextContent;
+            ConsoleWriters.StartingPageMessage($"Started on the {name} palico weapon.");
+            var leads = page.QuerySelectorAll(".lead");
+            int rarity = leads[0].TextContent.ToInt();
+            int price = leads[1].TextContent.ToInt();
+
+            var damage_tr = page.QuerySelector(".table").QuerySelectorAll("tr")[1];
+
+            var melee_data = damage_tr.FirstElementChild.QuerySelectorAll("div");
+            int melee_dmg = melee_data[0].TextContent.ToInt();
+            int melee_affinity = melee_data[1].TextContent.ToInt();
+            string sharpness = damage_tr.QuerySelector("span").ClassName;
+            string melee_element = "none";
+            int melee_elem_amount = 0;
+            if (damage_tr.Children[2].TextContent.Replace(" ", "") != "") {
+                melee_element = damage_tr.Children[2].TextContent.Trim().Split(' ')[1];
+                melee_elem_amount = damage_tr.Children[2].TextContent.ToInt();
+            }
+
+            var boom_data = damage_tr.Children[3].QuerySelectorAll("div");
+            int boom_dmg = boom_data[0].TextContent.ToInt();
+            int boom_affinity = boom_data[1].TextContent.ToInt();
+            string boom_element = "none";
+            int boom_elem_amount = 0;
+            if (damage_tr.Children[4].TextContent.Replace(" ", "") != "") {
+                boom_element = damage_tr.Children[4].TextContent.Trim().Split(' ')[1];
+                boom_elem_amount = damage_tr.Children[4].TextContent.ToInt();
+            }
+            int defense = damage_tr.LastElementChild.TextContent.ToInt();
+            
+            PalicoWeapon weapon = new PalicoWeapon() {
+                pw_name = name,
+                pw_description = description,
+                pw_affinity = melee_affinity,
+                pw_boomerang_affinity = boom_affinity,
+                pw_boomerang_damage = boom_dmg,
+                pw_boomerang_element = boom_element,
+                pw_boomerang_element_amt = boom_elem_amount,
+                pw_damage = melee_dmg,
+                pw_damage_type = weapon_damage_type,
+                pw_defense = defense,
+                pw_element = melee_element,
+                pw_element_amt = melee_elem_amount,
+                pw_price = price,
+                pw_rarity = rarity,
+                pw_sharpness = sharpness,
+                pw_type = weapon_type
+            };
+
+            var craft_table = page.QuerySelector(".table-sm").FirstElementChild.QuerySelectorAll("td");
+            weapon.craft_items = GetPalicoCrafts(craft_table, name);
+            ConsoleWriters.CompletionMessage($"Finished adding the {name} palico weapon!");
+            return weapon;
         }
     }
 }
