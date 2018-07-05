@@ -164,7 +164,7 @@ namespace Gensearch.Scrapers
         public List<ArmorCraftItem> GetArmorCrafts(IElement tr, int armor_id) {
             List<ArmorCraftItem> items = new List<ArmorCraftItem>();
             foreach (var div in tr.Children[1].QuerySelectorAll("div")) {
-                string item_name = div.TextContent.Trim().Replace("  (Unlock", "");
+                string item_name = div.TextContent.Trim().Replace("  (Unlock)", "");
                 var oof = String.Join(' ', item_name.Split(' ').SkipLast(1));
                 int quantity = item_name.Replace("(", " ").Replace(")", " ").ToInt();
                 bool unlocks = false;
