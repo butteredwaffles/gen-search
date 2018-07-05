@@ -8,8 +8,12 @@ There are different arguments you can run if you only wish to fetch certain part
 
 `dotnet run --items`
 
-...would only fill the database with the items. If you simply run `dotnet run` without params, it defaults to `--all`.
+...would only fill the database with the items. If you simply run `dotnet run` without parameters, it defaults to `--all`.
 
-Valid arguments are `--items, --monsters, --quests, --weapons, --skills, --arts, and --all.`
+Valid arguments are `--items, --monsters, --quests, --weapons, --skills, --arts, --decorations, --armor, --palico-skills, --palico-armor, --palico-weapons, and --all. `
 
 If you made edits, use `dotnet test` to run the test cases.
+
+## Converting the database
+
+The program creates an SQLite database with the information. However, the web app uses a MySQL database. Therefore, if you are planning on running the service yourself, you will have to create a dump of the SQLite one and import it into a MySQL database named `mhgen`.
