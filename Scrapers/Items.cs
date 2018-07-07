@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Web;
 using AngleSharp;
 using AngleSharp.Dom.Html;
+using Gensearch.Helpers;
 using SQLite;
 
 namespace Gensearch.Scrapers
@@ -61,9 +62,9 @@ namespace Gensearch.Scrapers
                 return new Item() {
                     item_name = name, // name
                     description = page.QuerySelector("p[itemprop=\"description\"]").TextContent,
-                    rarity = Convert.ToInt32(itemIntData[0].TextContent),
-                    max_stack = Convert.ToInt32(itemIntData[1].TextContent),
-                    sell_price = Convert.ToInt32(itemIntData[2].TextContent.Replace("z", "")),
+                    rarity = itemIntData[0].TextContent.ToInt(),
+                    max_stack = itemIntData[1].TextContent.ToInt(),
+                    sell_price = itemIntData[2].TextContent.ToInt(),
                     combinations = combination
                 };
             }

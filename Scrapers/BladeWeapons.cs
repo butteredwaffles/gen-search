@@ -69,7 +69,14 @@ namespace Gensearch.Scrapers
                         HuntingHorn horn = GetHuntingHorn(notes, sv.sword_id);
                         await db.InsertAsync(horn);
                     }
-                    if (!already_inserted) { await db.InsertAsync(sv); }
+                    if (!already_inserted) { 
+                        try {
+                            await db.InsertAsync(sv);
+                        }
+                        catch (SQLiteException){
+                            ConsoleWriters.ErrorMessage($"{sv.sword_name} is already in the database!");
+                        }
+                    }
                     
 
                     List<CraftItem> craftitems = Weapons.GetCraftItems(crafting_table.Children[current_wpn_index]);
@@ -150,7 +157,7 @@ namespace Gensearch.Scrapers
             string upgrades_into = "none";
             var upgradeinfo = crafting.Children[current_index].QuerySelectorAll("td");
             if (upgradeinfo[0].QuerySelector(".font-weight-bold") != null) {
-                upgrades_into = String.Join('\n', upgradeinfo[0].QuerySelectorAll("a").Select(a => a.TextContent.Trim()));
+                upgrades_into = String.Join(" & ", upgradeinfo[0].QuerySelectorAll("a").Select(a => a.TextContent.Trim()));
             }
             List<ElementDamage> elements = new List<ElementDamage>();
             int affinity = 0;

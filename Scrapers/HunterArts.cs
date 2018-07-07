@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AngleSharp;
 using AngleSharp.Dom;
+using Gensearch.Helpers;
 using ShellProgressBar;
 using SQLite;
 
@@ -40,7 +41,7 @@ namespace Gensearch.Scrapers
         public HunterArt GetArt(IElement wrapper) {
             var tds = wrapper.QuerySelectorAll("td");
             string art_name = tds[0].TextContent;
-            int gauge_size = Convert.ToInt32(tds[1].TextContent);
+            int gauge_size = tds[1].TextContent.ToInt();
             string description = tds[2].TextContent;
             return new HunterArt() {
                 art_name = art_name,

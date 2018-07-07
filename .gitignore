@@ -7,6 +7,4 @@
 bin/
 obj/
 ref/
-data/*.db
-data/*.db-journal
-data/dump.sql
+data/

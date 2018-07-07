@@ -9,7 +9,6 @@ namespace Gensearch.Scrapers
         [PrimaryKey, AutoIncrement]
         public int sword_id {get; set;}
         public string sword_class {get; set;}
-        [Unique, NotNull]
         public string sword_name {get; set;}
         public string sword_set_name {get; set;}
         [ForeignKey(typeof(Monster))]
