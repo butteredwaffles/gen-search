@@ -1,17 +1,31 @@
 from peewee import Model, IntegerField, FloatField, CharField
 from . import db_config
 
+
 class BaseModel(Model):
     class Meta:
         database = db_config.db
 
+
 class Monster(BaseModel):
-    base_hp = IntegerField(null=True)
-    base_size = FloatField(null=True)
-    king_size = FloatField(null=True)
-    mon_name = CharField(null=True, unique=True)
-    silver_size = FloatField(null=True)
-    small_size = FloatField(null=True)
+    id = IntegerField()
+    base_hp = IntegerField()
+    base_size = FloatField()
+    king_size = FloatField()
+    mon_name = CharField(unique=True)
+    silver_size = FloatField()
+    small_size = FloatField()
 
     class Meta:
-        table_name = 'monsters'
+        table_name = "monsters"
+
+
+class MonsterPart(BaseModel):
+    id = IntegerField()
+    part_name = CharField()
+    stagger_value = IntegerField()
+    extract_color = CharField()
+    monsterid = IntegerField()
+
+    class Meta:
+        table_name = "monsterparts"

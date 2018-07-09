@@ -12,7 +12,8 @@ IGNOREDPREFIXES = [
     'CREATE INDEX'
 ]
 
-REPLACEMAP = {#"INTEGER PRIMARY KEY": "INTEGER AUTO_INCREMENT PRIMARY KEY",
+
+REPLACEMAP = {
     "AUTOINCREMENT": "AUTO_INCREMENT",
     "DEFAULT 't'": "DEFAULT '1'",
     "DEFAULT 'f'": "DEFAULT '0'",
@@ -21,6 +22,7 @@ REPLACEMAP = {#"INTEGER PRIMARY KEY": "INTEGER AUTO_INCREMENT PRIMARY KEY",
     "VARCHAR": "VARCHAR(255)",
     '\"': "`"
 }
+
 
 def convert(filename):
     data = ""
@@ -51,13 +53,15 @@ def convert(filename):
             for key in REPLACEMAP.keys():
                 line = re.sub(key, REPLACEMAP[key], line, flags=re.IGNORECASE)
             if not changed_this_round and line.startswith(current_prefix):
-                try: 
+                try:
                     values = line.split(" VALUES ")[1].strip()[:-1]
                     line = line.replace(line, ', ' + values + '\n')
-                except IndexError: pass
+                except IndexError:
+                    pass
             newfile.append(line)
     with open("output/mysql.sql", "w", encoding="utf-8") as nf:
         nf.writelines(newfile)
+
 
 if __name__ == "__main__":
     try:
