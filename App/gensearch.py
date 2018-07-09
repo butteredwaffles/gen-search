@@ -5,6 +5,7 @@ from models.models import *
 app = Flask(__name__)
 BREAK_WORDS = ["Wound", "Capture", "Shiny", "Break", "Carve", "Gather"]
 
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -37,6 +38,10 @@ def get_individual_monster(name):
             "large_gold": mon.king_size
         },
         "parts": [],
+        "drops": {
+            "high": [],
+            "low": []
+        }
     }
 
     for part in MonsterPart.select().where(mon.id == MonsterPart.monsterid):
@@ -46,6 +51,25 @@ def get_individual_monster(name):
                 "stagger_value": part.stagger_value,
                 "extract_color": part.extract_color if part.extract_color is not None else "N/A"
             })
+
+    for drop in MonsterDrop.select().where(mon.id == MonsterDrop.monsterid):
+        if drop.rank == "Low":
+            monster["drops"]["low"].append({
+                "item_name": Item.get(Item.id == drop.itemid).item_name,
+                "source": MonsterPart.get(drop.sourceid == MonsterPart.id).part_name,
+                "rank": drop.rank,
+                "drop_chance": str(drop.drop_chance) + "%",
+                "quantity": drop.quantity
+            })
+        else:
+            monster["drops"]["high"].append({
+                "item_name": Item.get(Item.id == drop.itemid).item_name,
+                "source": MonsterPart.get(drop.sourceid == MonsterPart.id).part_name,
+                "rank": drop.rank,
+                "drop_chance": str(drop.drop_chance) + "%",
+                "quantity": drop.quantity
+            })
+        
     db_config.db.close()
     return jsonify(monster)
 

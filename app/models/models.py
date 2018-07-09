@@ -7,6 +7,19 @@ class BaseModel(Model):
         database = db_config.db
 
 
+class Item(BaseModel):
+    id = IntegerField()
+    item_name = CharField()
+    description = CharField()
+    rarity = IntegerField()
+    max_stack = IntegerField()
+    sell_price = IntegerField()
+    combinations = CharField()
+
+    class Meta:
+        table_name = "items"
+
+
 class Monster(BaseModel):
     id = IntegerField()
     base_hp = IntegerField()
@@ -29,3 +42,16 @@ class MonsterPart(BaseModel):
 
     class Meta:
         table_name = "monsterparts"
+
+
+class MonsterDrop(BaseModel):
+    id = IntegerField()
+    itemid = IntegerField()
+    monsterid = IntegerField()
+    sourceid = IntegerField()
+    rank = CharField()
+    drop_chance = IntegerField()
+    quantity = IntegerField()
+
+    class Meta:
+        table_name = "monsterdrops"
