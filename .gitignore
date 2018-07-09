@@ -5,6 +5,7 @@
 !.vscode/extensions.json
 
 bin/
+__pycache__/
 obj/
 ref/
 data/
