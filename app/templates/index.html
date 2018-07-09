@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+    <head>
+
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/styles.css') }}">
+        <link href="https://fonts.googleapis.com/css?family=Concert+One" rel="stylesheet">
+        <title>Gensearch - MHGen API</title>
+        
+
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="description" content="A RESTful API for retrieving information about Capcom's Monster Hunter Generations.">
+    </head>
+    <body>
+        <div class="container-fluid">
+            <div class="jumbotron">
+                <h1>Gensearch</h1>
+                <h4 class="font-italic">Access information about items, quests, monsters, armors, weapons, and more!</h4>
+            </div>
+            
+            <table class="table table-bordered table-responsive">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>What is Gensearch?</th>
+                        <th>How do I use this?</th>
+                        <th>Acknowledgements</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="table-light">
+                        <td>
+                            <p>Gensearch is a RESTful API that allows you to access information about content in the game Monster Hunter Generations.</p>
+                            <p>It features information on monster stats, armor sets, weapons, hunter arts, items, quests, skills, and palico data!</p>
+                        </td>
+                        <td>Documentation can be found <a href="/docs">here</a>. There are no tokens or other authorization requirements, so no jumping through other hoops to get access to what you want!</td>
+                        <td>
+                            <p>Many thanks to Kiranico for gathering and centralizing the information.</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- bootstrap scripts -->
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+    </body>
+</html>
