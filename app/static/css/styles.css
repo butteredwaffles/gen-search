@@ -3,3 +3,16 @@ body {
     font-family: 'Concert One', cursive;
     background-color: rgb(213, 213, 212);
 }
+
+.response-example {
+    width: 70%;
+}
+
+.pre-scrollable {
+    text-align: left;
+    color: white;
+}
+
+.info-table {
+    width: 80%;
+}

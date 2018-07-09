@@ -1,4 +1,6 @@
 from flask import Flask, render_template, url_for, jsonify
+import json
+import requests
 import models.db_config as db_config
 from models.models import *
 
@@ -8,7 +10,7 @@ BREAK_WORDS = ["Wound", "Capture", "Shiny", "Break", "Carve", "Gather"]
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', code_example=json.dumps(requests.get(url_for('get_individual_monster', name="seltas", _external=True)).json(), indent=2, ensure_ascii=False))
 
 
 @app.route('/api/monster', methods=["GET"])
@@ -73,7 +75,7 @@ def get_individual_monster(name):
 
     for quest in QuestMonster.select().where(mon.id == QuestMonster.monsterid):
         monster["quests"].append({
-            "quest_name": Quest.get(quest.questid == Quest.id).quest_name.replace(u"\u00e2\u02dc\u2026", " "),
+            "quest_name": Quest.get(quest.questid == Quest.id).quest_name,
             "amount": quest.amount,
             "special_attribute": quest.isSpecial,
             "monster_stats": {
@@ -86,10 +88,9 @@ def get_individual_monster(name):
                 "mount_multiplier": quest.mnt_multiplier
             }
         })
-
     db_config.db.close()
     return jsonify(monster)
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host="localhost", port=5000)
