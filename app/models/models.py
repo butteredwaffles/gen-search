@@ -55,3 +55,38 @@ class MonsterDrop(BaseModel):
 
     class Meta:
         table_name = "monsterdrops"
+
+
+class Quest(BaseModel):
+    id = IntegerField()
+    quest_name = CharField()
+    quest_type = CharField()
+    quest_description = CharField()
+    isKey = CharField()
+    isProwler = CharField()
+    isUnstable = CharField()
+    timeLimit = IntegerField()
+    contractFee = IntegerField()
+    goalid = IntegerField()
+    subgoalid = IntegerField()
+
+    class Meta:
+        table_name = "quests"
+
+
+class QuestMonster(BaseModel):
+    id = IntegerField()
+    questid = IntegerField()
+    monsterid = IntegerField()
+    amount = IntegerField()
+    isSpecial = CharField()
+    mon_hp = IntegerField()
+    stag_multiplier = FloatField()
+    atk_multiplier = FloatField()
+    def_multiplier = FloatField()
+    exh_multiplier = FloatField()
+    diz_multiplier = FloatField()
+    mnt_multiplier = FloatField()
+
+    class Meta:
+        table_name = "questmonsters"

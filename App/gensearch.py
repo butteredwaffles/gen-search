@@ -41,7 +41,8 @@ def get_individual_monster(name):
         "drops": {
             "high": [],
             "low": []
-        }
+        },
+        "quests": [],
     }
 
     for part in MonsterPart.select().where(mon.id == MonsterPart.monsterid):
@@ -69,7 +70,23 @@ def get_individual_monster(name):
                 "drop_chance": str(drop.drop_chance) + "%",
                 "quantity": drop.quantity
             })
-        
+
+    for quest in QuestMonster.select().where(mon.id == QuestMonster.monsterid):
+        monster["quests"].append({
+            "quest_name": Quest.get(quest.questid == Quest.id).quest_name.replace(u"\u00e2\u02dc\u2026", " "),
+            "amount": quest.amount,
+            "special_attribute": quest.isSpecial,
+            "monster_stats": {
+                "hp": quest.mon_hp,
+                "stagger_multiplier": quest.stag_multiplier,
+                "attack_multiplier": quest.atk_multiplier,
+                "defense_multiplier": quest.def_multiplier,
+                "exhaust_multiplier": quest.exh_multiplier,
+                "dizzy_multiplier": quest.diz_multiplier,
+                "mount_multiplier": quest.mnt_multiplier
+            }
+        })
+
     db_config.db.close()
     return jsonify(monster)
 
