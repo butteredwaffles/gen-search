@@ -8,3 +8,4 @@ bin/
 obj/
 ref/
 data/
+config.json
