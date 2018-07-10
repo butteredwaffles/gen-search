@@ -10,7 +10,9 @@ BREAK_WORDS = ["Wound", "Capture", "Shiny", "Break", "Carve", "Gather"]
 
 @app.route('/')
 def index():
-    return render_template('index.html', code_example=json.dumps(requests.get(url_for('get_individual_monster', name="seltas", _external=True)).json(), indent=2, ensure_ascii=False))
+    example = json.dumps(requests.get(url_for('get_individual_monster', name="seltas", _external=True)).json(), indent=4, ensure_ascii=False)
+    print(example)
+    return render_template('index.html', code_example=example)
 
 
 @app.route('/api/monster', methods=["GET"])
@@ -45,6 +47,11 @@ def get_individual_monster(name):
             "low": []
         },
         "quests": [],
+        "armor": [],
+        "weapons": {
+            "blademaster": [],
+            "gunner": []
+        }
     }
 
     for part in MonsterPart.select().where(mon.id == MonsterPart.monsterid):
@@ -73,6 +80,9 @@ def get_individual_monster(name):
                 "quantity": drop.quantity
             })
 
+    all_armor = [armor.armor_set for armor in Armor.select().where(mon.id == Armor.monster_id)]
+    monster["armor"] = list(set(all_armor))
+
     for quest in QuestMonster.select().where(mon.id == QuestMonster.monsterid):
         monster["quests"].append({
             "quest_name": Quest.get(quest.questid == Quest.id).quest_name,
@@ -88,6 +98,11 @@ def get_individual_monster(name):
                 "mount_multiplier": quest.mnt_multiplier
             }
         })
+
+    monster["weapons"]["blademaster"] = [weapon.sword_name for weapon in BlademasterWeapon.select().where(mon.id == BlademasterWeapon.monster_id)]
+    monster["weapons"]["gunner"] = [weapon.bow_name for weapon in Bow.select().where(mon.id == Bow.monster_id)]
+    monster["weapons"]["gunner"] += [weapon.bg_name for weapon in Bowgun.select().where(mon.id == Bowgun.monster_id)]
+
     db_config.db.close()
     return jsonify(monster)
 

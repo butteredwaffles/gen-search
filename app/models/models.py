@@ -90,3 +90,86 @@ class QuestMonster(BaseModel):
 
     class Meta:
         table_name = "questmonsters"
+
+
+class Armor(BaseModel):
+    armor_id = IntegerField(primary_key=True)
+    armor_set = CharField()
+    armor_name = CharField()
+    armor_description = CharField()
+    min_armor_defense = IntegerField()
+    max_armor_defense = IntegerField()
+    fire_def = IntegerField()
+    water_def = IntegerField()
+    thunder_def = IntegerField()
+    ice_def = IntegerField()
+    dragon_def = IntegerField()
+    slots = IntegerField()
+    rarity = IntegerField()
+    max_upgrade = IntegerField()
+    monster_id = IntegerField()
+    is_blademaster = IntegerField()
+    is_gunner = IntegerField()
+    is_male = IntegerField()
+    is_female = IntegerField()
+
+    class Meta:
+        table_name = "armors"
+
+
+class BlademasterWeapon(BaseModel):
+    sword_id = IntegerField(primary_key=True)
+    sword_class = CharField()
+    sword_name = CharField()
+    sword_set_name = CharField()
+    monster_id = IntegerField()
+    raw_dmg = IntegerField()
+    affinity = IntegerField()
+    sharp_0_id = IntegerField()
+    sharp_1_id = IntegerField()
+    sharp_2_id = IntegerField()
+    slots = IntegerField()
+    rarity = IntegerField()
+    description = CharField()
+    upgrades_into = CharField()
+    price = IntegerField()
+
+    class Meta:
+        table_name = "swordvalues"
+
+
+class Bow(BaseModel):
+    bow_id = IntegerField(primary_key=True)
+    monster_id = IntegerField()
+    bow_name = CharField()
+    bow_damage = IntegerField()
+    affinity = IntegerField()
+    arc_type = CharField()
+    level_one_charge = CharField()
+    level_two_charge = CharField()
+    level_three_charge = CharField()
+    level_four_charge = CharField()
+    supported_coatings = CharField()
+    slots = IntegerField()
+    rarity = IntegerField()
+    description = CharField()
+
+    class Meta:
+        table_name = "bows"
+
+
+class Bowgun(BaseModel):
+    bg_id = IntegerField(primary_key=True)
+    monster_id = IntegerField()
+    bg_name = CharField()
+    bg_damage = IntegerField()
+    affinity = IntegerField()
+    reload_speed = CharField()
+    recoil = CharField()
+    deviation = CharField()
+    slots = IntegerField()
+    rarity = IntegerField()
+    description = CharField()
+
+    class Meta:
+        table_name = "bowguns"

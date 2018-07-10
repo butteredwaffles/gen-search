@@ -10,41 +10,43 @@
 
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <meta name="description" content="A RESTful API for retrieving information about Capcom's Monster Hunter Generations.">
+        <meta name="description" content="An API for retrieving information about Capcom's Monster Hunter Generations.">
     </head>
     <body>
         <div class="container-fluid">
-            <div class="jumbotron">
+            <div class="jumbotron bg-dark header-info">
                 <h1>Gensearch</h1>
                 <h4 class="font-italic">Access information about items, quests, monsters, armors, weapons, and more!</h4>
             </div>
-            <div class="response-example mx-auto">
-                <h5 class="text-muted">Here's an example response for Seltas.</h5>
-                <pre class="pre-scrollable bg-dark">
-                    {{ code_example }}
-                </pre>
+            <div class="row">
+                <div class="response-example col">
+                    <h5 class="text-muted">Here's an example response for Seltas.</h5>
+                    <pre class="pre-scrollable bg-dark code-example">
+                        <code>{{ code_example }}</code>
+                    </pre>
+                </div>
+                <table class="table table-bordered info-table col-6 mh-100">
+                    <tbody>
+                        <tr class="table-light">
+                            <th>What is Gensearch?</th>
+                            <td>
+                                <p>Gensearch is an API that allows you to access information about content in the game Monster Hunter Generations.</p>
+                                <p>It features information on monster stats, armor sets, weapons, hunter arts, items, quests, skills, and palico data!</p>
+                            </td>
+                        </tr>
+                        <tr class="table-light">
+                            <th>How do I use this?</th>
+                            <td>Documentation can be found <a href="/docs">here</a>. There are no tokens or other authorization requirements, so no jumping through hoops to get access to what you want!</td>
+                        </tr>
+                        <tr class="table-light">
+                            <th>Acknowledgements</th>
+                            <td>
+                                <p>Many thanks to <a href="http://mhgen.kiranico.com">Kiranico</a> for gathering and centralizing the information. I take no credit for any of the properties of the game or collecting any of the information myself.</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-            <table class="table table-bordered table-responsive info-table mx-auto">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>What is Gensearch?</th>
-                        <th>How do I use this?</th>
-                        <th>Acknowledgements</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr class="table-light">
-                        <td>
-                            <p>Gensearch is a RESTful API that allows you to access information about content in the game Monster Hunter Generations.</p>
-                            <p>It features information on monster stats, armor sets, weapons, hunter arts, items, quests, skills, and palico data!</p>
-                        </td>
-                        <td>Documentation can be found <a href="/docs">here</a>. There are no tokens or other authorization requirements, so no jumping through other hoops to get access to what you want!</td>
-                        <td>
-                            <p>Many thanks to <a href="http://mhgen.kiranico.com">Kiranico</a> for gathering and centralizing the information.</p>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
         </div>
 
         <!-- bootstrap scripts -->
