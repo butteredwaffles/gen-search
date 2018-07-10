@@ -18,6 +18,7 @@
             <div class="row">
                 <div class="col-3 align-items-center h-100 bg-light" id="doc-navigation">
                     <a class="lead" href="#getting_started">Getting Started</a>
+                    <a class="lead" href="#monsters">Monsters</a>
                 </div>
                 <div class="col text-left bg-light" id="doc-wrapper">
                     <h2 class="display-4 doc-heading" id="getting_started">Getting Started</h2>
@@ -70,7 +71,7 @@ Date: Tue, 10 Jul 2018 21:11:23 GMT
                     </code></pre>
                     <p class="doc-text">..And so on. If it looks slightly different or the order of the data is different, it's still normal!</p>
                     <h2 class="display-4 doc-heading" id="monsters">Monsters</h2>
-                    <p class="doc-text">A Monster resource contains information about a fightable monster in Monster Hunter Generations, both large and small.</p>
+                    <p class="doc-text">A Monster resource contains information about a fightable monster in Monster Hunter Generations, either large or small.</p>
                     <h4>Request Example</h4>
                     <pre><code>http://localhost:5000/api/monster/seltas</code></pre>
                     <h4>Endpoints</h4>
@@ -210,7 +211,7 @@ Date: Tue, 10 Jul 2018 21:11:23 GMT
                         </ul>
                     </li>
                     <li><code>armor</code> (list/str) - A list of the names of the armor sets associated with this monster.</li>
-                    <li><code>weapons</code> (dict) - A dictionary of the weapons associated with this monster. The amount of keys vary, depending on what weapon classes it has.
+                    <li><code>weapons</code> (dict) - A dictionary of the weapons associated with this monster. The amount of keys vary depending on what weapon classes it has.
                         <ul>
                             <li><code>(weapon_type)</code> (list/str) - The key corresponds to the weapon class. Contains names of the weapons in that class related to this monster.</li>
                         </ul>

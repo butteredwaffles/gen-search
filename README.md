@@ -1,6 +1,6 @@
-**Note: Does not currently function as an API. The application is still being built.**
+**Note: Does not fully function as an API. The application is still being built.**
 
-This is mainly an exercise for me to improve my knowledge with databases. Some things may be wonky, but I will try to fix issues as I can. Once things are sorted, I'll work on getting a more complete version. For the foreseeable future, though, this won't be very useful.
+This is mainly an exercise for me to improve my knowledge with databases. Some things may be wonky, but I will try to fix issues as I can. 
 
 # Instructions
 
@@ -16,10 +16,19 @@ If you made edits, use `dotnet test` to run the test cases.
 
 ## Converting the database
 
-The program creates an SQLite database with the information. However, the web app uses a MySQL database. Therefore, if you are planning on running the service yourself, you will have to create a dump of the SQLite one and import it into a MySQL database named `mhgen`.
+The program creates an SQLite database with the information. However, the web app uses a MySQL database. Therefore, if you are planning on running the service yourself, you will have to create a dump of the SQLite one. Change the current directory to the `app` folder, and put the relevant MySQL information inside `config.json`. For clarification, `db_name` refers to the name of the database on your MySQL server, *not* the name of the SQLite one.
 
-Inside the `app` folder, you can run `sqlite3-translator.py` in order to convert the SQLite database dump (which you can get using a program such as SQLiteStudio) to a MySQL compatible file. Python3 is required, as is the `progressbar2` library.
+You can then run `sqlite3-translator.py` in order to convert the SQLite database dump (which you can get using a program such as SQLiteStudio) to a MySQL compatible file. Python3 is required, as is the `progressbar2` library.
 
 `python3 sqlite3-translator.py <path-to-sqlite-dump>`
 
-This will create a folder named `output` in your current directory containing the `mysql.sql` file. Run this file on the database and it will import everything into MySQL.
+This will create a folder named `output` in your current directory containing the `mysql.sql` file. Run this file on your MySQL database and it will import everything into it.
+
+## Running the web server
+
+If you haven't already, `cd` into the `app` directory. To run the server, the `flask`, `peewee`, and `requests` library must be installed. You must also be running Python3.
+
+Run `python3 gensearch.py` and navigate to `localhost:5000` in your web browser. Now you're set!
+
+The website contains documentation and such already, so feel free to look in there for usage!
+
