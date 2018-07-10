@@ -179,7 +179,7 @@ Date: Tue, 10 Jul 2018 21:11:23 GMT
                     </li>
                     <li><code>drops</code> (dict) - The various items you can receive from the monster.
                         <ul>
-                            <li><code>high</code> - High rank drops.
+                            <li><code>high</code> (list/dict) - High rank drops.
                                 <ul>
                                     <li><code>item_name</code> (string) - The name of the item.</li>
                                     <li><code>source</code> (string) - How you receive the item, whether it be from breaking parts, carving, or gathering.</li>
@@ -188,7 +188,7 @@ Date: Tue, 10 Jul 2018 21:11:23 GMT
                                     <li><code>quantity</code> (int) - The number of the item you receive.</li>
                                 </ul>
                             </li>
-                            <li><code>low</code> - Low rank drops. They share the same attributes as high rank ones.</li>
+                            <li><code>low</code> (list/dict) - Low rank drops. They share the same attributes as high rank ones.</li>
                         </ul>
                     </li>
                     <li><code>quests</code> (list/dict) - The quests where this monster appears.
@@ -199,12 +199,12 @@ Date: Tue, 10 Jul 2018 21:11:23 GMT
                             <li><code>monster_stats</code> (dict) - The <strong>quest-specific</strong> attributes of this monster compared to its normal ones.
                                 <ul>
                                     <li><code>hp</code> (int) - The amount of HP this monster has.</li>
-                                    <li><code>stagger_multiplier</code> - The multiplier that affects the stagger value of each part.</li>
-                                    <li><code>attack_multiplier</code> - The multiplier that affects the monster's attack.</li>
-                                    <li><code>defense_multiplier</code> - The multiplier that affects the monster's defense.</li>
-                                    <li><code>exhaust_multiplier</code> - The multiplier that affects how quickly the monster gets exhausted/tired/hungry.</li>
-                                    <li><code>dizzy_multiplier</code> - The multiplier that affects how easy it is to stun the monster.</li>
-                                    <li><code>mount_multiplier</code> - The multiplier that affects how easy to monster is to mount.</li>
+                                    <li><code>stagger_multiplier</code> (int) - The multiplier that affects the stagger value of each part.</li>
+                                    <li><code>attack_multiplier</code> (int) - The multiplier that affects the monster's attack.</li>
+                                    <li><code>defense_multiplier</code> (int) - The multiplier that affects the monster's defense.</li>
+                                    <li><code>exhaust_multiplier</code> (int) - The multiplier that affects how quickly the monster gets exhausted/tired/hungry.</li>
+                                    <li><code>dizzy_multiplier</code> (int) - The multiplier that affects how easy it is to stun the monster.</li>
+                                    <li><code>mount_multiplier</code> (int) - The multiplier that affects how easy to monster is to mount.</li>
                                 </ul>
                             </li>
                         </ul>
