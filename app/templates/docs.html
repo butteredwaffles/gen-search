@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+    <head>
+            <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+            <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/styles.css') }}">
+            <link href="https://fonts.googleapis.com/css?family=Concert+One" rel="stylesheet">
+            <title>Gensearch - MHGen API</title>
+    
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+            <meta name="description" content="The documentation page for Gensearch, an API for retrieving information about Capcom's Monster Hunter Generations.">
+    </head>
+    <body>
+        <div class="container-fluid">
+            <div class="bg-dark text-left header-info px-5 mt-2">
+                <h1>Gensearch Docs</h1>
+            </div>
+            <div class="row">
+                <div class="col-3 align-items-center h-100 bg-light" id="doc-navigation">
+                    <a class="lead" href="#getting_started">Getting Started</a>
+                </div>
+                <div class="col text-left bg-light" id="doc-wrapper">
+                    <h2 class="display-4 doc-heading" id="getting_started">Getting Started</h2>
+                    <p class="doc-text">To make requests to online resources, you can use a library such as <code>curl</code>.</p>
+                    <p class="doc-text">There are a few different things you can retrieve. The <strong>base URL</strong> stays the 
+                    same across all endpoints. It is all the characters in the URL before <code>/api/</code>. 
+                    Open a terminal (or use an online program that allows you to make GET requests) and type this in.</p>
+                    <pre><code>http://localhost:5000/api/monster/gore_magala</code></pre>
+                    <p class="doc-text">You should see a blob of .JSON in the console that resembles this:</p>
+                    <pre><code>
+HTTP/1.0 200 OK
+Content-Type: application/json
+Content-Length: 15122
+Server: Werkzeug/0.14.1 Python/3.6.3
+Date: Tue, 10 Jul 2018 21:11:23 GMT
+                            
+{
+    "armor": [
+        "[Blademaster] Gore", 
+        "[Gunner] Gore S", 
+        "[Gunner] EX Gore", 
+        "[Blademaster] EX Gore", 
+        "[Blademaster] Gore S", 
+        "[Gunner] Gore"
+    ], 
+    "base_hp": 4800, 
+    "base_size": 1760.9, 
+    "crown_sizes": {
+        "large_gold": 2165.91, 
+        "silver": 2025.03, 
+        "small_gold": 1584.81
+    }, 
+    "drops": {
+        "high": [
+            {...},
+        ]
+        "low": [
+            {...},
+        ]
+    }
+    "name": "Gore Magala", 
+    "parts": [
+        {...}, 
+    ]
+    "quests": [
+        {...},
+    ]
+    ... 
+}
+                    </code></pre>
+                    <p class="doc-text">..And so on. If it looks slightly different or the order of the data is different, it's still normal!</p>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

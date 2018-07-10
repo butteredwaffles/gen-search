@@ -21,3 +21,24 @@ code {
 .header-info {
     color: white;
 }
+
+#doc-navigation, #doc-wrapper {
+    margin-right: 10px;
+    margin-left: 10px;
+}
+
+#doc-navigation a {
+    display: block;
+    padding: 10px 8px 8px 10px;
+    border-top: 2px solid gray;
+    border-bottom: 2px solid gray;
+}
+
+.doc-text {
+    font-size: 17px;
+    line-height: 1;
+}
+
+.doc-heading {
+    border-bottom: 2px solid gray;
+}

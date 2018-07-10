@@ -11,8 +11,12 @@ BREAK_WORDS = ["Wound", "Capture", "Shiny", "Break", "Carve", "Gather"]
 @app.route('/')
 def index():
     example = json.dumps(requests.get(url_for('get_individual_monster', name="seltas", _external=True)).json(), indent=4, ensure_ascii=False)
-    print(example)
     return render_template('index.html', code_example=example)
+
+
+@app.route('/docs')
+def docs():
+    return render_template('docs.html')
 
 
 @app.route('/api/monster', methods=["GET"])
@@ -31,7 +35,7 @@ def get_all_monsters():
 @app.route('/api/monster/<name>', methods=["GET"])
 def get_individual_monster(name):
     db_config.db.connect()
-    mon = Monster.get(Monster.mon_name == name.title())
+    mon = Monster.get(Monster.mon_name == name.title().replace("_", " "))
     monster = {
         "name": mon.mon_name,
         "base_hp": mon.base_hp,
@@ -102,14 +106,12 @@ def get_individual_monster(name):
         "bow": Bow.select().where(mon.id == Bow.monster_id),
         "bowgun": Bowgun.select().where(mon.id == Bowgun.monster_id)
     }
-
     for weapon in weapons["blademaster"]:
         monster["weapons"].setdefault(weapon.sword_class.lower().replace("&", "and").replace(" ", "_"), []).append(weapon.sword_set_name)
     for weapon in weapons["bow"]:
         monster["weapons"].setdefault("bow", []).append(weapon.bow_set_name)
     for weapon in weapons["bowgun"]:
         monster["weapons"].setdefault(weapon.bg_type.lower().replace(" ", "_"), []).append(weapon.bg_set_name)
-    
     for wpn_class in monster["weapons"].keys():
         monster["weapons"][wpn_class] = list(set(monster["weapons"][wpn_class]))
 
