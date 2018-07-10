@@ -21,6 +21,7 @@ namespace Gensearch.Scrapers
             var context = BrowsingContext.New(config);
             var page = await context.OpenAsync(address);
             string[] flav = Weapons.GetFlavorText(page);
+            string bow_set_name = page.QuerySelector("title").TextContent.Split('/')[0].Trim();
 
             var crafting_table = page.QuerySelectorAll(".table")[1].QuerySelector("tbody");
             int current_wpn_index = 0;
@@ -50,6 +51,7 @@ namespace Gensearch.Scrapers
                 
                 Bow bow = new Bow() {
                     monster_id = monsterid,
+                    bow_set_name = bow_set_name,
                     bow_name = weapon_name,
                     bow_damage = weapon_damage,
                     affinity = affinity,
@@ -96,6 +98,12 @@ namespace Gensearch.Scrapers
             var context = BrowsingContext.New(config);
             var page = await context.OpenAsync(address);
             string[] flav = Weapons.GetFlavorText(page);
+            string title = page.QuerySelector("title").TextContent;
+            string bg_set_name = title.Split('/')[0].Trim();
+            string bg_type = "Heavy Bowgun";
+            if (address.Contains("lightbowgun")) {
+                bg_type = "Light Bowgun";
+            }
 
             var crafting_table = page.QuerySelectorAll(".table")[1].QuerySelector("tbody");
             int current_wpn_index = 0;
@@ -124,6 +132,8 @@ namespace Gensearch.Scrapers
                 
                 Bowgun bowgun = new Bowgun() {
                     monster_id = monsterid,
+                    bg_set_name = bg_set_name,
+                    bg_type = bg_type,
                     bg_name = weapon_name,
                     bg_damage = weapon_damage,
                     affinity = affinity,

@@ -49,8 +49,6 @@ def get_individual_monster(name):
         "quests": [],
         "armor": [],
         "weapons": {
-            "blademaster": [],
-            "gunner": []
         }
     }
 
@@ -99,9 +97,21 @@ def get_individual_monster(name):
             }
         })
 
-    monster["weapons"]["blademaster"] = [weapon.sword_name for weapon in BlademasterWeapon.select().where(mon.id == BlademasterWeapon.monster_id)]
-    monster["weapons"]["gunner"] = [weapon.bow_name for weapon in Bow.select().where(mon.id == Bow.monster_id)]
-    monster["weapons"]["gunner"] += [weapon.bg_name for weapon in Bowgun.select().where(mon.id == Bowgun.monster_id)]
+    weapons = {
+        "blademaster": BlademasterWeapon.select().where(mon.id == BlademasterWeapon.monster_id),
+        "bow": Bow.select().where(mon.id == Bow.monster_id),
+        "bowgun": Bowgun.select().where(mon.id == Bowgun.monster_id)
+    }
+
+    for weapon in weapons["blademaster"]:
+        monster["weapons"].setdefault(weapon.sword_class.lower().replace("&", "and").replace(" ", "_"), []).append(weapon.sword_set_name)
+    for weapon in weapons["bow"]:
+        monster["weapons"].setdefault("bow", []).append(weapon.bow_set_name)
+    for weapon in weapons["bowgun"]:
+        monster["weapons"].setdefault(weapon.bg_type.lower().replace(" ", "_"), []).append(weapon.bg_set_name)
+    
+    for wpn_class in monster["weapons"].keys():
+        monster["weapons"][wpn_class] = list(set(monster["weapons"][wpn_class]))
 
     db_config.db.close()
     return jsonify(monster)

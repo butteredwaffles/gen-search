@@ -116,6 +116,7 @@ namespace Gensearch.Scrapers
         [ForeignKey(typeof(Monster))]
         public int monster_id {get; set;}
         public string bow_name {get; set;}
+        public string bow_set_name {get; set;}
         public int bow_damage {get; set;}
         public int affinity {get; set;}
         public string arc_type {get; set;}
@@ -140,9 +141,11 @@ namespace Gensearch.Scrapers
     public class Bowgun {
         [PrimaryKey, AutoIncrement]
         public int bg_id {get; set;}
+        public string bg_type {get; set;}
         [ForeignKey(typeof(Monster))]
         public int monster_id {get; set;}
         public string bg_name {get; set;}
+        public string bg_set_name {get; set;}
         
         public int bg_damage {get; set;}
         public int affinity {get; set;}
