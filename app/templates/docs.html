@@ -69,6 +69,153 @@ Date: Tue, 10 Jul 2018 21:11:23 GMT
 }
                     </code></pre>
                     <p class="doc-text">..And so on. If it looks slightly different or the order of the data is different, it's still normal!</p>
+                    <h2 class="display-4 doc-heading" id="monsters">Monsters</h2>
+                    <p class="doc-text">A Monster resource contains information about a fightable monster in Monster Hunter Generations, both large and small.</p>
+                    <h4>Request Example</h4>
+                    <pre><code>http://localhost:5000/api/monster/seltas</code></pre>
+                    <h4>Endpoints</h4>
+                    <ul>
+                        <li><code>/monster/</code> -- Retrieves a list of dictionaries named <code>monsters</code> containing each monster in the game and their API endpoint.</li>
+                        <li><code>/monster/name/</code> -- Retrieves the resource for a specific monster.</li>
+                    </ul>
+                    <h4>Response Example</h4>
+                    <pre class="pre-scrollable bg-dark"><code>{
+    "armor": [
+        "[Blademaster] Seltas", 
+        "[Gunner] Seltas"
+    ], 
+    "base_hp": 2000, 
+    "base_size": 615.9, 
+    "crown_sizes": {
+    "large_gold": 757.56, 
+    "silver": 708.29, 
+    "small_gold": 554.31
+    }, 
+    "drops": {
+        "high": [
+            {
+            "drop_chance": "65%", 
+            "item_name": "Seltas Carapace", 
+            "quantity": 1, 
+            "rank": "High", 
+            "source": "Body Carve"
+            },
+            ...
+        ], 
+        "low": [
+            {
+            "drop_chance": "60%", 
+            "item_name": "Seltas Carapace", 
+            "quantity": 1, 
+            "rank": "Low", 
+            "source": "Body Carve"
+            }, 
+            ...
+        ]
+    }, 
+    "name": "Seltas", 
+    "parts": [
+    {
+        "extract_color": "red", 
+        "part_name": "Head", 
+        "stagger_value": 180
+    }, 
+    {
+        "extract_color": "white", 
+        "part_name": "Feet", 
+        "stagger_value": 60
+    }, 
+    {
+        "extract_color": "orange", 
+        "part_name": "Stomach", 
+        "stagger_value": 100
+    }
+    ], 
+    "quests": [
+        {
+            "amount": 5, 
+            "monster_stats": {
+            "attack_multiplier": 2.65, 
+            "defense_multiplier": 0.85, 
+            "dizzy_multiplier": 1.25, 
+            "exhaust_multiplier": 1.6, 
+            "hp": 1940, 
+            "mount_multiplier": 1.6, 
+            "stagger_multiplier": 1.35
+            }, 
+            "quest_name": "[Village\u26056] Advanced: Seltas Queen", 
+            "special_attribute": "no"
+        }, 
+        ...
+    ], 
+    "weapons": {
+        "bow": [
+            "Heat Haze"
+        ], 
+        "charge_blade": [
+            "Schildsect"
+        ], 
+        ...
+    }
+}</code></pre>
+                <h4>Attributes</h4>
+                <ul>
+                    <li><code>name</code> (string) - The name of the monster.</li>
+                    <li><code>base_hp</code> (int) - The average HP of the monster.</li>
+                    <li><code>base_size</code> (int) - The average size of the monster.</li>
+                    <li><code>crown_sizes</code> (dict) - The minimum/maximum size to achieve crown sizes.
+                        <ul>
+                            <li><code>small_gold</code> (float) - The size required to get a small crown.</li>
+                            <li><code>silver</code> (float) - The size required to get a silver crown (a silver crown is received when the monster is either slightly below or above average size).</li>
+                            <li><code>large_gold</code> (float) - The size required to get a large crown.</li>
+                        </ul>
+                    </li>
+                    <li><code>parts</code> (list/dict) - The distinct parts of the monster.
+                        <ul>
+                            <li><code>part_name</code> (string) - The name of the part.</li>
+                            <li><code>stagger_value</code> (int) - The damage threshold for monsters to stagger. Parts break after a certain number of staggers, although this amount is not currently included in the API.</li>
+                            <li><code>extract_color</code> (string) - The color of nectar you receive when hitting the part with the insect glaive.</li>
+                        </ul>
+                    </li>
+                    <li><code>drops</code> (dict) - The various items you can receive from the monster.
+                        <ul>
+                            <li><code>high</code> - High rank drops.
+                                <ul>
+                                    <li><code>item_name</code> (string) - The name of the item.</li>
+                                    <li><code>source</code> (string) - How you receive the item, whether it be from breaking parts, carving, or gathering.</li>
+                                    <li><code>rank</code> (string) - Whether this item is low or high rank.</li>
+                                    <li><code>drop_chance</code> (string) - The chance of the hunter receiving this item after completing the requirements.</li>
+                                    <li><code>quantity</code> (int) - The number of the item you receive.</li>
+                                </ul>
+                            </li>
+                            <li><code>low</code> - Low rank drops. They share the same attributes as high rank ones.</li>
+                        </ul>
+                    </li>
+                    <li><code>quests</code> (list/dict) - The quests where this monster appears.
+                        <ul>
+                            <li><code>quest_name</code> (string) - The name of the quest.</li>
+                            <li><code>amount</code> (int) - The amount of this monster in the quest.</li>
+                            <li><code>special_attribute</code> (string) - If the monster is hyper or an intruder.</li>
+                            <li><code>monster_stats</code> (dict) - The <strong>quest-specific</strong> attributes of this monster compared to its normal ones.
+                                <ul>
+                                    <li><code>hp</code> (int) - The amount of HP this monster has.</li>
+                                    <li><code>stagger_multiplier</code> - The multiplier that affects the stagger value of each part.</li>
+                                    <li><code>attack_multiplier</code> - The multiplier that affects the monster's attack.</li>
+                                    <li><code>defense_multiplier</code> - The multiplier that affects the monster's defense.</li>
+                                    <li><code>exhaust_multiplier</code> - The multiplier that affects how quickly the monster gets exhausted/tired/hungry.</li>
+                                    <li><code>dizzy_multiplier</code> - The multiplier that affects how easy it is to stun the monster.</li>
+                                    <li><code>mount_multiplier</code> - The multiplier that affects how easy to monster is to mount.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><code>armor</code> (list/str) - A list of the names of the armor sets associated with this monster.</li>
+                    <li><code>weapons</code> (dict) - A dictionary of the weapons associated with this monster. The amount of keys vary, depending on what weapon classes it has.
+                        <ul>
+                            <li><code>(weapon_type)</code> (list/str) - The key corresponds to the weapon class. Contains names of the weapons in that class related to this monster.</li>
+                        </ul>
+                    </li>
+                </ul>
                 </div>
             </div>
         </div>
