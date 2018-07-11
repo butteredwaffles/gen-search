@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, url_for
-import models.db_config as db_config
+from models.db_config import db
 from models.models import *
 
 monster_routes = Blueprint('monsters', __name__, template_folder="../templates", static_folder="../static")
@@ -8,20 +8,20 @@ BREAK_WORDS = ["Wound", "Capture", "Shiny", "Break", "Carve", "Gather"]
 
 @monster_routes.route('/', methods=["GET"])
 def get_all_monsters():
-    db_config.db.connect()
+    db.connect()
     monsters = {"monsters": []}
     for monster in Monster.select():
         monsters["monsters"].append({
             "name": monster.mon_name,
             "url": url_for('.get_individual_monster', name=monster.mon_name, _external=True)
         })
-    db_config.db.close()
+    db.close()
     return jsonify(monsters)
 
 
 @monster_routes.route('/<name>', methods=["GET"])
 def get_individual_monster(name):
-    db_config.db.connect()
+    db.connect()
     mon = Monster.get(Monster.mon_name == name.title().replace("_", " "))
     monster = {
         "name": mon.mon_name,
@@ -102,5 +102,5 @@ def get_individual_monster(name):
     for wpn_class in monster["weapons"].keys():
         monster["weapons"][wpn_class] = list(set(monster["weapons"][wpn_class]))
 
-    db_config.db.close()
+    db.close()
     return jsonify(monster)

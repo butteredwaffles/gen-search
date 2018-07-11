@@ -20,6 +20,20 @@ class Item(BaseModel):
         table_name = "items"
 
 
+class CraftItem(BaseModel):
+    craft_id = IntegerField(primary_key=True)
+    item_name = CharField()
+    creation_type = CharField()
+    creation_id = IntegerField()
+    quantity = IntegerField()
+    unlocks_creation = CharField()
+    is_scrap = CharField()
+    usage = CharField()
+
+    class Meta:
+        table_name = "craftitems"
+
+
 class Monster(BaseModel):
     id = IntegerField()
     base_hp = IntegerField()

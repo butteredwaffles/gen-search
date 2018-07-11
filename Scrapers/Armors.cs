@@ -168,12 +168,12 @@ namespace Gensearch.Scrapers
                 var oof = String.Join(' ', item_name.Split(' ').SkipLast(1));
                 int quantity = item_name.Replace("(", " ").Replace(")", " ").ToInt();
                 bool unlocks = false;
-                if (item_name.Contains("Unlock")) {
+                if (div.TextContent.Contains("Unlock")) {
                     unlocks = true;
                 }
                 items.Add(new ArmorCraftItem() {
                     armor_id = armor_id,
-                    item_name = item_name,
+                    item_name = oof,
                     quantity = quantity,
                     unlocks_armor = unlocks
                 });
