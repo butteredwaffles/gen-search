@@ -5,6 +5,7 @@ import models.db_config as db_config
 from models.models import *
 
 app = Flask(__name__)
+app.config['JSON_AS_ASCII'] = False
 BREAK_WORDS = ["Wound", "Capture", "Shiny", "Break", "Carve", "Gather"]
 
 
@@ -26,7 +27,7 @@ def get_all_monsters():
     for monster in Monster.select():
         monsters["monsters"].append({
             "name": monster.mon_name,
-            "url": url_for('get_individual_monster', name=monster.mon_name)
+            "url": url_for('get_individual_monster', name=monster.mon_name, _external=True)
         })
     db_config.db.close()
     return jsonify(monsters)

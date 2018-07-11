@@ -42,3 +42,5 @@ code {
 .doc-heading {
     border-bottom: 2px solid gray;
 }
+
+.oxygen, li {font-family: 'Oxygen', sans-serif;}

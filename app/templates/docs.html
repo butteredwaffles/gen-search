@@ -3,7 +3,7 @@
     <head>
             <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
             <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/styles.css') }}">
-            <link href="https://fonts.googleapis.com/css?family=Concert+One" rel="stylesheet">
+            <link href="https://fonts.googleapis.com/css?family=Concert+One|Oxygen" rel="stylesheet">
             <title>Gensearch - MHGen API</title>
     
             <meta charset="UTF-8">
@@ -22,12 +22,12 @@
                 </div>
                 <div class="col text-left bg-light" id="doc-wrapper">
                     <h2 class="display-4 doc-heading" id="getting_started">Getting Started</h2>
-                    <p class="doc-text">To make requests to online resources, you can use a library such as <code>curl</code>.</p>
-                    <p class="doc-text">There are a few different things you can retrieve. The <strong>base URL</strong> stays the 
+                    <p class="doc-text oxygen">To make requests to online resources, you can use a library such as <code>curl</code>.</p>
+                    <p class="doc-text oxygen">There are a few different things you can retrieve. The <strong>base URL</strong> stays the 
                     same across all endpoints. It is all the characters in the URL before <code>/api/</code>. 
                     Open a terminal (or use an online program that allows you to make GET requests) and type this in.</p>
                     <pre><code>http://localhost:5000/api/monster/gore_magala</code></pre>
-                    <p class="doc-text">You should see a blob of .JSON in the console that resembles this:</p>
+                    <p class="doc-text oxygen">You should see a blob of .JSON in the console that resembles this:</p>
                     <pre><code>
 HTTP/1.0 200 OK
 Content-Type: application/json
@@ -69,17 +69,44 @@ Date: Tue, 10 Jul 2018 21:11:23 GMT
     ... 
 }
                     </code></pre>
-                    <p class="doc-text">..And so on. If it looks slightly different or the order of the data is different, it's still normal!</p>
+                    <p class="doc-text oxygen">..And so on. If it looks slightly different or the order of the data is different, it's still normal!</p>
                     <h2 class="display-4 doc-heading" id="monsters">Monsters</h2>
-                    <p class="doc-text">A Monster resource contains information about a fightable monster in Monster Hunter Generations, either large or small.</p>
+                    <p class="doc-text oxygen">A Monster resource contains information about a fightable monster in Monster Hunter Generations, either large or small.</p>
                     <h4>Request Example</h4>
                     <pre><code>http://localhost:5000/api/monster/seltas</code></pre>
                     <h4>Endpoints</h4>
                     <ul>
                         <li><code>/monster/</code> -- Retrieves a list of dictionaries named <code>monsters</code> containing each monster in the game and their API endpoint.</li>
-                        <li><code>/monster/name/</code> -- Retrieves the resource for a specific monster.</li>
+                        <li><code>/monster/:name/</code> -- Retrieves the resource for a specific monster.</li>
                     </ul>
-                    <h4>Response Example</h4>
+                    <h5>Response Example for <code>/monster/</code></h5>
+                    <pre class="pre-scrollable bg-dark"><code>
+{
+    "monsters": [
+        {
+            "name": "Velocidrome", 
+            "url": "http://localhost:5000/api/monster/Velocidrome"
+        }, 
+        {
+            "name": "Bulldrome", 
+            "url": "http://localhost:5000/api/monster/Bulldrome"
+        }, 
+        {
+            "name": "Great Maccao", 
+            "url": "http://localhost:5000/api/monster/Great%20Maccao"
+        }, 
+        ....
+    ]
+}
+                    </code></pre>
+                    <h5>Attributes</h5>
+                    <ul>
+                        <li><code>monsters</code> (list/dict) - A list of all the monsters in the game.
+                            <ul><code>name</code> (string) - The name of the monster.</ul>
+                            <ul><code>url</code> (string) - The API URL for the monster.</ul>
+                        </li>
+                    </ul>
+                    <h5>Response Example for <code>/monster/:name/</code></h5>
                     <pre class="pre-scrollable bg-dark"><code>{
     "armor": [
         "[Blademaster] Seltas", 
