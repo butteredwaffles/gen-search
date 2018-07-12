@@ -105,12 +105,12 @@ namespace Gensearch.Scrapers
                 craft_items = new List<PalicoCraftItem>()
             };
             var craft_table = page.QuerySelector(".table-sm").FirstElementChild.QuerySelectorAll("td");
-            armor.craft_items = GetPalicoCrafts(craft_table, armor.pa_name);
+            armor.craft_items = GetPalicoCrafts(craft_table, armor.pa_name, "armor");
             ConsoleWriters.CompletionMessage($"Finished adding the {name} palico armor!");
             return armor;
         }
 
-        public List<PalicoCraftItem> GetPalicoCrafts(IHtmlCollection<IElement> tds, string palico_item) {
+        public List<PalicoCraftItem> GetPalicoCrafts(IHtmlCollection<IElement> tds, string palico_item, string type) {
             List<PalicoCraftItem> items = new List<PalicoCraftItem>();
             for (int i = 0; i < tds.Length; i += 2) {
                 int item_id = Items.GetItemFromDB(tds[i].TextContent).Result.id;
@@ -118,7 +118,8 @@ namespace Gensearch.Scrapers
                 items.Add(new PalicoCraftItem() {
                     palico_item = palico_item,
                     item_id = item_id,
-                    quantity = quantity
+                    quantity = quantity,
+                    type = type
                 });
             }
             return items;
@@ -206,7 +207,7 @@ namespace Gensearch.Scrapers
             };
 
             var craft_table = page.QuerySelector(".table-sm").FirstElementChild.QuerySelectorAll("td");
-            weapon.craft_items = GetPalicoCrafts(craft_table, name);
+            weapon.craft_items = GetPalicoCrafts(craft_table, name, "weapon");
             ConsoleWriters.CompletionMessage($"Finished adding the {name} palico weapon!");
             return weapon;
         }

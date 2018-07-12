@@ -10,3 +10,4 @@ obj/
 ref/
 data/
 config.json
+app/dump.sql

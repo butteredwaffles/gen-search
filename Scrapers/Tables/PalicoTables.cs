@@ -75,5 +75,6 @@ namespace Gensearch.Scrapers.Tables
         [ForeignKey(typeof(Item))]
         public int item_id {get; set;}
         public int quantity {get; set;}
+        public string type {get; set;}
     }
 }
