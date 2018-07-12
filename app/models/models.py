@@ -165,6 +165,33 @@ class ArmorScrapReward(BaseModel):
         table_name = "armorscraprewards"
 
 
+class Decoration(BaseModel):
+    deco_id = IntegerField(primary_key=True)
+    deco_name = CharField()
+    deco_slot_requirement = IntegerField()
+    positive_skill_tree = CharField()
+    positive_skill_effect = IntegerField()
+    negative_skill_tree = CharField()
+    negative_skill_effect = IntegerField()
+
+    class Meta:
+        table_name = "decorations"
+
+
+class DecorationCombination(BaseModel):
+    deco_comb_id = IntegerField(primary_key=True)
+    deco_id = IntegerField()
+    item_1_id = IntegerField()
+    item_1_quantity = IntegerField()
+    item_2_id = IntegerField()
+    item_2_quantity = IntegerField()
+    item_3_id = IntegerField()
+    item_3_quantity = IntegerField()
+
+    class Meta:
+        table_name = "decorationcombinations"
+
+
 class BlademasterWeapon(BaseModel):
     sword_id = IntegerField(primary_key=True)
     sword_class = CharField()

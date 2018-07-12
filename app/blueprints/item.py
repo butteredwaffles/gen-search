@@ -39,8 +39,9 @@ def get_individual_item(name):
                 "create": [],
                 "upgrade": [],
                 "byproduct": []
-            }
-        }
+            },
+            "decorations": []
+        },
     }
 
     weapon_crafts = CraftItem.select().where(CraftItem.item_name == item["name"])
@@ -57,7 +58,7 @@ def get_individual_item(name):
             "quantity": craft.quantity,
             "unlocks_creation": True if craft.unlocks_creation == "yes" else False
         })
-    
+
     armor_crafts = ArmorCraftItem.select().where(ArmorCraftItem.item_name == item["name"])
     for craft in armor_crafts:
         item["crafting"]["armor"]["create"].append({
@@ -83,5 +84,19 @@ def get_individual_item(name):
                 "source": scrap.type,
                 "level": scrap.level
             })
-    
+
+    decocombos = DecorationCombination.select()
+    for combo in decocombos.where(DecorationCombination.item_1_id == db_item.id or DecorationCombination.item_2_id == db_item.id or DecorationCombination.item_3_id == db_item.id):
+        quantity = 0
+        if combo.item_1_id == db_item.id:
+            quantity = combo.item_1_quantity
+        elif combo.item_1_id == db_item.id:
+            quantity = combo.item_2_quantity,
+        else:
+            quantity = combo.item_3_quantity
+        item["crafting"]["decorations"].append({
+            "decoration_name": Decoration.get(combo.deco_id == Decoration.deco_id).deco_name,
+            "quantity": quantity
+        })
+
     return jsonify(item)
