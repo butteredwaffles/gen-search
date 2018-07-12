@@ -131,6 +131,40 @@ class Armor(BaseModel):
         table_name = "armors"
 
 
+class ArmorCraftItem(BaseModel):
+    aci_id = IntegerField(primary_key=True)
+    armor_id = IntegerField()
+    item_name = CharField()
+    quantity = IntegerField()
+    unlocks_armor = IntegerField()
+
+    class Meta:
+        table_name = "armorcraftitems"
+
+
+class ArmorUpgradeItem(BaseModel):
+    aui_id = IntegerField(primary_key=True)
+    armor_id = IntegerField()
+    upgrade_level = IntegerField()
+    item_name = CharField()
+    quantity = IntegerField()
+
+    class Meta:
+        table_name = "armorupgradeitems"
+
+
+class ArmorScrapReward(BaseModel):
+    asr_id = IntegerField(primary_key=True)
+    armor_id = IntegerField()
+    item_id = IntegerField()
+    quantity = IntegerField()
+    type = CharField()
+    level = IntegerField()
+
+    class Meta:
+        table_name = "armorscraprewards"
+
+
 class BlademasterWeapon(BaseModel):
     sword_id = IntegerField(primary_key=True)
     sword_class = CharField()

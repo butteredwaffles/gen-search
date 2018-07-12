@@ -57,5 +57,31 @@ def get_individual_item(name):
             "quantity": craft.quantity,
             "unlocks_creation": True if craft.unlocks_creation == "yes" else False
         })
+    
+    armor_crafts = ArmorCraftItem.select().where(ArmorCraftItem.item_name == item["name"])
+    for craft in armor_crafts:
+        item["crafting"]["armor"]["create"].append({
+            "armor_name": Armor.get(Armor.armor_id == craft.armor_id).armor_name,
+            "quantity": craft.quantity,
+            "unlocks_armor": True if craft.unlocks_armor == 1 else False
+        })
 
+    upgrade_crafts = ArmorUpgradeItem.select().where(ArmorUpgradeItem.item_name == item["name"])
+    for craft in upgrade_crafts:
+        item["crafting"]["armor"]["upgrade"].append({
+            "armor_name": Armor.get(Armor.armor_id == craft.armor_id).armor_name,
+            "quantity": craft.quantity,
+            "level": craft.upgrade_level
+        })
+
+    if "Scrap" in item["name"]:
+        reward_scraps = ArmorScrapReward.select().where(ArmorScrapReward.item_id == db_item.id)
+        for scrap in reward_scraps:
+            item["crafting"]["armor"]["byproduct"].append({
+                "armor_name": Armor.get(Armor.armor_id == scrap.armor_id).armor_name,
+                "quantity": scrap.quantity,
+                "source": scrap.type,
+                "level": scrap.level
+            })
+    
     return jsonify(item)
