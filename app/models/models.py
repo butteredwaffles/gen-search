@@ -34,6 +34,17 @@ class CraftItem(BaseModel):
         table_name = "craftitems"
 
 
+class PalicoCraftItem(BaseModel):
+    pc_id = IntegerField(primary_key=True)
+    palico_item = CharField()
+    item_id = IntegerField()
+    quantity = IntegerField()
+    type = CharField()
+
+    class Meta:
+        table_name = "palicocraftitems"
+
+
 class Monster(BaseModel):
     id = IntegerField()
     base_hp = IntegerField()
@@ -104,6 +115,18 @@ class QuestMonster(BaseModel):
 
     class Meta:
         table_name = "questmonsters"
+
+
+class QuestBoxItem(BaseModel):
+    id = IntegerField()
+    box_type = CharField()
+    questid = IntegerField()
+    itemid = IntegerField()
+    quantity = IntegerField()
+    appear_chance = IntegerField()
+
+    class Meta:
+        table_name = "questboxitems"
 
 
 class Armor(BaseModel):
