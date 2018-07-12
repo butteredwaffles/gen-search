@@ -17,6 +17,7 @@
             </div>
             <div class="row">
                 <div class="rounded col-3 align-items-center h-100 bg-light mt-3" id="doc-navigation">
+                    <a class="lead" href="/">Home</a>
                     <a class="lead" href="#getting_started">Getting Started</a>
                     <a class="lead" href="#monsters">Monsters</a>
                 </div>
@@ -243,6 +244,44 @@ Date: Tue, 10 Jul 2018 21:11:23 GMT
                     <li><code>weapons</code> (dict) - A dictionary of the weapons associated with this monster. The amount of keys vary depending on what weapon classes it has.
                         <ul>
                             <li><code>(weapon_type)</code> (list/str) - The key corresponds to the weapon class. Contains names of the weapons in that class related to this monster.</li>
+                        </ul>
+                    </li>
+                </ul>
+
+
+                <h2 class="display-4 doc-heading" id="items">Items</h2>
+                    <p class="doc-text oxygen">An Item resource contains information about an obtainable item in Generations.</p>
+                    <h4>Request Example</h4>
+                    <pre><code>http://localhost:5000/api/item/honey</code></pre>
+                    <h4>Endpoints</h4>
+                    <ul>
+                        <li><code>/item/</code> -- Retrieves all items in the game.</li>
+                        <li><code>/item/:name/</code> -- Retrieves a single item resource.</li>
+                    </ul>
+                    <h5>Response Example for <code>/item/</code></h5>
+                    <pre class="pre-scrollable bg-dark"><code>{
+    "items": [
+        {
+            "name": "Book of Combos 3", 
+            "url": "http://localhost:5000/api/item/Book%20of%20Combos%203"
+        }, 
+        {
+            "name": "Potion", 
+            "url": "http://localhost:5000/api/item/Potion"
+        }, 
+        {
+            "name": "Book of Combos 2", 
+            "url": "http://localhost:5000/api/item/Book%20of%20Combos%202"
+        },
+        ...
+    ]
+}</code></pre>
+                <h5>Attributes</h5>
+                <ul>
+                    <li><code>items</code> (list/dict) - A list of all the items in the game.
+                        <ul>
+                            <li><code>name</code> - The name of the item.</li>
+                            <li><code>url</code> - The API endpoint of the item.</li>
                         </ul>
                     </li>
                 </ul>

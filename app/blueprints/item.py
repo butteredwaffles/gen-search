@@ -95,7 +95,7 @@ def get_individual_item(name):
         quantity = 0
         if combo.item_1_id == db_item.id:
             quantity = combo.item_1_quantity
-        elif combo.item_1_id == db_item.id:
+        elif combo.item_2_id == db_item.id:
             quantity = combo.item_2_quantity,
         else:
             quantity = combo.item_3_quantity

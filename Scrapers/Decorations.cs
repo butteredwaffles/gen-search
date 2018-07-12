@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AngleSharp;
 using AngleSharp.Dom;
+using Gensearch.Helpers;
 using ShellProgressBar;
 using SQLite;
 
@@ -58,7 +59,6 @@ namespace Gensearch.Scrapers
         }
 
         public async Task<List<DecorationCombination>> GetDecorationCombinations(IElement wrapper, int deco_id) {
-            Regex intsOnly = new Regex(@"[^\d\+-]");
             var divs = wrapper.Children[6].QuerySelectorAll("div");
             List<DecorationCombination> combinations = new List<DecorationCombination>();
             switch(divs.Length) {
@@ -66,9 +66,9 @@ namespace Gensearch.Scrapers
                     combinations.Add(new DecorationCombination() {
                         deco_id = deco_id,
                         item_1_id = (await Items.GetItemFromDB(divs[0].FirstElementChild.TextContent)).id,
-                        item_1_quantity = Convert.ToInt32(intsOnly.Replace(divs[0].TextContent, "")),
+                        item_1_quantity = Convert.ToInt32(divs[0].TextContent.ToInt()),
                         item_2_id = (await Items.GetItemFromDB(divs[1].FirstElementChild.TextContent)).id,
-                        item_2_quantity = Convert.ToInt32(intsOnly.Replace(divs[1].TextContent, "")),
+                        item_2_quantity = Convert.ToInt32(divs[1].TextContent.ToInt()),
                         item_3_id = -1,
                         item_3_quantity = 0
                     });
@@ -77,29 +77,29 @@ namespace Gensearch.Scrapers
                     combinations.Add(new DecorationCombination() {
                         deco_id = deco_id,
                         item_1_id = (await Items.GetItemFromDB(divs[0].FirstElementChild.TextContent)).id,
-                        item_1_quantity = Convert.ToInt32(intsOnly.Replace(divs[0].TextContent, "")),
+                        item_1_quantity = Convert.ToInt32(divs[0].TextContent.ToInt()),
                         item_2_id = (await Items.GetItemFromDB(divs[1].FirstElementChild.TextContent)).id,
-                        item_2_quantity = Convert.ToInt32(intsOnly.Replace(divs[1].TextContent, "")),
+                        item_2_quantity = Convert.ToInt32(divs[1].TextContent.ToInt()),
                         item_3_id = (await Items.GetItemFromDB(divs[2].FirstElementChild.TextContent)).id,
-                        item_3_quantity = Convert.ToInt32(intsOnly.Replace(divs[2].TextContent, "")),
+                        item_3_quantity = Convert.ToInt32(divs[2].TextContent.ToInt()),
                     });
                     break;
                 case 5:
                     combinations.Add(new DecorationCombination() {
                         deco_id = deco_id,
                         item_1_id = (await Items.GetItemFromDB(divs[0].FirstElementChild.TextContent)).id,
-                        item_1_quantity = Convert.ToInt32(intsOnly.Replace(divs[0].TextContent, "")),
+                        item_1_quantity = Convert.ToInt32(divs[0].TextContent.ToInt()),
                         item_2_id = (await Items.GetItemFromDB(divs[1].FirstElementChild.TextContent)).id,
-                        item_2_quantity = Convert.ToInt32(intsOnly.Replace(divs[1].TextContent, "")),
+                        item_2_quantity = Convert.ToInt32(divs[1].TextContent.ToInt()),
                         item_3_id = (await Items.GetItemFromDB(divs[2].FirstElementChild.TextContent)).id,
-                        item_3_quantity = Convert.ToInt32(intsOnly.Replace(divs[2].TextContent, "")),
+                        item_3_quantity = Convert.ToInt32(divs[2].TextContent.ToInt()),
                     });
                     combinations.Add(new DecorationCombination() {
                         deco_id = deco_id,
                         item_1_id = (await Items.GetItemFromDB(divs[3].FirstElementChild.TextContent)).id,
-                        item_1_quantity = Convert.ToInt32(intsOnly.Replace(divs[3].TextContent, "")),
+                        item_1_quantity = Convert.ToInt32(divs[3].TextContent.ToInt()),
                         item_2_id = (await Items.GetItemFromDB(divs[4].FirstElementChild.TextContent)).id,
-                        item_2_quantity = Convert.ToInt32(intsOnly.Replace(divs[4].TextContent, "")),
+                        item_2_quantity = Convert.ToInt32(divs[4].TextContent.ToInt()),
                         item_3_id = -1,
                         item_3_quantity = 0,
                     });
@@ -108,20 +108,20 @@ namespace Gensearch.Scrapers
                     combinations.Add(new DecorationCombination() {
                         deco_id = deco_id,
                         item_1_id = (await Items.GetItemFromDB(divs[0].FirstElementChild.TextContent)).id,
-                        item_1_quantity = Convert.ToInt32(intsOnly.Replace(divs[0].TextContent, "")),
+                        item_1_quantity = Convert.ToInt32(divs[0].TextContent.ToInt()),
                         item_2_id = (await Items.GetItemFromDB(divs[1].FirstElementChild.TextContent)).id,
-                        item_2_quantity = Convert.ToInt32(intsOnly.Replace(divs[1].TextContent, "")),
+                        item_2_quantity = Convert.ToInt32(divs[1].TextContent.ToInt()),
                         item_3_id = (await Items.GetItemFromDB(divs[2].FirstElementChild.TextContent)).id,
-                        item_3_quantity = Convert.ToInt32(intsOnly.Replace(divs[2].TextContent, "")),
+                        item_3_quantity = Convert.ToInt32(divs[2].TextContent.ToInt()),
                     });
                     combinations.Add(new DecorationCombination() {
                         deco_id = deco_id,
                         item_1_id = (await Items.GetItemFromDB(divs[3].FirstElementChild.TextContent)).id,
-                        item_1_quantity = Convert.ToInt32(intsOnly.Replace(divs[3].TextContent, "")),
+                        item_1_quantity = Convert.ToInt32(divs[3].TextContent.ToInt()),
                         item_2_id = (await Items.GetItemFromDB(divs[4].FirstElementChild.TextContent)).id,
-                        item_2_quantity = Convert.ToInt32(intsOnly.Replace(divs[4].TextContent, "")),
+                        item_2_quantity = Convert.ToInt32(divs[4].TextContent.ToInt()),
                         item_3_id = (await Items.GetItemFromDB(divs[5].FirstElementChild.TextContent)).id,
-                        item_3_quantity = Convert.ToInt32(intsOnly.Replace(divs[5].TextContent, "")),
+                        item_3_quantity = Convert.ToInt32(divs[5].TextContent.ToInt()),
                     });
                     break;
             }
