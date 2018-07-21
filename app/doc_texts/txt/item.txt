@@ -16,7 +16,7 @@ crafting (dict) - The usage of this item in materials.
         create (list/dict) - The armor that this item is used to craft.
             name (str) - The name of the armor.
             quantity (int) - The amount of this item required to craft this armor.
-            unlocks_creation (bool) - True if this item makes the armor show up in the blacksmith's menu, false otherwise.
+            unlocks_armor (bool) - True if this item makes the armor show up in the blacksmith's menu, false otherwise.
         upgrade (list/dict) - The armor that this item is used to upgrade.
             name (str) - The name of the armor.
             quantity (int) - The amount of this item required to upgrade this armor.
