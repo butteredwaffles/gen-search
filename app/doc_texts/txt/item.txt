@@ -1,0 +1,42 @@
+name (str) - The name of the item.
+description (str) - The in-game description of the item.
+rarity (int) - The rarity of the item.
+max_stack_size (int) - The maximum amount of this item you can carry with you on hunts.
+sell_price (int) - The sell price of the item.
+combination (str) - The combination to craft this item.
+crafting (dict) - The usage of this item in materials.
+    weapons (dict) - The usage of this item in weapons.
+        create (list/dict) - The weapons that this item is used to craft.
+            name (str) - The name of the weapon.
+            quantity (int) - The amount of this item required to craft this weapon.
+            unlocks_creation (bool) - True if this item makes the weapon show up in the blacksmith's menu, false otherwise.
+        upgrade (list/dict) - The weapons that this item is used to upgrade. Has the same attributes as <code>weapons/create</code> with minor differences.
+        byproduct (list/dict) - The weapons that this item is gained as a byproduct. Has the same attributes as <code>weapons/create</code> with minor differences. Note that this section is usually used just for scraps.
+    armor (dict) - The usage of this item in armor.
+        create (list/dict) - The armor that this item is used to craft.
+            name (str) - The name of the armor.
+            quantity (int) - The amount of this item required to craft this armor.
+            unlocks_creation (bool) - True if this item makes the armor show up in the blacksmith's menu, false otherwise.
+        upgrade (list/dict) - The armor that this item is used to upgrade.
+            name (str) - The name of the armor.
+            quantity (int) - The amount of this item required to upgrade this armor.
+            level (int) - The armor level when this item is used.
+        byproduct (list/dict) - The armor where this item is gained as a byproduct.
+            name (str) - The name of the armor.
+            quantity (int) - The amount of this item gained.
+            source (str) - "create" if gained from creating the armor, "upgrade" if gained from upgrading.
+            level (int) - The armor level when this item is obtained if gained from upgrading. -1 if gained from creation.
+        PLACE HOLDER
+    decorations (list/dict) - The decorations this item is used to craft.
+        name (str) - The name of the decoration.
+        quantity (int) - The amount of this item required to craft the decoration.
+    palico (list/dict) - The palico items this item is used to craft.
+        name (str) - The name of the palico weapon/armor.
+        quantity (int) - THe amount of this item needed to craft the palico item.
+    PLACE HOLDER
+quest_rewards (list/dict) - Quests where this item can be obtained as a quest reward.
+    quest (str) - The name of the quest.
+    quantity (int) - The amount of this item gained from the quest box.
+    box (str) - The name of the box where this item is found (Main Reward A, Supplies, etc..)
+    appearance_chance (int) - The chance (percent) of this item appearing.
+PLACE HOLDER

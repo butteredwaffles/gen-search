@@ -16,12 +16,12 @@
                 <h1>Gensearch Docs</h1>
             </div>
             <div class="row">
-                <div class="rounded col-3 align-items-center h-100 bg-light mt-3" id="doc-navigation">
+                <div class="rounded col-xl-3 align-items-center h-100 bg-light mt-3" id="doc-navigation">
                     <a class="lead" href="/">Home</a>
                     <a class="lead" href="#getting_started">Getting Started</a>
                     <a class="lead" href="#monsters">Monsters</a>
                 </div>
-                <div class="rounded col text-left bg-light mt-3" id="doc-wrapper">
+                <div class="rounded col-xl-8 text-left bg-light mt-3" id="doc-wrapper">
                     <h2 class="display-4 doc-heading" id="getting_started">Getting Started</h2>
                     <p class="doc-text oxygen">To make requests to online resources, you can use a library such as <code>curl</code>.</p>
                     <p class="doc-text oxygen">There are a few different things you can retrieve. The <strong>base URL</strong> stays the 
@@ -285,6 +285,121 @@ Date: Tue, 10 Jul 2018 21:11:23 GMT
                         </ul>
                     </li>
                 </ul>
+                <h5>Response example for <code>/item/:name/</code></h5>
+                <pre class="pre-scrollable bg-dark"><code>{
+    "combination": [
+        "None"
+    ],
+    "crafting": {
+        "armor": {
+            "byproduct": [],
+            "create": [
+                {
+                    "name": "Seltas Vambraces",
+                    "quantity": 4,
+                    "unlocks_armor": false
+                },
+            ],
+            "upgrade": []
+        },
+        "decorations": [],
+        "palico": {
+            "armor": [],
+            "weapon": []
+        },
+        "weapons": {
+            "byproduct": [],
+            "create": [
+                {
+                "name": "Shell Shooter 1",
+                "quantity": 6,
+                "unlocks_creation": false
+                },
+            ],
+            "upgrade": [
+                {
+                "name": "Griffin's Charge 1",
+                "quantity": 4,
+                "unlocks_creation": false
+                },
+            ]
+        }
+    },
+    "description": "A hard piece of exoskeleton whose smooth surface reduces air resistance while flying.",
+    "max_stack_size": 99,
+    "name": "Seltas Carapace",
+    "quest_rewards": [
+        {
+            "appearance_chance": 10,
+            "box": "Sub Reward",
+            "quantity": 1,
+            "quest": "[Guild★4] Ancestral Steppe Fungus Run"
+        },
+    ],
+    "rarity": 6,
+    "sell_price": 660
+}</code></pre>
+<ul>
+    <li><code>name</code> (str) - The name of the item.
+    <li><code>description</code> (str) - The in-game description of the item.
+    <li><code>rarity</code> (int) - The rarity of the item.
+    <li><code>max_stack_size</code> (int) - The maximum amount of this item you can carry with you on hunts.
+    <li><code>sell_price</code> (int) - The sell price of the item.
+    <li><code>combination</code> (str) - The combination to craft this item.
+    <li><code>crafting</code> (dict) - The usage of this item in materials.
+        <ul>
+            <li><code>weapons</code> (dict) - The usage of this item in weapons.
+            <ul>
+                <li><code>create</code> (list/dict) - The weapons that this item is used to craft.
+                <ul>
+                    <li><code>name</code> (str) - The name of the weapon.
+                    <li><code>quantity</code> (int) - The amount of this item required to craft this weapon.
+                    <li><code>unlocks_creation</code> (bool) - True if this item makes the weapon show up in the blacksmith's menu, false otherwise.
+                </ul>
+                <li><code>upgrade</code> (list/dict) - The weapons that this item is used to upgrade. Has the same attributes as <code>weapons/create</code> with minor differences.
+                    <li><code>byproduct</code> (list/dict) - The weapons that this item is gained as a byproduct. Has the same attributes as <code>weapons/create</code> with minor differences. Note that this section is usually used just for scraps.
+            </ul>
+            <li><code>armor</code> (dict) - The usage of this item in armor.
+            <ul>
+                <li><code>create</code> (list/dict) - The armor that this item is used to craft.
+                <ul>
+                    <li><code>name</code> (str) - The name of the armor.
+                    <li><code>quantity</code> (int) - The amount of this item required to craft this armor.
+                    <li><code>unlocks_creation</code> (bool) - True if this item makes the armor show up in the blacksmith's menu, false otherwise.
+                </ul>
+                <li><code>upgrade</code> (list/dict) - The armor that this item is used to upgrade.
+                <ul>
+                    <li><code>name</code> (str) - The name of the armor.
+                    <li><code>quantity</code> (int) - The amount of this item required to upgrade this armor.
+                    <li><code>level</code> (int) - The armor level when this item is used.
+                </ul>
+                <li><code>byproduct</code> (list/dict) - The armor where this item is gained as a byproduct.
+                <ul>
+                    <li><code>name</code> (str) - The name of the armor.
+                    <li><code>quantity</code> (int) - The amount of this item gained.
+                    <li><code>source</code> (str) - "create" if gained from creating the armor, "upgrade" if gained from upgrading.
+                    <li><code>level</code> (int) - The armor level when this item is obtained if gained from upgrading. -1 if gained from creation.
+                </ul>
+            </ul>
+            <li><code>decorations</code> (list/dict) - The decorations this item is used to craft.
+            <ul>
+                <li><code>name</code> (str) - The name of the decoration.
+                <li><code>quantity</code> (int) - The amount of this item required to craft the decoration.
+            </ul>
+            <li><code>palico</code> (list/dict) - The palico items this item is used to craft.
+            <ul>
+                <li><code>name</code> (str) - The name of the palico weapon/armor.
+                <li><code>quantity</code> (int) - THe amount of this item needed to craft the palico item.
+            </ul>
+        </ul>
+        <li><code>quest_rewards</code> (list/dict) - Quests where this item can be obtained as a quest reward.
+        <ul>
+            <li><code>quest</code> (str) - The name of the quest.
+            <li><code>quantity</code> (int) - The amount of this item gained from the quest box.
+            <li><code>box</code> (str) - The name of the box where this item is found (Main Reward A, Supplies, etc..)
+            <li><code>appearance_chance</code> (int) - The chance (percent) of this item appearing.
+        </ul>
+</ul>
                 </div>
             </div>
         </div>

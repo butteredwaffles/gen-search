@@ -33,6 +33,8 @@ code {
     border-bottom: 1px solid gray;
 }
 
+pre {white-space: pre-line;}
+
 .doc-text {
     font-size: 17px;
     line-height: 1;

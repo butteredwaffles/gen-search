@@ -16,13 +16,15 @@ If you made edits, use `dotnet test` to run the test cases.
 
 ## Converting the database
 
-The program creates an SQLite database with the information. However, the web app uses a MySQL database. Therefore, if you are planning on running the service yourself, you will have to create a dump of the SQLite one. Change the current directory to the `app` folder, and put the relevant MySQL information inside `config.json`. For clarification, `db_name` refers to the name of the database on your MySQL server, *not* the name of the SQLite one.
+The program creates an SQLite database with the information. However, the web app uses a MySQL database. Therefore, if you are planning on running the service yourself, you will have to create a dump of the SQLite one.
 
-You can then run `sqlite3-translator.py` in order to convert the SQLite database dump (which you can get using a program such as SQLiteStudio) to a MySQL compatible file. Python3 is required, as is the `progressbar2` library.
+Change the current directory to `app/Utility` and run `sqlite3-translator.py` in order to convert the SQLite database dump (which you can get using a program such as SQLiteStudio) to a MySQL compatible file. Python3 is required, as is the `progressbar2` library.
 
 `python3 sqlite3-translator.py <path-to-sqlite-dump>`
 
 This will create a folder named `output` in your current directory containing the `mysql.sql` file. Run this file on your MySQL database and it will import everything into it.
+
+Change the current directory to the `app` folder, and put the relevant MySQL information inside `config.json`. For clarification, `db_name` refers to the name of the database on your MySQL server, *not* the name of the SQLite one.
 
 ## Running the web server
 

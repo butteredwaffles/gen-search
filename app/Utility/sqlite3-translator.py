@@ -60,7 +60,7 @@ def convert(filename):
                 except IndexError:
                     pass
             newfile.append(line)
-    if not os.path.exists("output/"): 
+    if not os.path.exists("output/"):
         os.makedirs("output/")
     with open("output/mysql.sql", "w", encoding="utf-8") as nf:
         nf.writelines(newfile)
