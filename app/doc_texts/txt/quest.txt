@@ -1,0 +1,36 @@
+name (str) - The name of the quest.
+type (str) - The goal category of the quest. (ie Slay, Hunt, Gather)
+description (str) - The in-game description of the quest.
+is_key (bool) - True if the quest is a key quest (a quest required to unlock the next tier of quests), else False.
+is_prowler (bool) - True if the quest is prowler-exclusive, else False.
+is_unstable (bool) - True if there is a chance of a monster spawning that was not explicitly stated to appear in the quest. (Details about what monster could appear is included in the monsters list.)
+time_limit (int) - How many minutes are allotted for the quest.
+contract_fee (int) - How much you have to pay in order to enter the quest.
+goal (dict) - The main goal of the quest.
+    zenny_reward (int) - The zenny gained from completing the goal.
+    hrp_reward (int) - The Hunter Rank Points gained from completing the goal.
+    wycadpts_reward (int) - The Wycademy Points gained from completing the goal.
+    description (str) - The in-game description of the goal.
+subgoal (dict) - The optional, secondary goal of the quest. Has the same attributes as the <code>goal</code> dict.
+monsters (list/dict) - The monsters that make an appearance in this quest.
+    name (str) - The name of the monster.
+    amount (int) - The amount of this monster that appears in the quest.
+    special_attribute (str) - "Hyper" if the monster is hyper, "intruder" if the monster is an intruder monster, or "none" if the monster is normal.
+    monster_stats (dict) - The quest-specific attributes of the monster.
+        hp (int) - The monster's HP.
+        stagger_multiplier (float) - The multiplier that affects the stagger value of each part.
+        attack_mulitiplier (float) - The multiplier that affects the monster's attack.
+        defense_multiplier (float) - The multiplier that affects the monster's defense.
+        exhaust_multiplier (float) - The multiplier that affects how quickly the monster gets exhausted/tired/hungry.
+        dizzy_multiplier (float) - The multiplier that affects how easy it is to stun the monster.
+        mount_multiplier (float) - The multiplier that affects how easy to monster is to mount.
+    PLACE HOLDER
+rewards (list/dict) - The item rewards from this quest.
+    name (str) - The name of the item.
+    box (str) - The name of the box this item appears in. (ie Main Reward A, Supplies)
+    quantity (int) - How much of this item is gained.
+    appear_chance (int) - The chance of this item appearing in the rewards. 100 if the box is Supplies.
+prerequisites (list/dict) - The quests that must be done before this one appears.
+    name (str) - The name of the prereq quest.
+    url (str) - The API endpoint of the prereq quest.
+unlocks (list/dict) - The quests that are unlocked by completing this one. Has the same attributes as the <code>prerequisites</code> dict.

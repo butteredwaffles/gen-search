@@ -27,7 +27,7 @@ def convert_file_to_li(filename, output_filename):
                 newfile.append(INDENT_CHAR * (indentation + INDENT_AMOUNT * 2) + "</ul>\n")
                 if not line.strip() == "PLACE HOLDER":
                     newfile.append(INDENT_CHAR * (indentation + INDENT_AMOUNT * 2) + "<li><code>" + split[0] + "</code> " + split[1].rstrip() + "\n")
-                
+
             newfile.append(newline)
         newfile.append("</ul>")
     with open(output_filename, "w+") as outputfile:

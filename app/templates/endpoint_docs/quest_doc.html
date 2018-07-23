@@ -1,0 +1,47 @@
+<ul>
+    <li><code>name</code> (str) - The name of the quest.
+    <li><code>type</code> (str) - The goal category of the quest. (ie Slay, Hunt, Gather)
+    <li><code>description</code> (str) - The in-game description of the quest.
+    <li><code>is_key</code> (bool) - True if the quest is a key quest (a quest required to unlock the next tier of quests), else False.
+    <li><code>is_prowler</code> (bool) - True if the quest is prowler-exclusive, else False.
+    <li><code>is_unstable</code> (bool) - True if there is a chance of a monster spawning that was not explicitly stated to appear in the quest. (Details about what monster could appear is included in the monsters list.)
+    <li><code>time_limit</code> (int) - How many minutes are allotted for the quest.
+    <li><code>contract_fee</code> (int) - How much you have to pay in order to enter the quest.
+    <li><code>goal</code> (dict) - The main goal of the quest.
+        <ul>
+            <li><code>zenny_reward</code> (int) - The zenny gained from completing the goal.
+            <li><code>hrp_reward</code> (int) - The Hunter Rank Points gained from completing the goal.
+            <li><code>wycadpts_reward</code> (int) - The Wycademy Points gained from completing the goal.
+            <li><code>description</code> (str) - The in-game description of the goal.
+        </ul>
+        <li><code>subgoal</code> (dict) - The optional, secondary goal of the quest. Has the same attributes as the <code>goal</code> dict.
+            <li><code>monsters</code> (list/dict) - The monsters that make an appearance in this quest.
+        <ul>
+            <li><code>name</code> (str) - The name of the monster.
+            <li><code>amount</code> (int) - The amount of this monster that appears in the quest.
+            <li><code>special_attribute</code> (str) - "Hyper" if the monster is hyper, "intruder" if the monster is an intruder monster, or "none" if the monster is normal.
+            <li><code>monster_stats</code> (dict) - The quest-specific attributes of the monster.
+            <ul>
+                <li><code>hp</code> (int) - The monster's HP.
+                <li><code>stagger_multiplier</code> (float) - The multiplier that affects the stagger value of each part.
+                <li><code>attack_mulitiplier</code> (float) - The multiplier that affects the monster's attack.
+                <li><code>defense_multiplier</code> (float) - The multiplier that affects the monster's defense.
+                <li><code>exhaust_multiplier</code> (float) - The multiplier that affects how quickly the monster gets exhausted/tired/hungry.
+                <li><code>dizzy_multiplier</code> (float) - The multiplier that affects how easy it is to stun the monster.
+                <li><code>mount_multiplier</code> (float) - The multiplier that affects how easy to monster is to mount.
+            </ul>
+        </ul>
+        <li><code>rewards</code> (list/dict) - The item rewards from this quest.
+        <ul>
+            <li><code>name</code> (str) - The name of the item.
+            <li><code>box</code> (str) - The name of the box this item appears in. (ie Main Reward A, Supplies)
+            <li><code>quantity</code> (int) - How much of this item is gained.
+            <li><code>appear_chance</code> (int) - The chance of this item appearing in the rewards. 100 if the box is Supplies.
+        </ul>
+        <li><code>prerequisites</code> (list/dict) - The quests that must be done before this one appears.
+        <ul>
+            <li><code>name</code> (str) - The name of the prereq quest.
+            <li><code>url</code> (str) - The API endpoint of the prereq quest.
+        </ul>
+        <li><code>unlocks</code> (list/dict) - The quests that are unlocked by completing this one. Has the same attributes as the <code>prerequisites</code> dict.
+</ul>

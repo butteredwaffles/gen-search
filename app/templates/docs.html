@@ -20,6 +20,7 @@
                     <a class="lead" href="/">Home</a>
                     <a class="lead" href="#getting_started">Getting Started</a>
                     <a class="lead" href="#monsters">Monsters</a>
+                    <a class="lead" href="#quests">Quests</a>
                 </div>
                 <div class="rounded col-xl-8 text-left bg-light mt-3" id="doc-wrapper">
                     <h2 class="display-4 doc-heading" id="getting_started">Getting Started</h2>
@@ -230,12 +231,12 @@ Date: Tue, 10 Jul 2018 21:11:23 GMT
                             <li><code>monster_stats</code> (dict) - The <strong>quest-specific</strong> attributes of this monster compared to its normal ones.
                                 <ul>
                                     <li><code>hp</code> (int) - The amount of HP this monster has.</li>
-                                    <li><code>stagger_multiplier</code> (int) - The multiplier that affects the stagger value of each part.</li>
-                                    <li><code>attack_multiplier</code> (int) - The multiplier that affects the monster's attack.</li>
-                                    <li><code>defense_multiplier</code> (int) - The multiplier that affects the monster's defense.</li>
-                                    <li><code>exhaust_multiplier</code> (int) - The multiplier that affects how quickly the monster gets exhausted/tired/hungry.</li>
-                                    <li><code>dizzy_multiplier</code> (int) - The multiplier that affects how easy it is to stun the monster.</li>
-                                    <li><code>mount_multiplier</code> (int) - The multiplier that affects how easy to monster is to mount.</li>
+                                    <li><code>stagger_multiplier</code> (float) - The multiplier that affects the stagger value of each part.</li>
+                                    <li><code>attack_multiplier</code> (float) - The multiplier that affects the monster's attack.</li>
+                                    <li><code>defense_multiplier</code> (float) - The multiplier that affects the monster's defense.</li>
+                                    <li><code>exhaust_multiplier</code> (float) - The multiplier that affects how quickly the monster gets exhausted/tired/hungry.</li>
+                                    <li><code>dizzy_multiplier</code> (float) - The multiplier that affects how easy it is to stun the monster.</li>
+                                    <li><code>mount_multiplier</code> (float) - The multiplier that affects how easy to monster is to mount.</li>
                                 </ul>
                             </li>
                         </ul>
@@ -250,16 +251,16 @@ Date: Tue, 10 Jul 2018 21:11:23 GMT
 
 
                 <h2 class="display-4 doc-heading" id="items">Items</h2>
-                    <p class="doc-text oxygen">An Item resource contains information about an obtainable item in Generations.</p>
-                    <h4>Request Example</h4>
-                    <pre><code>http://localhost:5000/api/item/honey</code></pre>
-                    <h4>Endpoints</h4>
-                    <ul>
-                        <li><code>/item/</code> -- Retrieves all items in the game.</li>
-                        <li><code>/item/:name/</code> -- Retrieves a single item resource.</li>
-                    </ul>
-                    <h5>Response Example for <code>/item/</code></h5>
-                    <pre class="pre-scrollable bg-dark"><code>{
+                <p class="doc-text oxygen">An Item resource contains information about an obtainable item in Generations.</p>
+                <h4>Request Example</h4>
+                <pre><code>http://localhost:5000/api/item/honey</code></pre>
+                <h4>Endpoints</h4>
+                <ul>
+                    <li><code>/item/</code> -- Retrieves all items in the game.</li>
+                    <li><code>/item/:name/</code> -- Retrieves a single item resource.</li>
+                </ul>
+                <h5>Response Example for <code>/item/</code></h5>
+                <pre class="pre-scrollable bg-dark"><code>{
     "items": [
         {
             "name": "Book of Combos 3", 
@@ -339,67 +340,143 @@ Date: Tue, 10 Jul 2018 21:11:23 GMT
     "rarity": 6,
     "sell_price": 660
 }</code></pre>
-<ul>
-    <li><code>name</code> (str) - The name of the item.
-    <li><code>description</code> (str) - The in-game description of the item.
-    <li><code>rarity</code> (int) - The rarity of the item.
-    <li><code>max_stack_size</code> (int) - The maximum amount of this item you can carry with you on hunts.
-    <li><code>sell_price</code> (int) - The sell price of the item.
-    <li><code>combination</code> (str) - The combination to craft this item.
-    <li><code>crafting</code> (dict) - The usage of this item in materials.
-        <ul>
-            <li><code>weapons</code> (dict) - The usage of this item in weapons.
-            <ul>
-                <li><code>create</code> (list/dict) - The weapons that this item is used to craft.
-                <ul>
-                    <li><code>name</code> (str) - The name of the weapon.
-                    <li><code>quantity</code> (int) - The amount of this item required to craft this weapon.
-                    <li><code>unlocks_creation</code> (bool) - True if this item makes the weapon show up in the blacksmith's menu, false otherwise.
-                </ul>
-                <li><code>upgrade</code> (list/dict) - The weapons that this item is used to upgrade. Has the same attributes as <code>weapons/create</code> with minor differences.
-                    <li><code>byproduct</code> (list/dict) - The weapons that this item is gained as a byproduct. Has the same attributes as <code>weapons/create</code> with minor differences. Note that this section is usually used just for scraps.
-            </ul>
-            <li><code>armor</code> (dict) - The usage of this item in armor.
-            <ul>
-                <li><code>create</code> (list/dict) - The armor that this item is used to craft.
-                <ul>
-                    <li><code>name</code> (str) - The name of the armor.
-                    <li><code>quantity</code> (int) - The amount of this item required to craft this armor.
-                    <li><code>unlocks_armor</code> (bool) - True if this item makes the armor show up in the blacksmith's menu, false otherwise.
-                </ul>
-                <li><code>upgrade</code> (list/dict) - The armor that this item is used to upgrade.
-                <ul>
-                    <li><code>name</code> (str) - The name of the armor.
-                    <li><code>quantity</code> (int) - The amount of this item required to upgrade this armor.
-                    <li><code>level</code> (int) - The armor level when this item is used.
-                </ul>
-                <li><code>byproduct</code> (list/dict) - The armor where this item is gained as a byproduct.
-                <ul>
-                    <li><code>name</code> (str) - The name of the armor.
-                    <li><code>quantity</code> (int) - The amount of this item gained.
-                    <li><code>source</code> (str) - "create" if gained from creating the armor, "upgrade" if gained from upgrading.
-                    <li><code>level</code> (int) - The armor level when this item is obtained if gained from upgrading. -1 if gained from creation.
-                </ul>
-            </ul>
-            <li><code>decorations</code> (list/dict) - The decorations this item is used to craft.
-            <ul>
-                <li><code>name</code> (str) - The name of the decoration.
-                <li><code>quantity</code> (int) - The amount of this item required to craft the decoration.
-            </ul>
-            <li><code>palico</code> (list/dict) - The palico items this item is used to craft.
-            <ul>
-                <li><code>name</code> (str) - The name of the palico weapon/armor.
-                <li><code>quantity</code> (int) - THe amount of this item needed to craft the palico item.
-            </ul>
-        </ul>
-        <li><code>quest_rewards</code> (list/dict) - Quests where this item can be obtained as a quest reward.
-        <ul>
-            <li><code>quest</code> (str) - The name of the quest.
-            <li><code>quantity</code> (int) - The amount of this item gained from the quest box.
-            <li><code>box</code> (str) - The name of the box where this item is found (Main Reward A, Supplies, etc..)
-            <li><code>appearance_chance</code> (int) - The chance (percent) of this item appearing.
-        </ul>
-</ul>
+                    <h5>Attributes</h5>
+                    {{ item_docs|safe }}
+
+                    <h2 class="display-4 doc-heading" id="quests">Quests</h2>
+                    <p class="doc-text oxygen">A Quest resource contains information about a quest in Monster Hunter Generations.</p>
+                    <h4>Request Example</h4>
+                    <pre><code>http://localhost:5000/api/quest</code></pre>
+                    <h4>Endpoints</h4>
+                    <ul>
+                        <li><code>/quest/</code> -- Retrieves all quests in the game.</li>
+                        <li><code>/quest/:name/</code> -- Retrieves a single quest resource.</li>
+                    </ul>
+                    <h5>Response Example for <code>/quest/</code></h5>
+<pre class="pre-scrollable bg-dark"><code>{
+    "quests": [
+      {
+        "name": "[Village★1] Find the Ferns", 
+        "url": "http://localhost:5000/api/quest/Find%20the%20Ferns"
+      }, 
+      {
+        "name": "[Village★1] Medicinal Moths", 
+        "url": "http://localhost:5000/api/quest/Medicinal%20Moths"
+      }, 
+      {
+        "name": "[Village★1] Due for Dragon Amber", 
+        "url": "http://localhost:5000/api/quest/Due%20for%20Dragon%20Amber"
+      }, 
+      {
+        "name": "[Village★1] A Fungal Hunt", 
+        "url": "http://localhost:5000/api/quest/A%20Fungal%20Hunt"
+      }, 
+      {
+        "name": "[Village★1] Wipe Out!", 
+        "url": "http://localhost:5000/api/quest/Wipe%20Out%21"
+      },
+      .......
+    ]
+}</code></pre>
+                    <h5>Attributes</h5>
+                    <ul>
+                        <li><code>quests</code> (list/dict) - A list containing all the quests.
+                            <ul>
+                                <li><code>name</code> (str) - The name of the quest.</li>
+                                <li><code>url</code> (str) - The API endpoint of the quest.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <h5>Response Example for <code>/quest/:name/</code></h5>
+<pre class="pre-scrollable bg-dark"><code>{
+    "quests": [
+      {
+        "contract_fee": 1300, 
+        "description": "Pokke Manager: Looks like another request from the Guild... They want some red monsters hunted down. You'll do it for me and save these hands from getting dirty, of course? Wonderful. Good luck, now!", 
+        "goal": {
+          "description": "Hunt all large monsters", 
+          "hrp_reward": 670, 
+          "wycadpts_reward": 1230, 
+          "zenny_reward": 12300
+        }, 
+        "is_key": false, 
+        "is_prowler": false, 
+        "is_unstable": false, 
+        "monsters": [
+          {
+            "amount": 1, 
+            "monster_stats": {
+              "attack_multiplier": 2.65, 
+              "defense_multiplier": 0.9, 
+              "dizzy_multiplier": 1.1, 
+              "exhaust_multiplier": 1.5, 
+              "hp": 2888, 
+              "mount_multiplier": 1.6, 
+              "stagger_multiplier": 1.2
+            }, 
+            "name": "Volvidon", 
+            "special_attribute": "no"
+          }, 
+          {
+            "amount": 1, 
+            "monster_stats": {
+              "attack_multiplier": 2.65, 
+              "defense_multiplier": 0.9, 
+              "dizzy_multiplier": 1.1, 
+              "exhaust_multiplier": 1.5, 
+              "hp": 2310, 
+              "mount_multiplier": 1.6, 
+              "stagger_multiplier": 1.2
+            }, 
+            "name": "Daimyo Hermitaur", 
+            "special_attribute": "no"
+          }, 
+          {
+            "amount": 1, 
+            "monster_stats": {
+              "attack_multiplier": 2.65, 
+              "defense_multiplier": 0.9, 
+              "dizzy_multiplier": 1.1, 
+              "exhaust_multiplier": 1.5, 
+              "hp": 2940, 
+              "mount_multiplier": 1.6, 
+              "stagger_multiplier": 1.2
+            }, 
+            "name": "Rathalos", 
+            "special_attribute": "no"
+          }
+        ], 
+        "name": "[Village★6] Advanced: Seeing Red", 
+        "prerequisites": [], 
+        "rewards": [
+          {
+            "appear_chance": 15, 
+            "box": "Main Reward A", 
+            "name": "Volvidon Carapace", 
+            "quantity": 1
+          }, 
+          {
+            "appear_chance": 15, 
+            "box": "Main Reward A", 
+            "name": "Hermitaur Carapace", 
+            "quantity": 1
+          }, 
+          ....
+        ], 
+        "subgoal": {
+          "description": "None", 
+          "hrp_reward": 0, 
+          "wycadpts_reward": 0, 
+          "zenny_reward": 0
+        }, 
+        "time_limit": 50, 
+        "type": "Hunt", 
+        "unlocks": []
+      }
+    ]
+  }</code></pre>
+                    <h5>Attributes</h5>
+                    {{ quest_docs|safe }}
                 </div>
             </div>
         </div>

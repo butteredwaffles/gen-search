@@ -99,6 +99,17 @@ class Quest(BaseModel):
         table_name = "quests"
 
 
+class QuestGoal(BaseModel):
+    id = IntegerField()
+    zenny_reward = IntegerField()
+    hrp_reward = IntegerField()
+    wycadpts_reward = IntegerField()
+    goal_description = CharField()
+
+    class Meta:
+        table_name = "questgoals"
+
+
 class QuestMonster(BaseModel):
     id = IntegerField()
     questid = IntegerField()
@@ -127,6 +138,16 @@ class QuestBoxItem(BaseModel):
 
     class Meta:
         table_name = "questboxitems"
+
+
+class QuestUnlock(BaseModel):
+    id = IntegerField()
+    unlock_type = CharField()
+    questid = IntegerField()
+    quest_name = CharField()
+
+    class Meta:
+        table_name = "questunlocks"
 
 
 class Armor(BaseModel):

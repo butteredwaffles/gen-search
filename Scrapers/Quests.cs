@@ -270,7 +270,8 @@ namespace Gensearch.Scrapers
                 foreach (var quest in wrapper.QuerySelectorAll("div").Skip(1)) {
                     unlocks.Add(new QuestUnlock() {
                         unlock_type = unlock_type,
-                        questid = quest_id,
+                        quest_name = quest.FirstElementChild.TextContent,
+                        questid = quest_id
                     });
                 }
             }

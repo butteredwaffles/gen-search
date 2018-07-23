@@ -91,6 +91,7 @@ namespace Gensearch.Scrapers
         public string unlock_type {get; set;} // whether this quest is a prereq or unlocks another one
         [ForeignKey(typeof(Quest)), NotNull]
         public int questid {get; set;}
+        public string quest_name {get; set;}
 
         [OneToOne]
         public Quest quest {get; set;}
