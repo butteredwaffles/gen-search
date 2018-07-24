@@ -34,24 +34,45 @@ def get_skill_tree(tree_name):
             "description": skill.skill_description
         })
 
-    for deco in Decoration.select().where(Decoration.negative_skill_tree == tree_name):
-        tree["decorations"]["harmful"].append(
-            {
-                "name": deco.deco_name,
-                "points": deco.negative_skill_effect
-            }
-        )
-    for deco in Decoration.select().where(Decoration.positive_skill_tree == tree_name):
-        tree["decorations"]["helpful"].append(
-            {
-                "name": deco.deco_name,
-                "points": deco.positive_skill_effect
-            }
-        )
+    skill_decos = get_decorations_for_skill(tree_name)
+    tree["decorations"]["harmful"] = skill_decos[0]
+    tree["decorations"]["helpful"] = skill_decos[1]
+
     db.close()
     return jsonify(tree)
 
 
 @skill_routes.route('/<tree_name>/<name>', methods=["GET"])
 def get_individual_skill(tree_name, name):
-    pass
+    db.connect()
+    db_skill = Skill.get(Skill.skill_name == name)
+    skill = {
+        "name": db_skill.skill_name,
+        "points": db_skill.skill_value,
+        "description": db_skill.skill_description,
+        "decorations": {
+            "harmful": [],
+            "helpful": []
+        }
+    }
+    skill_decos = get_decorations_for_skill(tree_name)
+    skill["decorations"]["harmful"] = skill_decos[0]
+    skill["decorations"]["helpful"] = skill_decos[1]
+    db.close()
+    return jsonify(skill)
+
+
+def get_decorations_for_skill(tree_name):
+    harmful = []
+    helpful = []
+    for deco in Decoration.select().where(Decoration.negative_skill_tree == tree_name):
+        harmful.append({
+            "name": deco.deco_name,
+            "points": deco.negative_skill_effect
+        })
+    for deco in Decoration.select().where(Decoration.positive_skill_tree == tree_name):
+        helpful.append({
+            "name": deco.deco_name,
+            "points": deco.positive_skill_effect
+        })
+    return [harmful, helpful]
