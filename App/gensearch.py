@@ -16,6 +16,7 @@ app.register_blueprint(quest_routes, url_prefix="/api/quest")
 DOC_DIRECTORY = "doc_texts/"
 TXT_DOC_DIRECTORY = "doc_texts/txt/"
 HTML_DOC_DIRECTORY = "templates/endpoint_docs/"
+OVERWRITE_HTML_DOC_FILES = True
 
 
 @app.route('/')
@@ -26,7 +27,7 @@ def index():
 
 @app.route('/docs')
 def docs():
-    return render_template('docs.html', item_docs=get_doc('item'), quest_docs=get_doc('quest'))
+    return render_template('docs.html', item_docs=get_doc('item'), quest_docs=get_doc('quest'), monster_docs=get_doc('monster'))
 
 
 def get_doc(name):
@@ -37,7 +38,7 @@ def get_doc(name):
     if not os.path.exists(txtinput):
         raise NotImplementedError()
 
-    if os.path.exists(htmloutput):
+    if os.path.exists(htmloutput) and not OVERWRITE_HTML_DOC_FILES:
         with open(htmloutput, "r") as f:
             return f.read()
     else:

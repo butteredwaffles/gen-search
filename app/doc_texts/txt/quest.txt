@@ -15,7 +15,7 @@ subgoal (dict) - The optional, secondary goal of the quest. Has the same attribu
 monsters (list/dict) - The monsters that make an appearance in this quest.
     name (str) - The name of the monster.
     amount (int) - The amount of this monster that appears in the quest.
-    special_attribute (str) - "Hyper" if the monster is hyper, "intruder" if the monster is an intruder monster, or "none" if the monster is normal.
+    special_attribute (str) - "Hyper" if the monster is hyper, "intruder" if the monster is an intruder monster, or "no" if the monster is normal.
     monster_stats (dict) - The quest-specific attributes of the monster.
         hp (int) - The monster's HP.
         stagger_multiplier (float) - The multiplier that affects the stagger value of each part.

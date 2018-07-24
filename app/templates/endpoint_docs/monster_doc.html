@@ -1,0 +1,50 @@
+<ul>
+    <li><code>name</code> (str) - The name of this monster.
+    <li><code>base_hp</code> (int) - The average HP of this monster.
+    <li><code>base_size</code> (int) - The average size of this monster.
+    <li><code>crown_sizes</code> (dict) - The size required to receive a crown for this monster.
+        <ul>
+            <li><code>small_gold</code> (float) - The size required to get a small crown.
+            <li><code>silver</code> (float) - The size required to get a silver crown.
+            <li><code>large_gold</code> (float) - The size required to get a large crown.
+        </ul>
+        <li><code>parts</code> (list/dict) - The distinct parts of this monster.
+        <ul>
+            <li><code>part_name</code> (str) - The name of the part.
+            <li><code>stagger_value</code> (int) - The damage threshold for monsters to stagger. Parts break after a certain number of staggers, although this amount is not currently included in the API.
+            <li><code>extract_color</code> (str) - The color of nectar received when hitting the part with the Kinsect.
+        </ul>
+        <li><code>drops</code> (dict) - The various items you can receive from this monster.
+        <ul>
+            <li><code>high</code> (list/dict) - High rank drops.
+            <ul>
+                <li><code>item_name</code> (str) - The name of the item.
+                <li><code>source</code> (str) - How you receive the item, whether it be from breaking parts, carving, or gathering.
+                <li><code>rank</code> (str) - Whether this item is low or high rank.
+                <li><code>drop_chance</code> (str) - The chance of the hunter receiving this item after completing its requirements.
+                <li><code>quantity</code> (int) - The number of the item you receive.
+            </ul>
+            <li><code>low</code> (list/dict) - Low rank drops. Shares the same attribute as high rank drops.
+        </ul>
+        <li><code>quests</code> (list/dict) - The quests where this monster appears.
+        <ul>
+            <li><code>quest_name</code> (str) - The name of the quest.
+            <li><code>amount</code> (int) - The amount of this monster in the quest.
+            <li><code>special_attribute</code> (str) - If the monster is hyper or an intruder.
+            <li><code>monster_stats</code> (dict) - The <strong>quest-specific</strong> attributes of this monster compared to its normal ones.
+            <ul>
+                <li><code>hp</code> (int) - The amount of HP this monster has.
+                <li><code>stagger_multiplier</code> (float) - The multiplier that affects the stagger value of each part.
+                <li><code>attack_multiplier</code> (float) - The multiplier that affects the monster's attack.
+                <li><code>defense_multiplier</code> (float) - The multiplier that affects the monster's defense.
+                <li><code>exhaust_multiplier</code> (float) - The multiplier that affects how quickly the monster gets exhausted/tired/hungry.
+                <li><code>dizzy_multiplier</code> (float) - The multiplier that affects how easy it is to stun the monster.
+                <li><code>mount_multiplier</code> (float) - The multiplier that affects how easy to monster is to mount.
+            </ul>
+        </ul>
+        <li><code>armor</code> (list/str) - A list of the names of the armor sets associated with this monster.
+                <li><code>weapons</code> (dict) - A dictionary of the weapons associated with this monster. The amount of keys vary depending on what weapon classes it has.
+        <ul>
+            <li><code>(weapon_type)</code> (list/str) - The key corresponds to the weapon class. Contains names of the weapons in that class related to this monster.
+        </ul>
+</ul>

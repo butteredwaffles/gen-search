@@ -1,0 +1,36 @@
+name (str) - The name of this monster.
+base_hp (int) - The average HP of this monster.
+base_size (int) - The average size of this monster.
+crown_sizes (dict) - The size required to receive a crown for this monster.
+    small_gold (float) - The size required to get a small crown.
+    silver (float) - The size required to get a silver crown.
+    large_gold (float) - The size required to get a large crown.
+parts (list/dict) - The distinct parts of this monster.
+    part_name (str) - The name of the part.
+    stagger_value (int) - The damage threshold for monsters to stagger. Parts break after a certain number of staggers, although this amount is not currently included in the API.
+    extract_color (str) - The color of nectar received when hitting the part with the Kinsect.
+drops (dict) - The various items you can receive from this monster.
+    high (list/dict) - High rank drops.
+        item_name (str) - The name of the item.
+        source (str) - How you receive the item, whether it be from breaking parts, carving, or gathering.
+        rank (str) - Whether this item is low or high rank.
+        drop_chance (str) - The chance of the hunter receiving this item after completing its requirements.
+        quantity (int) - The number of the item you receive.
+    low (list/dict) - Low rank drops. Shares the same attribute as high rank drops.
+quests (list/dict) - The quests where this monster appears.
+    quest_name (str) - The name of the quest.
+    amount (int) - The amount of this monster in the quest.
+    special_attribute (str) - If the monster is hyper or an intruder.
+    monster_stats (dict) - The <strong>quest-specific</strong> attributes of this monster compared to its normal ones.
+        hp (int) - The amount of HP this monster has.
+        stagger_multiplier (float) - The multiplier that affects the stagger value of each part.
+        attack_multiplier (float) - The multiplier that affects the monster's attack.
+        defense_multiplier (float) - The multiplier that affects the monster's defense.
+        exhaust_multiplier (float) - The multiplier that affects how quickly the monster gets exhausted/tired/hungry.
+        dizzy_multiplier (float) - The multiplier that affects how easy it is to stun the monster.
+        mount_multiplier (float) - The multiplier that affects how easy to monster is to mount.
+    PLACE HOLDER
+armor (list/str) - A list of the names of the armor sets associated with this monster.
+weapons (dict) - A dictionary of the weapons associated with this monster. The amount of keys vary depending on what weapon classes it has.
+    (weapon_type) (list/str) - The key corresponds to the weapon class. Contains names of the weapons in that class related to this monster.
+PLACE HOLDER

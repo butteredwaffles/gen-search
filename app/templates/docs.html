@@ -20,17 +20,18 @@
                     <a class="lead" href="/">Home</a>
                     <a class="lead" href="#getting_started">Getting Started</a>
                     <a class="lead" href="#monsters">Monsters</a>
+                    <a class="lead" href="#items">Items</a>
                     <a class="lead" href="#quests">Quests</a>
                 </div>
-                <div class="rounded col-xl-8 text-left bg-light mt-3" id="doc-wrapper">
+                <div class="rounded col-xl-8 text-left bg-light mt-3 doc-text" id="doc-wrapper">
                     <h2 class="display-4 doc-heading" id="getting_started">Getting Started</h2>
-                    <p class="doc-text oxygen">To make requests to online resources, you can use a library such as <code>curl</code>.</p>
-                    <p class="doc-text oxygen">There are a few different things you can retrieve. The <strong>base URL</strong> stays the 
+                    <p class="oxygen">To make requests to online resources, you can use a library such as <code>curl</code>.</p>
+                    <p class="oxygen">There are a few different things you can retrieve. The <strong>base URL</strong> stays the 
                     same across all endpoints. It is all the characters in the URL before <code>/api/</code>. 
                     Open a terminal (or use an online program that allows you to make GET requests) and type this in.</p>
                     <pre><code>http://localhost:5000/api/monster/gore_magala</code></pre>
-                    <p class="doc-text oxygen">You should see a blob of .JSON in the console that resembles this:</p>
-                    <pre><code>
+                    <p class="oxygen">You should see a blob of .JSON in the console that resembles this:</p>
+                    <pre class="pre-scrollable bg-dark"><code>
 HTTP/1.0 200 OK
 Content-Type: application/json
 Content-Length: 15122
@@ -190,68 +191,12 @@ Date: Tue, 10 Jul 2018 21:11:23 GMT
         ...
     }
 }</code></pre>
-                <h4>Attributes</h4>
-                <ul>
-                    <li><code>name</code> (string) - The name of the monster.</li>
-                    <li><code>base_hp</code> (int) - The average HP of the monster.</li>
-                    <li><code>base_size</code> (int) - The average size of the monster.</li>
-                    <li><code>crown_sizes</code> (dict) - The minimum/maximum size to achieve crown sizes.
-                        <ul>
-                            <li><code>small_gold</code> (float) - The size required to get a small crown.</li>
-                            <li><code>silver</code> (float) - The size required to get a silver crown (a silver crown is received when the monster is either slightly below or above average size).</li>
-                            <li><code>large_gold</code> (float) - The size required to get a large crown.</li>
-                        </ul>
-                    </li>
-                    <li><code>parts</code> (list/dict) - The distinct parts of the monster.
-                        <ul>
-                            <li><code>part_name</code> (string) - The name of the part.</li>
-                            <li><code>stagger_value</code> (int) - The damage threshold for monsters to stagger. Parts break after a certain number of staggers, although this amount is not currently included in the API.</li>
-                            <li><code>extract_color</code> (string) - The color of nectar you receive when hitting the part with the insect glaive.</li>
-                        </ul>
-                    </li>
-                    <li><code>drops</code> (dict) - The various items you can receive from the monster.
-                        <ul>
-                            <li><code>high</code> (list/dict) - High rank drops.
-                                <ul>
-                                    <li><code>item_name</code> (string) - The name of the item.</li>
-                                    <li><code>source</code> (string) - How you receive the item, whether it be from breaking parts, carving, or gathering.</li>
-                                    <li><code>rank</code> (string) - Whether this item is low or high rank.</li>
-                                    <li><code>drop_chance</code> (string) - The chance of the hunter receiving this item after completing the requirements.</li>
-                                    <li><code>quantity</code> (int) - The number of the item you receive.</li>
-                                </ul>
-                            </li>
-                            <li><code>low</code> (list/dict) - Low rank drops. They share the same attributes as high rank ones.</li>
-                        </ul>
-                    </li>
-                    <li><code>quests</code> (list/dict) - The quests where this monster appears.
-                        <ul>
-                            <li><code>quest_name</code> (string) - The name of the quest.</li>
-                            <li><code>amount</code> (int) - The amount of this monster in the quest.</li>
-                            <li><code>special_attribute</code> (string) - If the monster is hyper or an intruder.</li>
-                            <li><code>monster_stats</code> (dict) - The <strong>quest-specific</strong> attributes of this monster compared to its normal ones.
-                                <ul>
-                                    <li><code>hp</code> (int) - The amount of HP this monster has.</li>
-                                    <li><code>stagger_multiplier</code> (float) - The multiplier that affects the stagger value of each part.</li>
-                                    <li><code>attack_multiplier</code> (float) - The multiplier that affects the monster's attack.</li>
-                                    <li><code>defense_multiplier</code> (float) - The multiplier that affects the monster's defense.</li>
-                                    <li><code>exhaust_multiplier</code> (float) - The multiplier that affects how quickly the monster gets exhausted/tired/hungry.</li>
-                                    <li><code>dizzy_multiplier</code> (float) - The multiplier that affects how easy it is to stun the monster.</li>
-                                    <li><code>mount_multiplier</code> (float) - The multiplier that affects how easy to monster is to mount.</li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </li>
-                    <li><code>armor</code> (list/str) - A list of the names of the armor sets associated with this monster.</li>
-                    <li><code>weapons</code> (dict) - A dictionary of the weapons associated with this monster. The amount of keys vary depending on what weapon classes it has.
-                        <ul>
-                            <li><code>(weapon_type)</code> (list/str) - The key corresponds to the weapon class. Contains names of the weapons in that class related to this monster.</li>
-                        </ul>
-                    </li>
-                </ul>
+                <h5>Attributes</h5>
+                {{ monster_docs|safe }}
 
 
                 <h2 class="display-4 doc-heading" id="items">Items</h2>
-                <p class="doc-text oxygen">An Item resource contains information about an obtainable item in Generations.</p>
+                <p class="oxygen">An Item resource contains information about an obtainable item in Generations.</p>
                 <h4>Request Example</h4>
                 <pre><code>http://localhost:5000/api/item/honey</code></pre>
                 <h4>Endpoints</h4>
@@ -344,7 +289,7 @@ Date: Tue, 10 Jul 2018 21:11:23 GMT
                     {{ item_docs|safe }}
 
                     <h2 class="display-4 doc-heading" id="quests">Quests</h2>
-                    <p class="doc-text oxygen">A Quest resource contains information about a quest in Monster Hunter Generations.</p>
+                    <p class="oxygen">A Quest resource contains information about a quest in Monster Hunter Generations.</p>
                     <h4>Request Example</h4>
                     <pre><code>http://localhost:5000/api/quest</code></pre>
                     <h4>Endpoints</h4>

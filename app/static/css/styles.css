@@ -36,8 +36,8 @@ code {
 pre {white-space: pre-line;}
 
 .doc-text {
-    font-size: 17px;
-    line-height: 1;
+    font-size: 15px;
+    line-height: 1.2;
 }
 
 .doc-heading {
