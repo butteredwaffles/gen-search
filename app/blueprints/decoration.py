@@ -27,11 +27,13 @@ def get_individual_decoration(name):
         "slots": db_deco.deco_slot_requirement,
         "positive_skill": {
             "name": db_deco.positive_skill_tree,
-            "skill_points": db_deco.positive_skill_effect
+            "skill_points": db_deco.positive_skill_effect,
+            "url": url_for("skills.get_skill_tree", tree_name=db_deco.positive_skill_tree, _external=True)
         },
         "negative_skill": {
             "name": db_deco.negative_skill_tree,
-            "skill_points": db_deco.negative_skill_effect
+            "skill_points": db_deco.negative_skill_effect,
+            "url": url_for("skills.get_skill_tree", tree_name=db_deco.negative_skill_tree, _external=True)
         }
     }
 

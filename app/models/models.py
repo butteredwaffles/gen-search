@@ -209,6 +209,17 @@ class ArmorScrapReward(BaseModel):
         table_name = "armorscraprewards"
 
 
+class Skill(BaseModel):
+    skill_id = IntegerField(primary_key=True)
+    skill_tree = CharField()
+    skill_name = CharField()
+    skill_value = IntegerField()
+    skill_description = CharField()
+
+    class Meta:
+        table_name = "skills"
+
+
 class Decoration(BaseModel):
     deco_id = IntegerField(primary_key=True)
     deco_name = CharField()
