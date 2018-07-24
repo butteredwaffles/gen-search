@@ -1,0 +1,12 @@
+name (str) - The name of this decoration.
+slots (int) - The amount of armor slots required to use this decoration.
+positive_skill (dict) - The skill that this decoration helps.
+    name (str) - The name of the skill.
+    skill_points (int) - The number of points added onto the skill.
+negative_skill (dict) - The skill that this decoration hurts.
+    name (str) - The name of the skill. <code>"none"</code> if this decoration does not have a negative skill.
+    skill_points (int) - The number of points removed from the skill (represented by negatives). <code>0</code> if this decoration does not have a negative skill.
+combination (list/dict) - The items to craft this decoration.
+    name (str) - The name of the item.
+    quantity (int) - The amount of the item required.
+    url (str) - The API endpoint of the item.

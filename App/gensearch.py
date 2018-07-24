@@ -5,6 +5,7 @@ from flask import Flask, render_template, url_for
 from blueprints.monster import monster_routes
 from blueprints.item import item_routes
 from blueprints.quest import quest_routes
+from blueprints.decoration import deco_routes
 from utility import doc_to_html
 
 app = Flask(__name__)
@@ -12,6 +13,7 @@ app.config['JSON_AS_ASCII'] = False
 app.register_blueprint(monster_routes, url_prefix="/api/monster")
 app.register_blueprint(item_routes, url_prefix="/api/item")
 app.register_blueprint(quest_routes, url_prefix="/api/quest")
+app.register_blueprint(deco_routes, url_prefix="/api/decoration")
 
 DOC_DIRECTORY = "doc_texts/"
 TXT_DOC_DIRECTORY = "doc_texts/txt/"
