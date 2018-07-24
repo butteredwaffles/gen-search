@@ -1,7 +1,8 @@
 import json
 import os
+import peewee
 import requests
-from flask import Flask, render_template, url_for
+from flask import Flask, render_template, url_for, jsonify
 from blueprints.monster import monster_routes
 from blueprints.item import item_routes
 from blueprints.quest import quest_routes
@@ -32,6 +33,11 @@ def index():
 @app.route('/docs')
 def docs():
     return render_template('docs.html', item_docs=get_doc('item'), quest_docs=get_doc('quest'), monster_docs=get_doc('monster'))
+
+
+@app.errorhandler(peewee.DoesNotExist)
+def does_not_exist_error(error):
+    return jsonify({"message": "That is not a valid object to request!"}), 400
 
 
 def get_doc(name):

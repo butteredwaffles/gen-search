@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, url_for
 from models.db_config import db
 from models.models import *
+import peewee
 
 skill_routes = Blueprint('skills', __name__, template_folder="../templates", static_folder="../static")
 
@@ -19,6 +20,10 @@ def get_all_skills():
 def get_skill_tree(tree_name):
     db.connect()
     skills = Skill.select().where(Skill.skill_tree == tree_name)
+    
+    if not skills:
+        raise peewee.DoesNotExist
+
     tree = {
         "skill_tree_name": tree_name,
         "skills": [],
