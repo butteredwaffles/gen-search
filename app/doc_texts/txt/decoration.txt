@@ -8,7 +8,7 @@ negative_skill (dict) - The skill that this decoration hurts.
     name (str) - The name of the skill. <code>"none"</code> if this decoration does not have a negative skill.
     skill_points (int) - The number of points removed from the skill (represented by negatives). <code>0</code> if this decoration does not have a negative skill.
     url (str) - The API endpoint of the skill.
-combination (list/dict) - The items to craft this decoration.
+combination (list/list/dict) - The items to craft this decoration. Each list in <code>combinations</code> is a seperate option for crafting this.
     name (str) - The name of the item.
     quantity (int) - The amount of the item required.
     url (str) - The API endpoint of the item.

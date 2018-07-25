@@ -34,30 +34,32 @@ def get_individual_decoration(name):
             "name": db_deco.negative_skill_tree,
             "skill_points": db_deco.negative_skill_effect,
             "url": url_for("skills.get_skill_tree", tree_name=db_deco.negative_skill_tree, _external=True)
-        }
+        },
+        "combinations": []
     }
 
-    combo = DecorationCombination.get(DecorationCombination.deco_id == db_deco.deco_id)
-    item_1 = Item.get_by_id(combo.item_1_id).item_name
-    item_2 = Item.get_by_id(combo.item_2_id).item_name
-    deco["combination"] = [
-        {
-            "name": item_1,
-            "quantity": combo.item_1_quantity,
-            "url": url_for('items.get_individual_item', name=item_1, _external=True)
-        },
-        {
-            "name": item_2,
-            "quantity": combo.item_2_quantity,
-            "url": url_for('items.get_individual_item', name=item_2, _external=True)
-        }
-    ]
-    if combo.item_3_id != -1:
-        item_3 = Item.get_by_id(combo.item_3_id).item_name
-        deco["combination"].append({
-            "name": item_3,
-            "quantity": combo.item_3_quantity,
-            "url": url_for('items.get_individual_item', name=item_3, _external=True)
-        })
+    for combo in DecorationCombination.select().where(DecorationCombination.deco_id == db_deco.deco_id):
+        item_1 = Item.get_by_id(combo.item_1_id).item_name
+        item_2 = Item.get_by_id(combo.item_2_id).item_name
+        combination = [
+            {
+                "name": item_1,
+                "quantity": combo.item_1_quantity,
+                "url": url_for('items.get_individual_item', name=item_1, _external=True)
+            },
+            {
+                "name": item_2,
+                "quantity": combo.item_2_quantity,
+                "url": url_for('items.get_individual_item', name=item_2, _external=True)
+            }
+        ]
+        if combo.item_3_id != -1:
+            item_3 = Item.get_by_id(combo.item_3_id).item_name
+            combination.append({
+                "name": item_3,
+                "quantity": combo.item_3_quantity,
+                "url": url_for('items.get_individual_item', name=item_3, _external=True)
+            })
+        deco["combinations"].append(combination)
     db.close()
     return jsonify(deco)

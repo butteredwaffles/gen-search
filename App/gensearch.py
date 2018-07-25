@@ -32,8 +32,8 @@ def index():
 
 @app.route('/docs')
 def docs():
-    return render_template('docs.html', 
-        item_docs=get_doc('item'), quest_docs=get_doc('quest'), 
+    return render_template('docs.html',
+        item_docs=get_doc('item'), quest_docs=get_doc('quest'),
         monster_docs=get_doc('monster'), skill_tree_docs=get_doc('skill_tree'),
         skill_indiv_docs=get_doc('skill_indiv'), deco_docs=get_doc('decoration'))
 
