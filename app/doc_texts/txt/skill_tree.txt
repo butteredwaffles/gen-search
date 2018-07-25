@@ -1,0 +1,11 @@
+skill_tree_name (str) - The name of the skill tree.
+skills (list/dict) - The individual skills under the tree.
+    name (str) - The name of the skill.
+    points (int) - The amount of points required to activate the skill.
+    description (str) - The in-game description of the skill.
+decorations (dict) - The decorations that affect this skill.
+    harmful (list/dict) - The decorations that decrease the skill points.
+        name (str) - The name of the decoration.
+        points (int) - The points added onto the skill. A negative integer if harmful.
+    helpful (list/dict) - The decorations that increase the skill points. Has the same attributes as <code>harmful</code>.
+PLACE HOLDER

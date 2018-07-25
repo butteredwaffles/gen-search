@@ -1,0 +1,14 @@
+<ul>
+    <li><code>name</code> (str) - The name of the skill.
+    <li><code>points</code> (int) - The amount of points required to activate the skill.
+    <li><code>description</code> (str) - The in-game description of the skill.
+    <li><code>decorations</code> (dict) - The decorations that affect this skill.
+        <ul>
+            <li><code>harmful</code> (list/dict) - The decorations that decrease the skill points.
+            <ul>
+                <li><code>name</code> (str) - The name of the decoration.
+                <li><code>points</code> (int) - The points added onto the skill. A negative integer if harmful.
+            </ul>
+            <li><code>helpful</code> (list/dict) - The decorations that increase the skill points. Has the same attributes as <code>harmful</code>.
+        </ul>
+</ul>

@@ -20,7 +20,7 @@ def get_all_skills():
 def get_skill_tree(tree_name):
     db.connect()
     skills = Skill.select().where(Skill.skill_tree == tree_name)
-    
+
     if not skills:
         raise peewee.DoesNotExist
 

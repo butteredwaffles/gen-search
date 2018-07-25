@@ -22,6 +22,8 @@
                     <a class="lead" href="#monsters">Monsters</a>
                     <a class="lead" href="#items">Items</a>
                     <a class="lead" href="#quests">Quests</a>
+                    <a class="lead" href="#skills">Skills</a>
+                    <a class="lead" href="#decorations">Decorations</a>
                 </div>
                 <div class="rounded col-xl-8 text-left bg-light mt-3 doc-text" id="doc-wrapper">
                     <h2 class="display-4 doc-heading" id="getting_started">Getting Started</h2>
@@ -422,6 +424,158 @@ Date: Tue, 10 Jul 2018 21:11:23 GMT
   }</code></pre>
                     <h5>Attributes</h5>
                     {{ quest_docs|safe }}
+
+
+                    <h2 class="display-4 doc-heading" id="skills">Skills</h2>
+                    <p class="oxygen">A Skill resource contains information about an armor skill in MHGen.</p>
+                    <h4>Request Example</h4>
+                    <pre><code>http://localhost:5000/api/skill/Paralysis</code></pre>
+                    <h4>Endpoints</h4>
+                    <ul>
+                        <li><code>/skill/</code> -- Retrieves all skill trees in the game.</li>
+                        <li><code>/skill/:tree_name/</code> -- Retrieves a single skill tree.</li>
+                        <li><code>/skill/:tree_name/:skill_name/</code> -- Retrieves a single skill.</li>
+                    </ul>
+                    <h5>Response Example for <code>/skill/</code></h5>
+<pre class="pre-scrollable bg-dark"><code>{
+    "skills": [
+        "http://localhost:5000/api/skill/Poison", 
+        "http://localhost:5000/api/skill/Paralysis", 
+        "http://localhost:5000/api/skill/Sleep", 
+        "http://localhost:5000/api/skill/Stun", 
+        .....
+    ]
+}</code></pre>
+                    <h5>Attributes</h5>
+                    <ul>
+                        <li><code>skills</code> (list/str) - A list of skill endpoints.</li>
+                    </ul>
+                    <h5>Response Example for <code>/skill/:tree_name/</code></h5>
+<pre class="pre-scrollable bg-dark"><code>{
+    "decorations": {
+      "harmful": [], 
+      "helpful": [
+        {
+          "name": "Earplug Jwl 1", 
+          "points": 1
+        }, 
+        {
+          "name": "Earplug Jwl 3", 
+          "points": 4
+        }
+      ]
+    }, 
+    "skill_tree_name": "Hearing", 
+    "skills": [
+      {
+        "description": "Negates the effects of all large monsters' roars.", 
+        "name": "HG Earplugs", 
+        "points": 15
+      }, 
+      {
+        "description": "Negates the effects of some large monsters' roars.", 
+        "name": "Earplugs", 
+        "points": 10
+      }
+    ]
+}}</code></pre>
+                    <h5>Attributes</h5>
+                    {{ skill_tree_docs|safe }}
+                    
+                    <h5>Response Example for <code>/skill/:tree_name/:name/</code></h5>
+<pre class="pre-scrollable bg-dark"><code>{
+    "decorations": {
+      "harmful": [], 
+      "helpful": [
+        {
+          "name": "Earplug Jwl 1", 
+          "points": 1
+        }, 
+        {
+          "name": "Earplug Jwl 3", 
+          "points": 4
+        }
+      ]
+    }, 
+    "description": "Negates the effects of all large monsters' roars.", 
+    "name": "HG Earplugs", 
+    "points": 15
+  }}</code></pre>
+                    <h5>Attributes</h5>
+                    {{ skill_indiv_docs|safe }}
+
+
+                    <h2 class="display-4 doc-heading" id="decorations">Decorations</h2>
+                    <p class="oxygen">A Decoration resource contains information about a decoration in MHGen.</p>
+                    <h4>Request Example</h4>
+                    <pre><code>http://localhost:5000/api/decoration/</code></pre>
+                    <h4>Endpoints</h4>
+                    <ul>
+                        <li><code>/decoration/</code> -- Retrieves all decorations in the game.</li>
+                        <li><code>/decoration/:name/</code> -- Retrieves a single decoration.</li>
+                    </ul>
+                    <h5>Response Example for <code>/decoration/</code></h5>
+<pre class="pre-scrollable bg-dark"><code>{
+    "decorations": [
+      {
+        "name": "Antidote Jwl 1", 
+        "url": "http://localhost:5000/api/decoration/Antidote%20Jwl%201"
+      }, 
+      {
+        "name": "Antidote Jwl 2", 
+        "url": "http://localhost:5000/api/decoration/Antidote%20Jwl%202"
+      }, 
+      {
+        "name": "Paralysis Jwl 1", 
+        "url": "http://localhost:5000/api/decoration/Paralysis%20Jwl%201"
+      }, 
+      ...
+    ]
+}</code></pre>
+                    <h5>Attributes</h5>
+                    <ul>
+                        <li><code>decorations</code> (list/dict) - A list of all decorations.
+                            <ul>
+                                <li><code>name</code> (str) - The name of the decoration.</li>
+                                <li><code>url</code> (str) - The API endpoint of the decoration.</li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <h5>Response Example for <code>/decoration/:name/</code></h5>
+<pre class="pre-scrollable bg-dark"><code>{
+    "combination": [
+      {
+        "name": "Lazurite Jewel", 
+        "quantity": 1, 
+        "url": "http://localhost:5000/api/item/Lazurite%20Jewel"
+      }, 
+      {
+        "name": "Pearl Hide", 
+        "quantity": 1, 
+        "url": "http://localhost:5000/api/item/Pearl%20Hide"
+      }, 
+      {
+        "name": "Chameleos Spike", 
+        "quantity": 2, 
+        "url": "http://localhost:5000/api/item/Chameleos%20Spike"
+      }
+    ], 
+    "name": "Earplug Jwl 3", 
+    "negative_skill": {
+      "name": "Protection", 
+      "skill_points": -2, 
+      "url": "http://localhost:5000/api/skill/Protection"
+    }, 
+    "positive_skill": {
+      "name": "Hearing", 
+      "skill_points": 4, 
+      "url": "http://localhost:5000/api/skill/Hearing"
+    }, 
+    "slots": 3
+}</code></pre>
+                    <h5>Attributes</h5>
+                    {{ deco_docs|safe }}
                 </div>
             </div>
         </div>
