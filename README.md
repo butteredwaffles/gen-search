@@ -18,7 +18,7 @@ If you made edits, use `dotnet test` to run the test cases.
 
 The program creates an SQLite database with the information. However, the web app uses a MySQL database. Therefore, if you are planning on running the service yourself, you will have to create a dump of the SQLite one.
 
-Change the current directory to `app/Utility` and run `sqlite3-translator.py` in order to convert the SQLite database dump (which you can get using a program such as SQLiteStudio) to a MySQL compatible file. Python3 is required, as is the `progressbar2` library.
+Change the current directory to `app/utility` and run `sqlite3-translator.py` in order to convert the SQLite database dump (which you can get using a program such as SQLiteStudio) to a MySQL compatible file. Python3 is required, as is the `progressbar2` library.
 
 `python3 sqlite3-translator.py <path-to-sqlite-dump>`
 
@@ -28,9 +28,9 @@ Change the current directory to the `app` folder, and put the relevant MySQL inf
 
 ## Running the web server
 
-If you haven't already, `cd` into the `app` directory. To run the server, the `flask`, `peewee`, and `requests` library must be installed. You must also be running Python3.
+If you haven't already, `cd` into the `app` directory. To run the server, the `flask`, `peewee`, and `requests` library must be installed. You must also be running Python3.6 at the minimum.
 
-Run `python3 gensearch.py` and navigate to `localhost:5000` in your web browser. Now you're set!
+Run `python gensearch.py` and navigate to `localhost:5000` in your web browser. Now you're set!
 
 The website contains documentation and such already, so feel free to look in there for usage!
 
