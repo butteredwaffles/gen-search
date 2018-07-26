@@ -8,6 +8,7 @@ from blueprints.item import item_routes
 from blueprints.quest import quest_routes
 from blueprints.decoration import deco_routes
 from blueprints.skill import skill_routes
+from blueprints.ha import ha_routes
 from utility import doc_to_html
 
 app = Flask(__name__)
@@ -17,6 +18,7 @@ app.register_blueprint(item_routes, url_prefix="/api/item")
 app.register_blueprint(quest_routes, url_prefix="/api/quest")
 app.register_blueprint(deco_routes, url_prefix="/api/decoration")
 app.register_blueprint(skill_routes, url_prefix="/api/skill")
+app.register_blueprint(ha_routes, url_prefix="/api/hunterarts")
 
 DOC_DIRECTORY = "doc_texts/"
 TXT_DOC_DIRECTORY = "doc_texts/txt/"

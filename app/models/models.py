@@ -209,6 +209,25 @@ class ArmorScrapReward(BaseModel):
         table_name = "armorscraprewards"
 
 
+class HunterArt(BaseModel):
+    art_id = IntegerField(primary_key=True)
+    art_name = CharField()
+    art_gauge = IntegerField()
+    art_description = CharField()
+
+    class Meta:
+        table_name = "hunterarts"
+
+
+class HunterArtUnlock(BaseModel):
+    unlock_id = IntegerField(primary_key=True)
+    art_id = IntegerField()
+    quest_id = IntegerField()
+
+    class Meta:
+        table_name = "hunterartunlocks"
+
+
 class Skill(BaseModel):
     skill_id = IntegerField(primary_key=True)
     skill_tree = CharField()
