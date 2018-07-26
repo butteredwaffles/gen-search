@@ -34,17 +34,6 @@ class CraftItem(BaseModel):
         table_name = "craftitems"
 
 
-class PalicoCraftItem(BaseModel):
-    pc_id = IntegerField(primary_key=True)
-    palico_item = CharField()
-    item_id = IntegerField()
-    quantity = IntegerField()
-    type = CharField()
-
-    class Meta:
-        table_name = "palicocraftitems"
-
-
 class Monster(BaseModel):
     id = IntegerField()
     base_hp = IntegerField()
@@ -325,3 +314,37 @@ class Bowgun(BaseModel):
 
     class Meta:
         table_name = "bowguns"
+
+
+class PalicoWeapon(BaseModel):
+    pw_id = IntegerField(primary_key=True)
+    pw_name = CharField()
+    pw_description = CharField()
+    pw_rarity = IntegerField()
+    pw_price = IntegerField()
+    pw_type = CharField()
+    pw_damage = IntegerField()
+    pw_damage_type = CharField()
+    pw_affinity = IntegerField()
+    pw_element = CharField()
+    pw_element_amt = IntegerField()
+    pw_sharpness = CharField()
+    pw_boomerang_damage = IntegerField()
+    pw_boomerang_affinity = IntegerField()
+    pw_boomerang_element = CharField()
+    pw_boomerang_element_amt = IntegerField()
+    pw_defense = IntegerField()
+
+    class Meta:
+        table_name = "palicoweapons"
+
+
+class PalicoCraftItem(BaseModel):
+    pc_id = IntegerField(primary_key=True)
+    palico_item = CharField()
+    item_id = IntegerField()
+    quantity = IntegerField()
+    type = CharField()
+
+    class Meta:
+        table_name = "palicocraftitems"
