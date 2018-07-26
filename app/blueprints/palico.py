@@ -24,8 +24,6 @@ def get_individual_palico_info(category, name):
     db.connect()
     if category == "weapons":
         dbwep = PalicoWeapon.get(PalicoWeapon.pw_name == name)
-        craftitems = PalicoCraftItem.select() \
-            .where(PalicoCraftItem.type == "weapon" and PalicoCraftItem.palico_item == dbwep.pw_name)
         weapon = {
             "name": dbwep.pw_name,
             "description": dbwep.pw_description,
@@ -43,16 +41,22 @@ def get_individual_palico_info(category, name):
             "boomerang_element": dbwep.pw_boomerang_element.title(),
             "boomerang_element_damage": dbwep.pw_boomerang_element_amt,
             "defense": dbwep.pw_defense,
-            "crafting_materials": []
+            "crafting_materials": get_crafting_list("weapon", dbwep.pw_name)
         }
-
-        for craftitem in craftitems:
-            item = Item.get_by_id(craftitem.item_id)
-            weapon["crafting_materials"].append({
-                'name': item.item_name,
-                'url': url_for("items.get_individual_item", name=item.item_name, _external=True),
-                'quantity': craftitem.quantity
-            })
 
         return jsonify(weapon)
     return {"message": "That is not a valid palico item!"}
+
+
+def get_crafting_list(item_type, name):
+    materials = []
+    craftitems = PalicoCraftItem.select() \
+        .where(PalicoCraftItem.type == item_type and PalicoCraftItem.palico_item == name)
+    for craftitem in craftitems:
+        item = Item.get_by_id(craftitem.item_id)
+        materials.append({
+            'name': item.item_name,
+            'url': url_for("items.get_individual_item", name=item.item_name, _external=True),
+            'quantity': craftitem.quantity
+        })
+    return materials
