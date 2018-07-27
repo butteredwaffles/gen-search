@@ -31,6 +31,7 @@ def get_all_palico_category_info(category):
             })
         db.close()
         return jsonify(skills)
+
     db.close()
     return jsonify({"message": "Invalid category!"})
 

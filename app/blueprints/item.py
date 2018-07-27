@@ -53,7 +53,7 @@ def get_individual_item(name):
     for craft in weapon_crafts:
         weapon_name = ""
         if craft.creation_type == "Blademaster":
-            weapon_name = BlademasterWeapon.get(BlademasterWeapon.sword_id == craft.creation_id).sword_name
+            weapon_name = SwordValue.get(SwordValue.sword_id == craft.creation_id).sword_name
         elif craft.creation_type == "Bowgun":
             weapon_name = Bowgun.get(Bowgun.bg_id == craft.creation_id).bg_name
         else:

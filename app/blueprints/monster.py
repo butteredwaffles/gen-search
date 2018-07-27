@@ -89,7 +89,7 @@ def get_individual_monster(name):
         })
 
     weapons = {
-        "blademaster": BlademasterWeapon.select().where(mon.id == BlademasterWeapon.monster_id),
+        "blademaster": SwordValue.select().where(mon.id == SwordValue.monster_id),
         "bow": Bow.select().where(mon.id == Bow.monster_id),
         "bowgun": Bowgun.select().where(mon.id == Bowgun.monster_id)
     }

@@ -202,7 +202,7 @@ class DecorationCombination(BaseModel):
     item_3_quantity = IntegerField()
 
 
-class BlademasterWeapon(BaseModel):
+class SwordValue(BaseModel):
     sword_id = IntegerField(primary_key=True)
     sword_class = CharField()
     sword_name = CharField()
