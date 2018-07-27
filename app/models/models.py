@@ -5,6 +5,7 @@ from . import db_config
 class BaseModel(Model):
     class Meta:
         database = db_config.db
+        table_function = lambda cls: cls.__qualname__.split('.')[0].lower() + "s"
 
 
 class Item(BaseModel):
@@ -30,9 +31,6 @@ class CraftItem(BaseModel):
     is_scrap = CharField()
     usage = CharField()
 
-    class Meta:
-        table_name = "craftitems"
-
 
 class Monster(BaseModel):
     id = IntegerField()
@@ -43,9 +41,6 @@ class Monster(BaseModel):
     silver_size = FloatField()
     small_size = FloatField()
 
-    class Meta:
-        table_name = "monsters"
-
 
 class MonsterPart(BaseModel):
     id = IntegerField()
@@ -53,9 +48,6 @@ class MonsterPart(BaseModel):
     stagger_value = IntegerField()
     extract_color = CharField()
     monsterid = IntegerField()
-
-    class Meta:
-        table_name = "monsterparts"
 
 
 class MonsterDrop(BaseModel):
@@ -66,9 +58,6 @@ class MonsterDrop(BaseModel):
     rank = CharField()
     drop_chance = IntegerField()
     quantity = IntegerField()
-
-    class Meta:
-        table_name = "monsterdrops"
 
 
 class Quest(BaseModel):
@@ -84,9 +73,6 @@ class Quest(BaseModel):
     goalid = IntegerField()
     subgoalid = IntegerField()
 
-    class Meta:
-        table_name = "quests"
-
 
 class QuestGoal(BaseModel):
     id = IntegerField()
@@ -94,9 +80,6 @@ class QuestGoal(BaseModel):
     hrp_reward = IntegerField()
     wycadpts_reward = IntegerField()
     goal_description = CharField()
-
-    class Meta:
-        table_name = "questgoals"
 
 
 class QuestMonster(BaseModel):
@@ -113,9 +96,6 @@ class QuestMonster(BaseModel):
     diz_multiplier = FloatField()
     mnt_multiplier = FloatField()
 
-    class Meta:
-        table_name = "questmonsters"
-
 
 class QuestBoxItem(BaseModel):
     id = IntegerField()
@@ -125,18 +105,12 @@ class QuestBoxItem(BaseModel):
     quantity = IntegerField()
     appear_chance = IntegerField()
 
-    class Meta:
-        table_name = "questboxitems"
-
 
 class QuestUnlock(BaseModel):
     id = IntegerField()
     unlock_type = CharField()
     questid = IntegerField()
     quest_name = CharField()
-
-    class Meta:
-        table_name = "questunlocks"
 
 
 class Armor(BaseModel):
@@ -160,9 +134,6 @@ class Armor(BaseModel):
     is_male = IntegerField()
     is_female = IntegerField()
 
-    class Meta:
-        table_name = "armors"
-
 
 class ArmorCraftItem(BaseModel):
     aci_id = IntegerField(primary_key=True)
@@ -171,9 +142,6 @@ class ArmorCraftItem(BaseModel):
     quantity = IntegerField()
     unlocks_armor = IntegerField()
 
-    class Meta:
-        table_name = "armorcraftitems"
-
 
 class ArmorUpgradeItem(BaseModel):
     aui_id = IntegerField(primary_key=True)
@@ -181,9 +149,6 @@ class ArmorUpgradeItem(BaseModel):
     upgrade_level = IntegerField()
     item_name = CharField()
     quantity = IntegerField()
-
-    class Meta:
-        table_name = "armorupgradeitems"
 
 
 class ArmorScrapReward(BaseModel):
@@ -194,9 +159,6 @@ class ArmorScrapReward(BaseModel):
     type = CharField()
     level = IntegerField()
 
-    class Meta:
-        table_name = "armorscraprewards"
-
 
 class HunterArt(BaseModel):
     art_id = IntegerField(primary_key=True)
@@ -204,17 +166,11 @@ class HunterArt(BaseModel):
     art_gauge = IntegerField()
     art_description = CharField()
 
-    class Meta:
-        table_name = "hunterarts"
-
 
 class HunterArtUnlock(BaseModel):
     unlock_id = IntegerField(primary_key=True)
     art_id = IntegerField()
     quest_id = IntegerField()
-
-    class Meta:
-        table_name = "hunterartunlocks"
 
 
 class Skill(BaseModel):
@@ -223,9 +179,6 @@ class Skill(BaseModel):
     skill_name = CharField()
     skill_value = IntegerField()
     skill_description = CharField()
-
-    class Meta:
-        table_name = "skills"
 
 
 class Decoration(BaseModel):
@@ -237,9 +190,6 @@ class Decoration(BaseModel):
     negative_skill_tree = CharField()
     negative_skill_effect = IntegerField()
 
-    class Meta:
-        table_name = "decorations"
-
 
 class DecorationCombination(BaseModel):
     deco_comb_id = IntegerField(primary_key=True)
@@ -250,9 +200,6 @@ class DecorationCombination(BaseModel):
     item_2_quantity = IntegerField()
     item_3_id = IntegerField()
     item_3_quantity = IntegerField()
-
-    class Meta:
-        table_name = "decorationcombinations"
 
 
 class BlademasterWeapon(BaseModel):
@@ -272,9 +219,6 @@ class BlademasterWeapon(BaseModel):
     upgrades_into = CharField()
     price = IntegerField()
 
-    class Meta:
-        table_name = "swordvalues"
-
 
 class Bow(BaseModel):
     bow_id = IntegerField(primary_key=True)
@@ -293,9 +237,6 @@ class Bow(BaseModel):
     rarity = IntegerField()
     description = CharField()
 
-    class Meta:
-        table_name = "bows"
-
 
 class Bowgun(BaseModel):
     bg_id = IntegerField(primary_key=True)
@@ -311,9 +252,6 @@ class Bowgun(BaseModel):
     slots = IntegerField()
     rarity = IntegerField()
     description = CharField()
-
-    class Meta:
-        table_name = "bowguns"
 
 
 class PalicoWeapon(BaseModel):
@@ -335,8 +273,22 @@ class PalicoWeapon(BaseModel):
     pw_boomerang_element_amt = IntegerField()
     pw_defense = IntegerField()
 
+
+class PalicoArmor(BaseModel):
+    pa_id = IntegerField(primary_key=True)
+    pa_name = CharField()
+    pa_description = CharField()
+    pa_rarity = IntegerField()
+    pa_price = IntegerField()
+    pa_defense = IntegerField()
+    pa_fire = IntegerField()
+    pa_water = IntegerField()
+    pa_thunder = IntegerField()
+    pa_ice = IntegerField()
+    pa_dragon = IntegerField()
+
     class Meta:
-        table_name = "palicoweapons"
+        table_name = "palicoarmor"
 
 
 class PalicoCraftItem(BaseModel):
@@ -346,5 +298,11 @@ class PalicoCraftItem(BaseModel):
     quantity = IntegerField()
     type = CharField()
 
-    class Meta:
-        table_name = "palicocraftitems"
+
+class PalicoSkill(BaseModel):
+    ps_id = IntegerField(primary_key=True)
+    ps_name = CharField()
+    ps_type = CharField()
+    ps_description = CharField()
+    ps_memory_req = IntegerField()
+    ps_learn_level = IntegerField()
