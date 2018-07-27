@@ -76,7 +76,7 @@ def get_weapon(category, setname):
                 }
 
             if wep.sword_class == "Hunting Horn":
-                weapon["notes"] = HuntingHorn.get(HuntingHorn.sword_id == wep.sword_id)
+                weapon["notes"] = HuntingHorn.get(HuntingHorn.sword_id == wep.sword_id).notes
             
             if wep.sword_class in ["Charge Blade", "Switch Axe", "Gunlance"]:
                 weapon["phial_shell"] = PhialAndShellWeapon.get(PhialAndShellWeapon.sword_id == wep.sword_id).phial_or_shell_type
