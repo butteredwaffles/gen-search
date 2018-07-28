@@ -44,9 +44,9 @@ def docs():
         skill_indiv_docs=get_doc('skill_indiv'), deco_docs=get_doc('decoration'))
 
 
-# @app.errorhandler(peewee.DoesNotExist)
-# def does_not_exist_error(error):
-#     return jsonify({"message": "That is not a valid object to request!"}), 400
+@app.errorhandler(peewee.DoesNotExist)
+def does_not_exist_error(error):
+    return jsonify({"message": "That is not a valid object to request!"}), 400
 
 
 def get_doc(name):
