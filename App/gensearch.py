@@ -2,6 +2,7 @@ import json
 import os
 import peewee
 import requests
+from utility import doc_to_html
 from flask import Flask, render_template, url_for, jsonify
 from blueprints.monster import monster_routes
 from blueprints.item import item_routes
@@ -10,7 +11,7 @@ from blueprints.decoration import deco_routes
 from blueprints.skill import skill_routes
 from blueprints.ha import ha_routes
 from blueprints.palico import palico_routes
-from utility import doc_to_html
+from blueprints.weapons import weapon_routes
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
@@ -19,8 +20,9 @@ app.register_blueprint(item_routes, url_prefix="/api/item")
 app.register_blueprint(quest_routes, url_prefix="/api/quest")
 app.register_blueprint(deco_routes, url_prefix="/api/decoration")
 app.register_blueprint(skill_routes, url_prefix="/api/skill")
-app.register_blueprint(ha_routes, url_prefix="/api/hunterarts")
+app.register_blueprint(ha_routes, url_prefix="/api/hunterart")
 app.register_blueprint(palico_routes, url_prefix="/api/palico")
+app.register_blueprint(weapon_routes, url_prefix="/api/weapon")
 
 DOC_DIRECTORY = "doc_texts/"
 TXT_DOC_DIRECTORY = "doc_texts/txt/"
@@ -42,9 +44,9 @@ def docs():
         skill_indiv_docs=get_doc('skill_indiv'), deco_docs=get_doc('decoration'))
 
 
-@app.errorhandler(peewee.DoesNotExist)
-def does_not_exist_error(error):
-    return jsonify({"message": "That is not a valid object to request!"}), 400
+# @app.errorhandler(peewee.DoesNotExist)
+# def does_not_exist_error(error):
+#     return jsonify({"message": "That is not a valid object to request!"}), 400
 
 
 def get_doc(name):

@@ -202,6 +202,13 @@ class DecorationCombination(BaseModel):
     item_3_quantity = IntegerField()
 
 
+class ElementDamage(BaseModel):
+    elem_id = IntegerField(primary_key=True)
+    weapon_id = IntegerField()
+    elem_type = CharField()
+    elem_amount = IntegerField()
+
+
 class SwordValue(BaseModel):
     sword_id = IntegerField(primary_key=True)
     sword_class = CharField()
@@ -218,6 +225,29 @@ class SwordValue(BaseModel):
     description = CharField()
     upgrades_into = CharField()
     price = IntegerField()
+
+
+class SharpnessValue(BaseModel):
+    sharp_id = IntegerField(primary_key=True)
+    handicraft_modifier = IntegerField()
+    red_sharpness_length = IntegerField()
+    orange_sharpness_length = IntegerField()
+    yellow_sharpness_length = IntegerField()
+    green_sharpness_length = IntegerField()
+    blue_sharpness_length = IntegerField()
+    white_sharpness_length = IntegerField()
+
+
+class HuntingHorn(BaseModel):
+    hh_id = IntegerField(primary_key=True)
+    sword_id = IntegerField()
+    notes = CharField()
+
+
+class PhialAndShellWeapon(BaseModel):
+    pw_id = IntegerField(primary_key=True)
+    sword_id = IntegerField()
+    phial_or_shell_type = CharField()
 
 
 class Bow(BaseModel):
