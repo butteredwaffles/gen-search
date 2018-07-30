@@ -81,6 +81,15 @@ def get_all_weapons_by_category(category):
                     "set": weapon.bow_set_name,
                     "url": url_for(".get_weapon", _external=True, category=category, setname=weapon.bow_set_name)
                 })
+    elif category == "bowgun":
+        for weapon in Bowgun.select():
+            if weapon.bg_set_name not in found_sets:
+                found_sets.append(weapon.bg_set_name)
+                weapons["weapons"].append({
+                    "set": weapon.bg_set_name,
+                    "type": weapon.bg_type,
+                    "url": url_for(".get_weapon", _external=True, category=category, setname=weapon.bg_set_name)
+                })
     db.close()
     return jsonify(weapons)
 
@@ -110,7 +119,7 @@ def get_weapon(category, setname):
                 "sharpness": {},
                 "crafting_materials": [],
                 "scraps": [],
-                "defense": 0
+                "defense": 0,
             }
 
             elements = ElementDamage.select().where(ElementDamage.weapon_id == wep.sword_id)
@@ -163,7 +172,8 @@ def get_weapon(category, setname):
                 "rarity": db_bow.rarity,
                 "description": db_bow.description,
                 "elements": [],
-                "defense": 0
+                "defense": 0,
+                "monster": "none"
             }
             bow["crafting_materials"], bow["scraps"] = get_crafting_items("Bow", db_bow.bow_id)
 
@@ -182,6 +192,67 @@ def get_weapon(category, setname):
                         })
 
             weapons["weapons"].append(bow)
+    elif category == "bowgun":
+        for db_gun in Bowgun.select().where(Bowgun.bg_set_name == setname):
+            gun = {
+                "name": db_gun.bg_name,
+                "type": db_gun.bg_type,
+                "damage": db_gun.bg_damage,
+                "affinity": db_gun.affinity,
+                "reload_speed": db_gun.reload_speed,
+                "recoil": db_gun.recoil,
+                "deviation": db_gun.deviation,
+                "slots": db_gun.slots,
+                "rarity": db_gun.rarity,
+                "description": db_gun.description,
+                "shots": {
+                    "regular": [],
+                    "internal": [],
+                    "special_fire": []
+                },
+                "defense": 0
+            }
+
+            if db_gun.monster_id != -1:
+                gun["monster"] = Monster.get_by_id(db_gun.monster_id).mon_name
+            gun["crafting_materials"], gun["scraps"] = get_crafting_items("Bowgun", db_gun.bg_id)
+            defense = ElementDamage.select().where(ElementDamage.weapon_id == db_gun.bg_id).limit(1)
+            if len(defense) > 0:
+                # Bowguns do not have traditional elements, but they do have defense
+                gun["defense"] = defense[0].elem_amount
+
+            ammo = BowgunAmmo.get(BowgunAmmo.bowgun_id == db_gun.bg_id)
+            for shot, amount in ammo.__dict__["__data__"].items():
+                if shot == "ammo_id" or shot == "bowgun_id":
+                    continue
+                gun["shots"]["regular"].append(
+                    {
+                        "ammo_name": shot,
+                        "amount": int(amount[0]),
+                        "skill_required": True if "skill" in amount else False
+                    }
+                )
+
+            for shot in SpecialBowgunAmmo.select().where(SpecialBowgunAmmo.bowgun_id == db_gun.bg_id):
+                sp_shot = {
+                    "ammo_name": shot.ammo_name,
+                    "shots": shot.shots,
+                }
+                if shot.ammo_type == "Rapid Fire":
+                    # Converting the multiplier to a value between 0 and 1
+                    sp_shot["multiplier"] = float(shot.multiplier / 100)
+                    sp_shot["wait"] = shot.wait
+
+                gun["shots"]["special_fire"].append(sp_shot)
+
+            for internal_ammo in InternalBowgunAmmo.select().where(InternalBowgunAmmo.bowgun_id == db_gun.bg_id):
+                gun["shots"]["internal"].append({
+                    "ammo_name": internal_ammo.ammo_name,
+                    "total_amount": internal_ammo.total_ammo,
+                    "load_amount": internal_ammo.load_amt
+                })
+
+            weapons["weapons"].append(gun)
     db.close()
     return jsonify(weapons)
 

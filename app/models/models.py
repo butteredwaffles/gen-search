@@ -284,6 +284,68 @@ class Bowgun(BaseModel):
     description = CharField()
 
 
+class BowgunAmmo(BaseModel):
+    ammo_id = IntegerField(primary_key=True)
+    bowgun_id = IntegerField()
+    normal_1 = CharField()
+    normal_2 = CharField()
+    normal_3 = CharField()
+    recover_1 = CharField()
+    recover_2 = CharField()
+    fire = CharField()
+    pierce_1 = CharField()
+    pierce_2 = CharField()
+    pierce_3 = CharField()
+    poison_1 = CharField()
+    poison_2 = CharField()
+    water = CharField()
+    pellet_1 = CharField()
+    pellet_2 = CharField()
+    pellet_3 = CharField()
+    paralysis_1 = CharField()
+    paralysis_2 = CharField()
+    thunder = CharField()
+    crag_1 = CharField()
+    crag_2 = CharField()
+    crag_3 = CharField()
+    sleep_1 = CharField()
+    sleep_2 = CharField()
+    ice = CharField()
+    clust_1 = CharField()
+    clust_2 = CharField()
+    clust_3 = CharField()
+    exhaust_1 = CharField()
+    exhaust_2 = CharField()
+    dragon = CharField()
+
+    class Meta:
+        table_name = "bowgunammo"
+
+
+class InternalBowgunAmmo(BaseModel):
+    int_bg_id = IntegerField(primary_key=True)
+    bowgun_id = IntegerField()
+    ammo_name = CharField()
+    total_ammo = IntegerField()
+    load_amt = IntegerField()
+
+    class Meta:
+        table_name = "internalbowgunammo"
+
+
+class SpecialBowgunAmmo(BaseModel):
+    sp_bg_id = IntegerField(primary_key=True)
+    bowgun_id = IntegerField()
+    ammo_type = CharField()
+    ammo_name = CharField()
+    shots = IntegerField()
+    multiplier = IntegerField()
+    wait = CharField()
+
+    class Meta:
+        table_name = "specialbowgunammo"
+
+
 class PalicoWeapon(BaseModel):
     pw_id = IntegerField(primary_key=True)
     pw_name = CharField()
